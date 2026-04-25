@@ -1,0 +1,620 @@
+/* ═══════════════════════════════════════════════════════════
+   TerrenoSur - Dark Theme (Admin & Vendedor)
+   ═══════════════════════════════════════════════════════════ */
+
+/* Global Colors & Base Variables Overrides */
+:root {
+    --gold: #d4af37;
+    --gold-light: #f3d566;
+    --gold-dark: #b89626;
+    --gold-glow: rgba(212, 175, 55, 0.3);
+    --gold-100: rgba(212, 175, 55, 0.15);
+
+    --dark-surface: rgba(20, 20, 25, 0.7);
+    --dark-border: rgba(255, 255, 255, 0.08);
+    --text-primary-dark: #f8fafc;
+    --text-secondary-dark: #cbd5e1;
+    --text-muted-dark: #94a3b8;
+}
+
+/* Tema Administrador (Negro/Azul Profundo + Dorado) */
+body.theme-admin {
+    --primary: var(--gold);
+    --primary-dark: var(--gold-dark);
+    --primary-light: var(--gold-light);
+    --primary-50: rgba(212, 175, 55, 0.08);
+    --primary-100: rgba(212, 175, 55, 0.15);
+    --primary-200: rgba(212, 175, 55, 0.25);
+
+    --accent: var(--gold);
+    --accent-light: var(--gold-light);
+    --accent-dark: var(--gold-dark);
+
+    --bg-dark: #050818;
+    --bg-darker: #000000;
+    --bg-light: #0a0f2c;
+    --bg-lighter: #0d143a;
+
+    --body-bg: linear-gradient(135deg, #000000 0%, #0a0f2c 100%);
+
+    --text-primary: var(--text-primary-dark);
+    --text-secondary: var(--text-secondary-dark);
+    --text-muted: var(--text-muted-dark);
+    --text-invert: #ffffff;
+
+    --card-bg: rgba(10, 15, 44, 0.6);
+    --sidebar-bg: linear-gradient(180deg, #000000 0%, #050818 100%);
+    --topbar-bg: rgba(5, 8, 24, 0.85);
+
+    --shadow-glow: 0 0 15px var(--gold-glow);
+}
+
+/* Tema Vendedor (Negro/Morado Oscuro + Dorado) */
+body.theme-vendedor {
+    --primary: #8b5cf6;
+    --primary-dark: #6d28d9;
+    --primary-light: #a78bfa;
+    --primary-50: rgba(139, 92, 246, 0.08);
+    --primary-100: rgba(139, 92, 246, 0.15);
+    --primary-200: rgba(139, 92, 246, 0.25);
+
+    --accent: var(--gold);
+    --accent-light: var(--gold-light);
+    --accent-dark: var(--gold-dark);
+
+    --bg-dark: #1f083b;
+    --bg-darker: #130024;
+    --bg-light: #2d0a4e;
+    --bg-lighter: #3a0d66;
+
+    --body-bg: linear-gradient(135deg, #130024 0%, #2d0a4e 100%);
+
+    --text-primary: var(--text-primary-dark);
+    --text-secondary: var(--text-secondary-dark);
+    --text-muted: var(--text-muted-dark);
+    --text-invert: #ffffff;
+
+    --card-bg: rgba(45, 10, 78, 0.5);
+    --sidebar-bg: linear-gradient(180deg, #130024 0%, #1a0033 100%);
+    --topbar-bg: rgba(19, 0, 36, 0.85);
+
+    --shadow-glow: 0 0 15px rgba(139, 92, 246, 0.3);
+}
+
+/* Base Body Application */
+body {
+    background: var(--body-bg, linear-gradient(135deg, #0f172a 0%, #020617 100%)) !important;
+    background-attachment: fixed !important;
+    color: var(--text-primary, #f8fafc) !important;
+}
+
+body.theme-admin,
+body.theme-vendedor {
+    background: var(--body-bg) !important;
+    background-attachment: fixed !important;
+    color: var(--text-primary) !important;
+}
+
+/* ==========================================================================
+   Component Overrides for Dark Mode
+   ========================================================================== */
+
+/* Cards */
+body .card {
+    background: var(--card-bg, rgba(30, 41, 59, 0.6)) !important;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--dark-border, rgba(255, 255, 255, 0.1)) !important;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3) !important;
+    color: var(--text-primary, #f8fafc);
+}
+
+body .card:hover {
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4), var(--shadow-glow, 0 0 15px rgba(255, 255, 255, 0.1)) !important;
+    border-color: rgba(255, 255, 255, 0.2) !important;
+}
+
+body .card-header {
+    background: rgba(0, 0, 0, 0.2) !important;
+    border-bottom: 1px solid var(--dark-border, rgba(255, 255, 255, 0.1)) !important;
+    color: var(--text-primary, #f8fafc);
+}
+
+body .card-title {
+    color: var(--text-primary, #f8fafc);
+}
+
+/* Topbar */
+body.theme-admin .topbar,
+body.theme-vendedor .topbar {
+    background: var(--topbar-bg) !important;
+    border-bottom: 1px solid var(--dark-border) !important;
+}
+
+body.theme-admin .topbar-title h1,
+body.theme-vendedor .topbar-title h1 {
+    color: var(--text-primary) !important;
+}
+
+body.theme-admin .topbar-greeting,
+body.theme-vendedor .topbar-greeting {
+    color: var(--text-secondary);
+}
+
+body.theme-admin .sidebar-toggle,
+body.theme-vendedor .sidebar-toggle {
+    color: var(--text-secondary);
+}
+
+body.theme-admin .sidebar-toggle:hover,
+body.theme-vendedor .sidebar-toggle:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text-primary);
+}
+
+/* Sidebar */
+body.theme-admin .sidebar,
+body.theme-vendedor .sidebar {
+    background: var(--sidebar-bg) !important;
+    border-right: 1px solid var(--dark-border) !important;
+}
+
+body.theme-admin .sidebar-header,
+body.theme-vendedor .sidebar-header {
+    border-bottom: 1px solid var(--dark-border) !important;
+}
+
+body.theme-admin .sidebar-footer,
+body.theme-vendedor .sidebar-footer {
+    border-top: 1px solid var(--dark-border) !important;
+    background: rgba(0, 0, 0, 0.2);
+}
+
+body.theme-admin .app-footer,
+body.theme-vendedor .app-footer {
+    border-top: 1px solid var(--dark-border) !important;
+    background: rgba(0, 0, 0, 0.2) !important;
+    color: var(--text-muted) !important;
+}
+
+/* Typography Overrides */
+body.theme-admin h1,
+body.theme-admin h2,
+body.theme-admin h3,
+body.theme-admin h4,
+body.theme-admin h5,
+body.theme-admin h6,
+body.theme-vendedor h1,
+body.theme-vendedor h2,
+body.theme-vendedor h3,
+body.theme-vendedor h4,
+body.theme-vendedor h5,
+body.theme-vendedor h6 {
+    color: var(--text-primary);
+}
+
+body.theme-admin p,
+body.theme-vendedor p {
+    color: var(--text-secondary);
+}
+
+/* Buttons */
+body .btn {
+    color: var(--text-primary) !important;
+}
+
+body.theme-admin .btn-primary {
+    background: linear-gradient(135deg, var(--gold), var(--gold-dark)) !important;
+    color: #000000 !important;
+    box-shadow: 0 4px 15px var(--gold-glow) !important;
+    font-weight: 700;
+}
+
+body.theme-admin .btn-primary:hover {
+    background: linear-gradient(135deg, var(--gold-light), var(--gold)) !important;
+    box-shadow: 0 6px 20px rgba(212, 175, 55, 0.5) !important;
+    color: #000000 !important;
+}
+
+body.theme-vendedor .btn-primary {
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark)) !important;
+    color: #ffffff !important;
+    box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3) !important;
+}
+
+body.theme-vendedor .btn-primary:hover {
+    background: linear-gradient(135deg, var(--primary-light), var(--primary)) !important;
+    box-shadow: 0 6px 20px rgba(139, 92, 246, 0.5) !important;
+}
+
+body .btn-secondary {
+    background: rgba(255, 255, 255, 0.05) !important;
+    color: var(--text-primary) !important;
+    border: 1px solid var(--dark-border) !important;
+}
+
+body .btn-secondary:hover {
+    background: rgba(255, 255, 255, 0.1) !important;
+    border-color: rgba(255, 255, 255, 0.2) !important;
+}
+
+body .btn-success {
+    background: linear-gradient(135deg, #059669, #047857) !important;
+    color: #ffffff !important;
+    box-shadow: 0 4px 15px rgba(5, 150, 105, 0.3) !important;
+    border: none !important;
+}
+
+body .btn-danger {
+    background: linear-gradient(135deg, #dc2626, #b91c1c) !important;
+    color: #ffffff !important;
+    box-shadow: 0 4px 15px rgba(220, 38, 38, 0.3) !important;
+    border: none !important;
+}
+
+body .btn-info {
+    background: linear-gradient(135deg, #0284c7, #0369a1) !important;
+    color: #ffffff !important;
+    box-shadow: 0 4px 15px rgba(2, 132, 199, 0.3) !important;
+    border: none !important;
+}
+
+body .btn-outline {
+    background: transparent !important;
+    border-color: var(--dark-border) !important;
+    color: var(--text-primary) !important;
+}
+
+body .btn-outline:hover {
+    background: rgba(255, 255, 255, 0.05) !important;
+    border-color: var(--accent) !important;
+    color: var(--accent) !important;
+}
+
+/* Specific Gold overrides for Admin to shine more */
+body.theme-admin .nav-link.active {
+    background: linear-gradient(135deg, rgba(212, 175, 55, 0.15), rgba(212, 175, 55, 0.05)) !important;
+    color: var(--gold) !important;
+    border-left: 3px solid var(--gold);
+    box-shadow: inset 4px 0px 15px rgba(212, 175, 55, 0.05);
+}
+
+body.theme-admin .nav-link.active::before {
+    background: var(--gold) !important;
+}
+
+body.theme-admin .nav-link.active .nav-icon {
+    color: var(--gold) !important;
+}
+
+/* Inputs and Forms */
+body .form-control,
+body .form-select {
+    background-color: rgba(0, 0, 0, 0.3) !important;
+    border: 1px solid var(--dark-border) !important;
+    color: var(--text-primary) !important;
+}
+
+body .form-control:focus,
+body .form-select:focus {
+    background-color: rgba(0, 0, 0, 0.4) !important;
+    border-color: var(--accent) !important;
+    box-shadow: 0 0 0 3px var(--gold-100) !important;
+    color: #ffffff !important;
+}
+
+body .form-label {
+    color: var(--text-secondary) !important;
+}
+
+/* File Upload Specific */
+body.theme-admin .file-upload-wrapper,
+body.theme-vendedor .file-upload-wrapper {
+    background: rgba(0, 0, 0, 0.2) !important;
+    border: 2px dashed rgba(255, 255, 255, 0.2) !important;
+}
+
+body.theme-admin .file-upload-wrapper:hover,
+body.theme-vendedor .file-upload-wrapper:hover {
+    border-color: var(--accent) !important;
+    background: rgba(255, 255, 255, 0.05) !important;
+}
+
+/* Dashboard Stats / Values */
+body.theme-admin .stat-value,
+body.theme-vendedor .stat-value {
+    color: var(--text-primary) !important;
+}
+
+body.theme-admin .stat-label,
+body.theme-vendedor .stat-label {
+    color: var(--text-muted) !important;
+}
+
+/* Tables */
+body .table,
+body .data-table {
+    color: var(--text-primary) !important;
+    background: transparent !important;
+}
+
+body .table th,
+body .data-table th,
+body .table thead th {
+    background-color: rgba(0, 0, 0, 0.3) !important;
+    color: var(--text-secondary) !important;
+    border-bottom: 1px solid var(--dark-border) !important;
+}
+
+body .table td,
+body .data-table td {
+    border-bottom: 1px solid var(--dark-border) !important;
+    color: var(--text-secondary) !important;
+    background: transparent !important;
+}
+
+body .table tbody tr:hover,
+body .data-table tbody tr:hover {
+    background-color: rgba(255, 255, 255, 0.03) !important;
+}
+
+/* Modals */
+body.theme-admin .modal-content,
+body.theme-vendedor .modal-content {
+    background: var(--bg-light) !important;
+    border: 1px solid var(--dark-border) !important;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5) !important;
+}
+
+body.theme-admin .modal-header,
+body.theme-vendedor .modal-header {
+    border-bottom: 1px solid var(--dark-border) !important;
+}
+
+body.theme-admin .modal-footer,
+body.theme-vendedor .modal-footer {
+    border-top: 1px solid var(--dark-border) !important;
+}
+
+/* Badges */
+body.theme-admin .badge-secondary,
+body.theme-vendedor .badge-secondary {
+    background: rgba(255, 255, 255, 0.1) !important;
+    color: var(--text-primary) !important;
+    border-color: rgba(255, 255, 255, 0.2) !important;
+}
+
+/* Alerts */
+body.theme-admin .alert,
+body.theme-vendedor .alert {
+    background: rgba(0, 0, 0, 0.3) !important;
+    border: 1px solid var(--dark-border) !important;
+}
+
+body.theme-admin .alert-content,
+body.theme-vendedor .alert-content {
+    color: var(--text-primary) !important;
+}
+
+/* Filters and Search */
+body.theme-admin .filter-sidebar,
+body.theme-vendedor .filter-sidebar {
+    background: var(--card-bg) !important;
+    border-right: 1px solid var(--dark-border) !important;
+}
+
+body.theme-admin .search-input-wrapper input,
+body.theme-vendedor .search-input-wrapper input {
+    background: rgba(0, 0, 0, 0.2) !important;
+    border-color: var(--dark-border) !important;
+    color: var(--text-primary) !important;
+}
+
+/* Status dots/indicators */
+body.theme-admin .status-indicator.active {
+    box-shadow: 0 0 10px var(--success) !important;
+}
+
+body.theme-admin .status-indicator.pending {
+    box-shadow: 0 0 10px var(--warning) !important;
+}
+
+/* Scrollbar customization for dark mode */
+body.theme-admin ::-webkit-scrollbar-track,
+body.theme-vendedor ::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.2);
+}
+
+body.theme-admin ::-webkit-scrollbar-thumb,
+body.theme-vendedor ::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+}
+
+body.theme-admin ::-webkit-scrollbar-thumb:hover,
+body.theme-vendedor ::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+/* Auth / Login Page Specific */
+.auth-page .card {
+    background: rgba(20, 20, 25, 0.8) !important;
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Modals */
+body .modal {
+    background: var(--bg-light) !important;
+    color: var(--text-primary) !important;
+    border: 1px solid var(--dark-border) !important;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5) !important;
+}
+
+body .modal-header,
+body .modal-footer {
+    border-color: var(--dark-border) !important;
+}
+
+/* Admin Dashboard Stats */
+body.theme-admin .stat-card {
+    background: linear-gradient(135deg, rgba(15, 43, 109, 0.8), rgba(5, 16, 31, 0.9)) !important;
+    border: 1px solid var(--dark-border) !important;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3) !important;
+}
+
+body.theme-admin .stat-card:hover {
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4), var(--shadow-glow) !important;
+    border-color: rgba(212, 175, 55, 0.3) !important;
+}
+
+body.theme-admin .stat-number {
+    color: var(--text-primary) !important;
+}
+
+body.theme-admin .stat-label {
+    color: var(--text-secondary) !important;
+}
+
+/* Vendedor Verification Progress */
+body.theme-vendedor .status-banner {
+    background: linear-gradient(135deg, rgba(15, 5, 25, 0.95), rgba(5, 0, 15, 1)) !important;
+    border: 1px solid var(--dark-border) !important;
+    color: var(--text-primary) !important;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4) !important;
+}
+
+body.theme-vendedor .status-banner h3,
+body.theme-vendedor .status-banner p {
+    color: var(--text-primary) !important;
+}
+
+body.theme-vendedor .step {
+    color: var(--text-secondary) !important;
+}
+
+body.theme-vendedor .step.completed {
+    color: var(--text-primary) !important;
+}
+
+body.theme-vendedor .step-icon {
+    background: rgba(0, 0, 0, 0.8) !important;
+    border: 2px solid var(--dark-border) !important;
+    color: var(--text-secondary) !important;
+}
+
+body.theme-vendedor .step.completed .step-icon {
+    background: var(--primary) !important;
+    border-color: var(--primary) !important;
+    color: #ffffff !important;
+}
+
+body.theme-vendedor .progress-steps {
+    background: rgba(0, 0, 0, 0.85) !important;
+    border: 1px solid var(--dark-border) !important;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4) !important;
+}
+
+/* Global specific overrides for inline styles and hardcoded white backgrounds */
+body [style*="background: white"],
+body [style*="background: #fff"],
+body [style*="background: #f9f9f9"],
+body [style*="background: #f8f9fa"],
+body [style*="background: #f0f0f0"] {
+    background: rgba(0, 0, 0, 0.2) !important;
+    color: var(--text-primary) !important;
+    border-color: var(--dark-border) !important;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   CORRECCIONES DE VISIBILIDAD - Admin & Vendedor
+   ═══════════════════════════════════════════════════════════ */
+
+/* 1. Panel de administrador - CI: Texto negro sobre fondo blanco */
+body.theme-admin .doc-info-label,
+body.theme-admin .doc-info-value {
+    color: #000000 !important;
+}
+
+body.theme-admin .ci-doc-meta {
+    background: rgba(255, 255, 255, 0.95) !important;
+    color: #000000 !important;
+}
+
+body.theme-admin .ci-doc-meta .doc-info-row {
+    color: #000000 !important;
+    border-bottom-color: rgba(0, 0, 0, 0.1) !important;
+}
+
+/* 2. Panel de vendedor - Publicar terreno: Texto blanco sobre fondo */
+body.theme-vendedor .form-card label,
+body.theme-vendedor .form-card .form-label {
+    color: #ffffff !important;
+}
+
+body.theme-vendedor .form-card .required {
+    color: #f87171 !important;
+}
+
+body.theme-vendedor .form-card .char-counter {
+    color: #c4b5fd !important;
+}
+
+body.theme-vendedor .form-card .dropzone-content p,
+body.theme-vendedor .form-card .dropzone-subtext,
+body.theme-vendedor .form-card .dropzone-hint {
+    color: #ffffff !important;
+}
+
+/* 3. Historial de revisiones - Badge y timeline: Texto negro */
+body.theme-vendedor .badge-success,
+body.theme-vendedor .badge-danger {
+    color: #000000 !important;
+}
+
+body.theme-vendedor .timeline-content {
+    background: rgba(255, 255, 255, 0.95) !important;
+    color: #000000 !important;
+}
+
+body.theme-vendedor .timeline-admin,
+body.theme-vendedor .timeline-comment {
+    color: #000000 !important;
+}
+
+body.theme-vendedor .timeline-date {
+    color: #4b5563 !important;
+}
+
+/* Admin timeline corrections */
+body.theme-admin .timeline-content {
+    background: rgba(255, 255, 255, 0.95) !important;
+    color: #000000 !important;
+}
+
+body.theme-admin .timeline-admin,
+body.theme-admin .timeline-comment {
+    color: #000000 !important;
+}
+
+body.theme-admin .timeline-date {
+    color: #4b5563 !important;
+}
+
+body.theme-admin .badge-success,
+body.theme-admin .badge-danger {
+    color: #000000 !important;
+}
+
+body .dropzone {
+    background: rgba(0, 0, 0, 0.2) !important;
+    border-color: var(--dark-border) !important;
+}
+
+body .preview-item,
+body .file-item,
+body .bg-white {
+    background: rgba(0, 0, 0, 0.3) !important;
+    color: var(--text-primary) !important;
+}

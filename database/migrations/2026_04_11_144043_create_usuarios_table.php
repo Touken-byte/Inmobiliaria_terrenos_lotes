@@ -1,0 +1,31 @@
+<?php
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration {
+    public function up(): void
+    {
+        Schema::create('usuarios', function (Blueprint $table) {
+            $table->id();
+            $table->string('nombre', 100);
+            $table->string('email', 150)->unique();
+            $table->string('password', 255);
+            $table->enum('rol', ['admin', 'vendedor'])->default('vendedor');
+            $table->enum('estado_verificacion', ['pendiente', 'verificado', 'rechazado'])->default('pendiente');
+            $table->string('telefono', 20)->nullable();
+            $table->dateTime('fecha_registro')->useCurrent();
+            $table->dateTime('ultimo_login')->nullable();
+            $table->boolean('activo')->default(true);
+
+            $table->index('email');
+            $table->index('rol');
+            $table->index('estado_verificacion');
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('usuarios');
+    }
+};
