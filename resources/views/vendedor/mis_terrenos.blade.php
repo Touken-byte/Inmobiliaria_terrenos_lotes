@@ -33,6 +33,26 @@
                         <span class="badge badge-{{ $terreno->estado === 'aprobado' ? 'success' : ($terreno->estado === 'rechazado' ? 'danger' : 'warning') }}">
                             {{ ucfirst($terreno->estado) }}
                         </span>
+                        
+                        @if($terreno->estado === 'rechazado' && $terreno->motivo_rechazo)
+                            <div class="alert alert-danger mt-3 mb-0" style="padding: 0.5rem; font-size: 0.9rem;">
+                                <strong>Motivo de rechazo:</strong> {{ $terreno->motivo_rechazo }}
+                            </div>
+                        @endif
+
+                        @if($terreno->estado === 'aprobado')
+                            @php
+                                $badgeLote = 'secondary';
+                                if($terreno->estado_lote === 'disponible') $badgeLote = 'success';
+                                if($terreno->estado_lote === 'reservado') $badgeLote = 'warning';
+                                if($terreno->estado_lote === 'vendido') $badgeLote = 'danger';
+                            @endphp
+                            <div class="mt-2">
+                                <span style="font-size: 0.85em; color: var(--text-muted);">Estado del Lote:</span>
+                                <span class="badge badge-{{ $badgeLote }}">{{ ucfirst($terreno->estado_lote) }}</span>
+                            </div>
+                        @endif
+
                         <div class="acciones">
                             <a href="{{ route('vendedor.terrenos.edit', $terreno->id) }}" class="btn btn-sm btn-secondary">Editar</a>
                         </div>

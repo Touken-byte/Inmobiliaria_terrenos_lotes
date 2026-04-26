@@ -78,6 +78,9 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::get('/historial', [AdminController::class, 'historial'])->name('historial');
     Route::post('/crear-vendedor', [AdminController::class, 'crearVendedor'])->name('crear_vendedor');
 
+    // Moderación de anuncios
+    Route::get('/moderacion', [AdminController::class, 'moderacionPanel'])->name('moderacion_panel');
+
     // Gestión de terrenos
     Route::get('/terrenos', [AdminController::class, 'terrenosPanel'])->name('terrenos_panel');
     Route::get('/terrenos/{id}', [AdminController::class, 'verTerreno'])->name('ver_terreno');
