@@ -7,6 +7,7 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\TerrenoController;
 use App\Http\Controllers\DocumentoPropiedadController;
 use App\Http\Controllers\SolicitudVisitaController;
+use App\Http\Controllers\MinutaController;
 
 Route::get('/', function () {
     return redirect()->route('login');
@@ -77,7 +78,10 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::post('/procesar-verificacion', [AdminController::class, 'procesarVerificacion'])->name('procesar_verificacion');
     Route::get('/historial', [AdminController::class, 'historial'])->name('historial');
     Route::post('/crear-vendedor', [AdminController::class, 'crearVendedor'])->name('crear_vendedor');
-
+    Route::get('/minutas', [MinutaController::class, 'index'])->name('minutas.index');
+    // Minutas
+    Route::get('/minutas/create', [MinutaController::class, 'create'])->name('minutas.create');
+    Route::post('/minutas', [MinutaController::class, 'store'])->name('minutas.store');
     // Gestión de terrenos
     Route::get('/terrenos', [AdminController::class, 'terrenosPanel'])->name('terrenos_panel');
     Route::get('/terrenos/{id}', [AdminController::class, 'verTerreno'])->name('ver_terreno');

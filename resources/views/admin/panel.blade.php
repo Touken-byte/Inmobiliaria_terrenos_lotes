@@ -3,7 +3,8 @@
 @section('title', 'Panel de Administración')
 
 @section('content')
-<!-- ═══ Stats Cards ═══ -->
+
+{{-- ═══ Stats Cards ═══ --}}
 <div class="stats-grid" id="statsSection">
     <div class="stat-card stat-total">
         <div class="stat-icon">
@@ -43,7 +44,161 @@
     </div>
 </div>
 
-<!-- ═══ Filtros y Búsqueda ═══ -->
+{{-- ═══ Acceso Rápido — Minutas ═══ --}}
+<style>
+.minutas-quick-card {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 16px;
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.minutas-quick-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(100deg, rgba(37,99,235,0.07) 0%, transparent 60%);
+    pointer-events: none;
+}
+
+.minutas-quick-left {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.minutas-quick-icon {
+    width: 44px; height: 44px;
+    background: rgba(37,99,235,0.2);
+    border: 1px solid rgba(37,99,235,0.3);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.minutas-quick-icon svg {
+    width: 20px; height: 20px;
+    stroke: #60a5fa;
+}
+
+.minutas-quick-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #fff;
+    margin: 0 0 2px;
+    letter-spacing: -0.01em;
+}
+
+.minutas-quick-sub {
+    font-size: 0.78rem;
+    color: rgba(255,255,255,0.35);
+    margin: 0;
+}
+
+.minutas-quick-actions {
+    display: flex;
+    gap: 0.65rem;
+    flex-wrap: wrap;
+}
+
+.btn-minuta-ver {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.55rem 1.1rem;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 9px;
+    color: rgba(255,255,255,0.75) !important;
+    font-size: 0.83rem;
+    font-weight: 500;
+    text-decoration: none !important;
+    transition: background 0.15s, border-color 0.15s, color 0.15s;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+}
+
+.btn-minuta-ver svg { width: 14px; height: 14px; stroke: currentColor; flex-shrink: 0; }
+
+.btn-minuta-ver:hover {
+    background: rgba(255,255,255,0.1);
+    border-color: rgba(255,255,255,0.2);
+    color: #fff !important;
+}
+
+.btn-minuta-nueva {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.55rem 1.1rem;
+    background: linear-gradient(135deg, #1d4ed8, #3b82f6);
+    border: none;
+    border-radius: 9px;
+    color: #fff !important;
+    font-size: 0.83rem;
+    font-weight: 600;
+    text-decoration: none !important;
+    transition: filter 0.15s, transform 0.15s, box-shadow 0.15s;
+    font-family: 'DM Sans', sans-serif;
+    box-shadow: 0 3px 12px rgba(37,99,235,0.35);
+    cursor: pointer;
+}
+
+.btn-minuta-nueva svg { width: 14px; height: 14px; stroke: currentColor; flex-shrink: 0; }
+
+.btn-minuta-nueva:hover {
+    filter: brightness(1.1);
+    transform: translateY(-1px);
+    box-shadow: 0 5px 18px rgba(37,99,235,0.45);
+}
+</style>
+
+<div class="minutas-quick-card">
+    <div class="minutas-quick-left">
+        <div class="minutas-quick-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+                <polyline points="14,2 14,8 20,8"/>
+                <line x1="16" y1="13" x2="8" y2="13"/>
+                <line x1="16" y1="17" x2="8" y2="17"/>
+                <polyline points="10,9 9,9 8,9"/>
+            </svg>
+        </div>
+        <div>
+            <p class="minutas-quick-title">Minutas de Compraventa</p>
+            <p class="minutas-quick-sub">Gestiona y registra minutas del sistema</p>
+        </div>
+    </div>
+    <div class="minutas-quick-actions">
+        <a href="{{ route('admin.minutas.index') }}" class="btn-minuta-ver">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                <circle cx="12" cy="12" r="3"/>
+            </svg>
+            Ver Minutas
+        </a>
+        <a href="{{ route('admin.minutas.create') }}" class="btn-minuta-nueva">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="12" y1="5" x2="12" y2="19"/>
+                <line x1="5" y1="12" x2="19" y2="12"/>
+            </svg>
+            Registrar Minuta
+        </a>
+    </div>
+</div>
+
+{{-- ═══ Filtros y Búsqueda ═══ --}}
 <div class="card" id="filtersCard">
     <div class="card-body">
         <div class="filters-row">
@@ -51,7 +206,6 @@
                 <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
                 <input type="text" id="searchVendor" class="search-input" placeholder="Buscar por nombre o email...">
             </div>
-            
             <div class="filter-actions-group" style="display:flex; gap:16px; align-items:center; flex-wrap:wrap;">
                 <div class="filter-buttons">
                     <a href="{{ url('/admin/panel?filtro=todos') }}" class="btn-filter {{ $filtroActual === 'todos' ? 'active' : '' }}">Todos</a>
@@ -59,7 +213,6 @@
                     <a href="{{ url('/admin/panel?filtro=verificado') }}" class="btn-filter {{ $filtroActual === 'verificado' ? 'active' : '' }}">✅ Verificados</a>
                     <a href="{{ url('/admin/panel?filtro=rechazado') }}" class="btn-filter {{ $filtroActual === 'rechazado' ? 'active' : '' }}">❌ Rechazados</a>
                 </div>
-                
                 <button type="button" class="btn btn-primary" onclick="mostrarModal('modalCrearVendedor')">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
                     <span>Nuevo Vendedor</span>
@@ -69,7 +222,7 @@
     </div>
 </div>
 
-<!-- ═══ Tabla de Vendedores ═══ -->
+{{-- ═══ Tabla de Vendedores ═══ --}}
 <div class="card" id="vendorsCard">
     <div class="card-header">
         <h2 class="card-title">
@@ -159,7 +312,7 @@
     </div>
 </div>
 
-<!-- ═══ Modal Crear Vendedor ═══ -->
+{{-- ═══ Modal Crear Vendedor ═══ --}}
 <div class="modal-overlay" id="modalCrearVendedor" style="display:none;">
     <div class="modal">
         <div class="modal-header">
@@ -193,4 +346,5 @@
         </form>
     </div>
 </div>
+
 @endsection
