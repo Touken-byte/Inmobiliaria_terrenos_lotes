@@ -61,6 +61,17 @@
                                 </span>
                                 <span>Historial</span>
                             </a>
+                            <a href="{{ url('/admin/moderacion') }}"
+                                class="nav-link {{ request()->is('admin/moderacion') ? 'active' : '' }}" id="nav-moderacion-admin">
+                                <span class="nav-icon">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M12 2L2 7l10 5 10-5-10-5z" />
+                                        <path d="M2 17l10 5 10-5" />
+                                        <path d="M2 12l10 5 10-5" />
+                                    </svg>
+                                </span>
+                                <span>Moderación Anuncios</span>
+                            </a>
                             <a href="{{ url('/admin/terrenos') }}"
                                 class="nav-link {{ request()->is('admin/terrenos*') ? 'active' : '' }}" id="nav-terrenos-admin">
                                 <span class="nav-icon">

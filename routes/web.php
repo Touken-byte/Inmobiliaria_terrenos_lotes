@@ -82,6 +82,9 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     // Minutas
     Route::get('/minutas/create', [MinutaController::class, 'create'])->name('minutas.create');
     Route::post('/minutas', [MinutaController::class, 'store'])->name('minutas.store');
+
+    // Moderación de anuncios
+    Route::get('/moderacion', [AdminController::class, 'moderacionPanel'])->name('moderacion_panel');
     // Gestión de terrenos
     Route::get('/terrenos', [AdminController::class, 'terrenosPanel'])->name('terrenos_panel');
     Route::get('/terrenos/{id}', [AdminController::class, 'verTerreno'])->name('ver_terreno');

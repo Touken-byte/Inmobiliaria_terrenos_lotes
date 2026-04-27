@@ -66,27 +66,33 @@
                                     </div>
                                 </td>
                                 <td>
-                                    @if(Auth::user() && Auth::user()->rol === 'vendedor')
-                                        <form action="{{ route('vendedor.lotes.estado', $t->id) }}" method="POST" style="display: flex; gap: 4px; align-items: center; flex-wrap: wrap;">
-                                            @csrf
-                                            <button type="submit" name="estado_lote" value="disponible" 
-                                                class="btn btn-sm {{ $t->estado_lote === 'disponible' ? 'btn-primary' : '' }}" 
-                                                style="padding: 4px 8px; font-size: 0.8em; border: 1px solid rgba(255,255,255,0.2); background: {{ $t->estado_lote === 'disponible' ? 'rgba(34, 197, 94, 0.2)' : 'transparent' }}; color: {{ $t->estado_lote === 'disponible' ? '#4ade80' : '#ccc' }}; border-radius: 6px;">
-                                                Disponible
-                                            </button>
-                                            <button type="submit" name="estado_lote" value="reservado" 
-                                                class="btn btn-sm {{ $t->estado_lote === 'reservado' ? 'btn-primary' : '' }}" 
-                                                style="padding: 4px 8px; font-size: 0.8em; border: 1px solid rgba(255,255,255,0.2); background: {{ $t->estado_lote === 'reservado' ? 'rgba(234, 179, 8, 0.2)' : 'transparent' }}; color: {{ $t->estado_lote === 'reservado' ? '#facc15' : '#ccc' }}; border-radius: 6px;">
-                                                Reservado
-                                            </button>
-                                            <button type="submit" name="estado_lote" value="vendido" 
-                                                class="btn btn-sm {{ $t->estado_lote === 'vendido' ? 'btn-primary' : '' }}" 
-                                                style="padding: 4px 8px; font-size: 0.8em; border: 1px solid rgba(255,255,255,0.2); background: {{ $t->estado_lote === 'vendido' ? 'rgba(239, 68, 68, 0.2)' : 'transparent' }}; color: {{ $t->estado_lote === 'vendido' ? '#f87171' : '#ccc' }}; border-radius: 6px;">
-                                                Vendido
-                                            </button>
-                                        </form>
+                                    @if($t->estado === 'aprobado')
+                                        @if(Auth::user() && Auth::user()->rol === 'vendedor')
+                                            <form action="{{ route('vendedor.lotes.estado', $t->id) }}" method="POST" style="display: flex; gap: 4px; align-items: center; flex-wrap: wrap;">
+                                                @csrf
+                                                <button type="submit" name="estado_lote" value="disponible" 
+                                                    class="btn btn-sm {{ $t->estado_lote === 'disponible' ? 'btn-primary' : '' }}" 
+                                                    style="padding: 4px 8px; font-size: 0.8em; border: 1px solid rgba(255,255,255,0.2); background: {{ $t->estado_lote === 'disponible' ? 'rgba(34, 197, 94, 0.2)' : 'transparent' }}; color: {{ $t->estado_lote === 'disponible' ? '#4ade80' : '#ccc' }}; border-radius: 6px;">
+                                                    Disponible
+                                                </button>
+                                                <button type="submit" name="estado_lote" value="reservado" 
+                                                    class="btn btn-sm {{ $t->estado_lote === 'reservado' ? 'btn-primary' : '' }}" 
+                                                    style="padding: 4px 8px; font-size: 0.8em; border: 1px solid rgba(255,255,255,0.2); background: {{ $t->estado_lote === 'reservado' ? 'rgba(234, 179, 8, 0.2)' : 'transparent' }}; color: {{ $t->estado_lote === 'reservado' ? '#facc15' : '#ccc' }}; border-radius: 6px;">
+                                                    Reservado
+                                                </button>
+                                                <button type="submit" name="estado_lote" value="vendido" 
+                                                    class="btn btn-sm {{ $t->estado_lote === 'vendido' ? 'btn-primary' : '' }}" 
+                                                    style="padding: 4px 8px; font-size: 0.8em; border: 1px solid rgba(255,255,255,0.2); background: {{ $t->estado_lote === 'vendido' ? 'rgba(239, 68, 68, 0.2)' : 'transparent' }}; color: {{ $t->estado_lote === 'vendido' ? '#f87171' : '#ccc' }}; border-radius: 6px;">
+                                                    Vendido
+                                                </button>
+                                            </form>
+                                        @else
+                                            <span class="badge badge-secondary">Modificable por el Vendedor de la propiedad</span>
+                                        @endif
+                                    @elseif($t->estado === 'rechazado')
+                                        <span class="badge badge-danger">Rechazado por moderación</span>
                                     @else
-                                        <span class="badge badge-secondary">Modificable por el Vendedor de la propiedad</span>
+                                        <span class="badge badge-warning" style="color: #000;">Pendiente de aprobación</span>
                                     @endif
                                 </td>
                             </tr>

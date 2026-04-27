@@ -14,6 +14,8 @@ use App\Models\Terreno;
 use App\Models\TerrenoImagen;
 use App\Mail\DocumentApproval;
 use App\Mail\DocumentRejection;
+use App\Mail\TerrenoAprobado;
+use App\Mail\TerrenoRechazado;
 use File;
 
 class AdminController extends Controller
@@ -247,8 +249,24 @@ class AdminController extends Controller
     }
 
     // ═══════════════════════════════════════════════════════
-    // GESTIÓN DE TERRENOS (IN-U01)
+    // GESTIÓN DE TERRENOS Y MODERACIÓN (IN-U01)
     // ═══════════════════════════════════════════════════════
+
+    public function moderacionPanel()
+    {
+        $stats = (object) [
+            'pendientes' => Terreno::where('estado', 'pendiente')->count(),
+            'total_aprobados' => Terreno::where('estado', 'aprobado')->count(),
+        ];
+
+        $terrenos = Terreno::with(['vendedor', 'imagenes'])
+            ->where('estado', 'pendiente')
+            ->orderBy('creado_en', 'ASC')
+            ->get();
+
+        return view('admin.moderacion', compact('stats', 'terrenos'));
+    }
+
 
     public function terrenosPanel(Request $request)
     {
@@ -300,12 +318,37 @@ class AdminController extends Controller
 
         $terreno->estado = $accion;
         $terreno->id_admin_aprobador = $adminId;
-        $terreno->actualizado_en = now(); // ← AGREGADO
+        $terreno->actualizado_en = now();
+        
+        if ($accion === 'rechazado') {
+            $terreno->motivo_rechazo = $observacion;
+        } else {
+            $terreno->motivo_rechazo = null; // Limpiar motivo si fue aprobado
+        }
+        
         $terreno->save();
+
+        // Enviar correos
+        try {
+            if ($accion === 'aprobado') {
+                Mail::to($terreno->vendedor->email)->send(new TerrenoAprobado($terreno, $terreno->vendedor));
+            } else {
+                Mail::to($terreno->vendedor->email)->send(new TerrenoRechazado($terreno, $terreno->vendedor, $observacion));
+            }
+        } catch (\Exception $e) {
+            \Log::error('Error al enviar email de terreno: ' . $e->getMessage());
+        }
 
         $accionTexto = $accion === 'aprobado' ? 'aprobado ✅' : 'rechazado ❌';
         $msgExtra = $observacion ? " Observación: {$observacion}" : '';
-        return redirect()->route('admin.terrenos_panel')->with('success', "Terreno #{$terreno->id} {$accionTexto} exitosamente.{$msgExtra}");
+        
+        // Si venimos de moderacion, volver a moderacion, si no, a terrenos_panel
+        // Note: back()->getTargetUrl() is tricky, let's just use url()->previous()
+        $previousUrl = url()->previous();
+        $isModeracion = str_contains($previousUrl, route('admin.moderacion_panel'));
+        $rutaDestino = $isModeracion ? 'admin.moderacion_panel' : 'admin.terrenos_panel';
+        
+        return redirect()->route($rutaDestino)->with('success', "Terreno #{$terreno->id} {$accionTexto} exitosamente.{$msgExtra}");
     }
 
     // ═══════════════════════════════════════════════════════

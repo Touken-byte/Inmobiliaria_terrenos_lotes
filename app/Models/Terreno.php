@@ -18,6 +18,7 @@ class Terreno extends Model
         'ubicacion',
         'descripcion',
         'estado',
+        'motivo_rechazo',
         'id_admin_aprobador',
         'estado_lote',
         'portada_id',  // <--- NUEVO
