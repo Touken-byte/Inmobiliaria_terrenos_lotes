@@ -11,7 +11,7 @@ return new class extends Migration {
             $table->string('nombre', 100);
             $table->string('email', 150)->unique();
             $table->string('password', 255);
-            $table->enum('rol', ['admin', 'vendedor'])->default('vendedor');
+            $table->enum('rol', ['admin', 'vendedor', 'comprador'])->default('vendedor');
             $table->enum('estado_verificacion', ['pendiente', 'verificado', 'rechazado'])->default('pendiente');
             $table->string('telefono', 20)->nullable();
             $table->dateTime('fecha_registro')->useCurrent();
