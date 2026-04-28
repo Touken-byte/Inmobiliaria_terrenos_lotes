@@ -3,148 +3,323 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@yield('title', 'TerrenoSur - Catálogo Premium')</title>
+    <title>@yield('title', 'TerrenoSur')</title>
 
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: { sans: ['Outfit', 'sans-serif'] },
-                    colors: {
-                        brand: {
-                            50: '#f0fdfa', 100: '#ccfbf1', 200: '#99f6e4', 300: '#5eead4', 400: '#2dd4bf',
-                            500: '#14b8a6', 600: '#0d9488', 700: '#0f766e', 800: '#115e59', 900: '#134e4a',
-                        },
-                        dark: '#0B0F19',
-                        darker: '#06080D',
-                        card: 'rgba(20, 25, 40, 0.7)'
-                    },
-                    animation: {
-                        'blob': 'blob 10s infinite alternate',
-                        'fade-in-up': 'fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards',
-                    },
-                    keyframes: {
-                        blob: {
-                            '0%': { transform: 'translate(0px, 0px) scale(1)' },
-                            '33%': { transform: 'translate(30px, -50px) scale(1.1)' },
-                            '66%': { transform: 'translate(-20px, 20px) scale(0.9)' },
-                            '100%': { transform: 'translate(0px, 0px) scale(1)' },
-                        },
-                        fadeInUp: {
-                            '0%': { opacity: '0', transform: 'translateY(30px)' },
-                            '100%': { opacity: '1', transform: 'translateY(0)' },
-                        }
-                    }
-                }
-            }
-        }
-    </script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
     <style>
-        body { font-family: 'Outfit', sans-serif; background-color: #0B0F19; color: #e2e8f0; overflow-x: hidden; }
-        .glass-panel {
-            background: rgba(17, 24, 39, 0.65);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
+        :root {
+            --void:         #050810;
+            --deep:         #080d1a;
+            --surface:      #0c1326;
+            --card:         #0f1830;
+            --card-raised:  #121e38;
+            --rim:          rgba(120,160,255,0.10);
+            --rim-bright:   rgba(120,160,255,0.28);
+            --gold:         #c9a84c;
+            --gold-light:   #e8c97a;
+            --gold-glow:    rgba(201,168,76,0.18);
+            --cobalt:       #3d7ef5;
+            --cobalt-soft:  rgba(61,126,245,0.14);
+            --emerald:      #1dba7e;
+            --text-1:       #eef2fc;
+            --text-2:       #8fa3cc;
+            --text-3:       #3d5480;
+            --font-serif:   'Cormorant Garamond', Georgia, serif;
+            --font-sans:    'Outfit', system-ui, sans-serif;
         }
-        .glass-card {
-            background: linear-gradient(145deg, rgba(30, 41, 59, 0.7) 0%, rgba(15, 23, 42, 0.8) 100%);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            background: var(--void);
+            color: var(--text-1);
+            font-family: var(--font-sans);
+            font-weight: 400;
+            min-height: 100svh;
+            display: flex;
+            flex-direction: column;
+            -webkit-font-smoothing: antialiased;
         }
-        .glass-card:hover {
-            transform: translateY(-8px);
-            border-color: rgba(45, 212, 191, 0.3); /* brand-400 */
-            box-shadow: 0 20px 40px -10px rgba(45, 212, 191, 0.15);
+
+        /* ── Grain overlay ── */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+            background-size: 200px;
+            pointer-events: none;
+            z-index: 9999;
+            opacity: 0.5;
         }
-        .text-gradient {
-            background: linear-gradient(to right, #2dd4bf, #3b82f6);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+
+        main { flex: 1; }
+
+        /* ══════════════════════════════════
+           NAVBAR
+        ══════════════════════════════════ */
+        .ts-nav {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            height: 68px;
+            background: rgba(5,8,16,0.85);
+            backdrop-filter: blur(24px) saturate(1.5);
+            -webkit-backdrop-filter: blur(24px) saturate(1.5);
+            border-bottom: 1px solid var(--rim);
         }
-        .bg-gradient-hover {
-            background: linear-gradient(to right, #0d9488, #2563eb);
-            background-size: 200% auto;
-            transition: 0.5s;
+
+        /* Top gold line */
+        .ts-nav::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 1px;
+            background: linear-gradient(90deg,
+                transparent 0%,
+                var(--gold) 30%,
+                var(--gold-light) 50%,
+                var(--gold) 70%,
+                transparent 100%
+            );
+            opacity: 0.5;
         }
-        .bg-gradient-hover:hover { background-position: right center; }
-        
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: #0B0F19; }
-        ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #334155; }
+
+        .ts-nav-inner {
+            max-width: 1360px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        /* Logo */
+        .ts-logo {
+            display: flex;
+            align-items: center;
+            gap: .75rem;
+            text-decoration: none;
+            transition: opacity .2s;
+        }
+        .ts-logo:hover { opacity: .8; }
+
+        .ts-logo-mark {
+            position: relative;
+            width: 38px;
+            height: 38px;
+            flex-shrink: 0;
+        }
+        .ts-logo-mark svg { width: 100%; height: 100%; }
+
+        .ts-logo-text {
+            display: flex;
+            flex-direction: column;
+            line-height: 1;
+        }
+        .ts-logo-name {
+            font-family: var(--font-serif);
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-1);
+            letter-spacing: .01em;
+        }
+        .ts-logo-name em {
+            font-style: italic;
+            color: var(--gold);
+        }
+        .ts-logo-sub {
+            font-size: .6rem;
+            font-weight: 500;
+            letter-spacing: .22em;
+            text-transform: uppercase;
+            color: var(--text-3);
+            margin-top: .2rem;
+        }
+
+        /* Nav actions */
+        .ts-nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .ts-user-chip {
+            display: flex;
+            align-items: center;
+            gap: .65rem;
+            padding: .4rem .85rem .4rem .4rem;
+            background: var(--card);
+            border: 1px solid var(--rim);
+            border-radius: 100px;
+            transition: border-color .2s;
+        }
+        .ts-user-chip:hover { border-color: var(--rim-bright); }
+
+        .ts-user-ava {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--cobalt) 0%, #6b3fd8 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: .65rem;
+            font-weight: 700;
+            color: #fff;
+            text-transform: uppercase;
+            flex-shrink: 0;
+        }
+        .ts-user-name {
+            font-size: .8rem;
+            font-weight: 600;
+            color: var(--text-1);
+        }
+
+        .ts-btn-logout {
+            padding: .4rem .9rem;
+            border: 1px solid var(--rim);
+            border-radius: 100px;
+            background: transparent;
+            font-family: var(--font-sans);
+            font-size: .75rem;
+            font-weight: 600;
+            letter-spacing: .06em;
+            color: var(--text-3);
+            cursor: pointer;
+            transition: all .2s;
+        }
+        .ts-btn-logout:hover {
+            color: #f87171;
+            border-color: rgba(248,113,113,0.3);
+            background: rgba(248,113,113,0.06);
+        }
+
+        .ts-btn-login {
+            padding: .5rem 1.25rem;
+            background: transparent;
+            border: 1px solid rgba(201,168,76,0.35);
+            border-radius: 100px;
+            font-family: var(--font-sans);
+            font-size: .78rem;
+            font-weight: 600;
+            letter-spacing: .06em;
+            color: var(--gold);
+            text-decoration: none;
+            transition: all .25s;
+        }
+        .ts-btn-login:hover {
+            background: var(--gold-glow);
+            border-color: var(--gold);
+            box-shadow: 0 0 24px var(--gold-glow);
+        }
+
+        /* ══════════════════════════════════
+           FOOTER
+        ══════════════════════════════════ */
+        .ts-footer {
+            position: relative;
+            border-top: 1px solid var(--rim);
+            padding: 2rem;
+            overflow: hidden;
+        }
+        .ts-footer::before {
+            content: '';
+            position: absolute;
+            bottom: 0; left: 0; right: 0;
+            height: 1px;
+            background: linear-gradient(90deg,
+                transparent 0%,
+                var(--gold) 50%,
+                transparent 100%
+            );
+            opacity: 0.2;
+        }
+        .ts-footer-inner {
+            max-width: 1360px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+        .ts-footer-brand {
+            font-family: var(--font-serif);
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text-3);
+            text-decoration: none;
+        }
+        .ts-footer-brand em { color: var(--gold); font-style: italic; }
+        .ts-footer-copy {
+            font-size: .72rem;
+            color: var(--text-3);
+            letter-spacing: .05em;
+        }
     </style>
 </head>
-<body class="antialiased min-h-screen flex flex-col relative">
+<body>
 
-    <!-- Background glowing orbs -->
-    <div class="fixed inset-0 overflow-hidden pointer-events-none z-[-1]">
-        <div class="absolute top-[-10%] left-[-10%] w-[30rem] h-[30rem] bg-brand-600/20 rounded-full mix-blend-screen filter blur-[100px] animate-blob"></div>
-        <div class="absolute top-[20%] right-[-10%] w-[35rem] h-[35rem] bg-blue-600/15 rounded-full mix-blend-screen filter blur-[120px] animate-blob" style="animation-delay: 2s;"></div>
-        <div class="absolute bottom-[-20%] left-[20%] w-[45rem] h-[45rem] bg-indigo-600/10 rounded-full mix-blend-screen filter blur-[130px] animate-blob" style="animation-delay: 4s;"></div>
+<!-- ── NAVBAR ── -->
+<nav class="ts-nav">
+    <div class="ts-nav-inner">
+        <a href="{{ route('catalogo.terrenos') }}" class="ts-logo">
+            <div class="ts-logo-mark">
+                <svg viewBox="0 0 38 38" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect width="38" height="38" rx="10" fill="url(#lgm)"/>
+                    <path d="M8 27L14.5 16L19 22L23.5 14L30 27H8Z" fill="white" fill-opacity="0.9"/>
+                    <path d="M8 27L14.5 16L19 22" stroke="rgba(255,255,255,0.3)" stroke-width="0.5"/>
+                    <defs>
+                        <linearGradient id="lgm" x1="0" y1="0" x2="38" y2="38" gradientUnits="userSpaceOnUse">
+                            <stop stop-color="#1a3a7a"/>
+                            <stop offset="1" stop-color="#0a1f4e"/>
+                        </linearGradient>
+                    </defs>
+                </svg>
+            </div>
+            <div class="ts-logo-text">
+                <span class="ts-logo-name">Terreno<em>Sur</em></span>
+                <span class="ts-logo-sub">Marketplace Premium</span>
+            </div>
+        </a>
+
+        <div class="ts-nav-actions">
+            @auth
+                <div class="ts-user-chip">
+                    <div class="ts-user-ava">{{ substr(Auth::user()->nombre, 0, 1) }}</div>
+                    <span class="ts-user-name">{{ Auth::user()->nombre }}</span>
+                </div>
+                <form method="POST" action="{{ route('logout') }}">
+                    @csrf
+                    <button type="submit" class="ts-btn-logout">Salir</button>
+                </form>
+            @else
+                <a href="{{ route('login') }}" class="ts-btn-login">Iniciar Sesión</a>
+            @endauth
+        </div>
     </div>
+</nav>
 
-    <!-- Navbar -->
-    <nav class="glass-panel sticky top-0 z-50">
-        <div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between h-20 items-center">
-                <div class="flex-shrink-0 flex items-center">
-                    <a href="{{ route('catalogo.terrenos') }}" class="text-2xl font-extrabold tracking-tight flex items-center gap-3 group">
-                        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-400 to-blue-600 flex items-center justify-center text-white shadow-lg shadow-brand-500/30 group-hover:shadow-brand-500/50 transition-all duration-300 transform group-hover:scale-105">
-                            <i class="fa-solid fa-mountain-sun"></i>
-                        </div>
-                        <span class="text-white">Terreno<span class="text-gradient">Sur</span></span>
-                    </a>
-                </div>
+<main>@yield('content')</main>
 
-                <div class="flex items-center gap-5">
-                    @auth
-                        <div class="hidden sm:flex flex-col items-end">
-                            <span class="text-[10px] text-slate-400 uppercase tracking-widest font-semibold">Inversor Verificado</span>
-                            <span class="text-sm font-bold text-white">{{ Auth::user()->nombre }}</span>
-                        </div>
-                        <div class="w-10 h-10 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-brand-400 font-bold shadow-inner">
-                            {{ strtoupper(substr(Auth::user()->nombre, 0, 1)) }}
-                        </div>
-                        <form method="POST" action="{{ route('logout') }}" class="m-0 ml-2">
-                            @csrf
-                            <button type="submit" class="text-slate-400 hover:text-red-400 transition-colors p-2 rounded-lg hover:bg-red-500/10" title="Cerrar sesión">
-                                <i class="fa-solid fa-power-off"></i>
-                            </button>
-                        </form>
-                    @else
-                        <a href="{{ route('login') }}" class="px-7 py-2.5 rounded-full text-sm font-bold text-white bg-gradient-hover shadow-lg shadow-blue-500/25 transition-transform hover:scale-105">
-                            Acceder
-                        </a>
-                    @endauth
-                </div>
-            </div>
-        </div>
-    </nav>
+<!-- ── FOOTER ── -->
+<footer class="ts-footer">
+    <div class="ts-footer-inner">
+        <a href="{{ route('catalogo.terrenos') }}" class="ts-footer-brand">
+            Terreno<em>Sur</em>
+        </a>
+        <p class="ts-footer-copy">
+            &copy; {{ date('Y') }} TerrenoSur Marketplace &mdash; Todos los derechos reservados
+        </p>
+    </div>
+</footer>
 
-    <main class="flex-1 w-full">
-        @yield('content')
-    </main>
-
-    <footer class="glass-panel mt-auto border-t-0 border-t border-white/5">
-        <div class="max-w-[1400px] mx-auto py-8 px-4 sm:px-6 lg:px-8">
-            <div class="flex flex-col md:flex-row justify-between items-center gap-4">
-                <div class="flex items-center gap-2 text-xl font-bold text-white opacity-40">
-                    <i class="fa-solid fa-mountain-sun text-brand-500"></i> TerrenoSur
-                </div>
-                <p class="text-center text-sm text-slate-500 font-medium">
-                    &copy; {{ date('Y') }} TerrenoSur Marketplace Premium. Diseñado para el futuro.
-                </p>
-            </div>
-        </div>
-    </footer>
 </body>
 </html>
