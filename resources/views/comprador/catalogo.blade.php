@@ -1,205 +1,195 @@
 @extends('layouts.comprador')
 
-@section('title', 'Catálogo de Terrenos | TerrenoSur')
+@section('title', 'Descubre tu próximo terreno | TerrenoSur Premium')
 
 @section('content')
-<div class="bg-slate-50 min-h-screen pb-20 font-sans text-slate-800">
+<div class="pb-24 w-full">
     
-    <!-- 1. BUSCADOR (Header pegajoso) -->
-    <div class="bg-white border-b border-slate-200 sticky top-0 z-40 shadow-sm">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-5">
-            <div class="flex justify-center w-full">
-                <form action="{{ route('catalogo.terrenos') }}" method="GET" class="w-full max-w-3xl">
-                    <div class="flex items-center w-full bg-white rounded-full shadow hover:shadow-md border border-slate-300 focus-within:ring-4 focus-within:ring-blue-100 focus-within:border-blue-500 transition-all p-1.5 h-14 sm:h-16 relative overflow-hidden">
-                        
-                        <div class="pl-5 pr-3 text-slate-400">
-                            <i class="fa-solid fa-search text-lg"></i>
-                        </div>
-                        
-                        <input 
-                            type="text" 
-                            name="search" 
-                            value="{{ request('search') }}" 
-                            placeholder="Zonas, barrio o características clave..."
-                            class="flex-1 w-full bg-transparent px-2 py-2 text-slate-800 outline-none text-base sm:text-lg font-medium placeholder-slate-400"
-                        >
-                        
-                        <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold h-full px-6 sm:px-8 rounded-full transition-colors flex items-center shadow-md">
-                            <span class="hidden sm:inline">Buscar</span>
-                            <i class="fa-solid fa-search sm:hidden"></i>
-                        </button>
-                    </div>
-                </form>
+    <!-- Hero Header / Buscador -->
+    <div class="relative w-full pt-16 pb-20 px-4 sm:px-6 lg:px-8 flex flex-col items-center justify-center text-center overflow-hidden">
+        <h1 class="text-5xl md:text-7xl font-extrabold text-white mb-6 tracking-tight animate-fade-in-up" style="opacity: 0; animation-delay: 0.1s;">
+            Encuentra el terreno <br/><span class="text-gradient">de tus sueños</span>
+        </h1>
+        <p class="text-lg md:text-xl text-slate-400 max-w-2xl mb-12 font-light animate-fade-in-up leading-relaxed" style="opacity: 0; animation-delay: 0.2s;">
+            Explora la colección más exclusiva de propiedades con alto potencial de plusvalía, verificadas y listas para invertir.
+        </p>
+
+        <form action="{{ route('catalogo.terrenos') }}" method="GET" class="w-full max-w-3xl z-10 animate-fade-in-up" style="opacity: 0; animation-delay: 0.3s;">
+            <div class="glass-panel rounded-full p-2.5 flex items-center shadow-2xl shadow-brand-500/10 focus-within:shadow-brand-500/20 focus-within:border-brand-500/50 transition-all duration-300">
+                <div class="pl-6 pr-3 text-brand-400">
+                    <i class="fa-solid fa-location-crosshairs text-2xl"></i>
+                </div>
+                <input 
+                    type="text" 
+                    name="search" 
+                    value="{{ request('search') }}" 
+                    placeholder="Busca zonas, características o palabras clave..."
+                    class="flex-1 w-full bg-transparent px-2 py-3 text-white outline-none text-lg font-medium placeholder-slate-500"
+                >
+                <button type="submit" class="bg-white text-darker hover:bg-slate-200 font-extrabold h-full px-8 py-3.5 rounded-full transition-colors flex items-center shadow-md">
+                    <span class="tracking-wide">Explorar</span>
+                </button>
             </div>
-        </div>
+        </form>
     </div>
 
     <!-- MAIN GRID CONTAINER -->
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8">
+    <div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 mt-6 animate-fade-in-up" style="opacity: 0; animation-delay: 0.4s;">
         <div class="flex flex-col lg:flex-row gap-8">
             
-            <!-- ============================================== -->
-            <!-- COLUMNA IZQUIERDA: FILTROS Y MAPA (1 Columna)  -->
-            <!-- ============================================== -->
-            <div class="w-full lg:w-1/4 flex flex-col gap-6 flex-shrink-0">
+            <!-- COLUMNA IZQUIERDA: FILTROS Y MAPA -->
+            <div class="w-full lg:w-[320px] flex flex-col gap-6 flex-shrink-0">
                 
-                <!-- 3. MAPA (Placeholder IN-C02) -->
-                <div class="bg-slate-200 rounded-2xl border border-slate-300 h-64 flex flex-col items-center justify-center text-slate-500 shadow-sm relative overflow-hidden group">
-                    <!-- Textura visual simulando un mapa de fondo -->
-                    <div class="absolute inset-0 opacity-10 bg-[url('https://maps.wikimedia.org/osm-intl/11/1075/1335.png')] bg-cover bg-center"></div>
-                    <i class="fa-solid fa-map-location-dot text-4xl mb-3 text-slate-400 group-hover:scale-110 transition-transform"></i>
-                    <h3 class="font-bold text-slate-700 mb-1">Vista en Mapa</h3>
-                    <p class="text-xs text-center px-4 font-medium uppercase tracking-wider text-slate-500">Próximamente (IN-C02)</p>
+                <!-- MAPA -->
+                <div class="glass-card rounded-3xl h-[300px] flex flex-col items-center justify-center text-slate-400 relative overflow-hidden group">
+                    <div class="absolute inset-0 opacity-30 bg-[url('https://maps.wikimedia.org/osm-intl/11/1075/1335.png')] bg-cover bg-center filter grayscale contrast-150 mix-blend-overlay group-hover:scale-110 transition-transform duration-1000"></div>
+                    <div class="absolute inset-0 bg-gradient-to-t from-dark/90 to-dark/40"></div>
+                    
+                    <div class="relative z-10 flex flex-col items-center">
+                        <div class="w-20 h-20 rounded-full bg-brand-500/20 flex items-center justify-center mb-5 backdrop-blur-md border border-brand-500/30 group-hover:bg-brand-500/40 group-hover:scale-110 transition-all duration-500 shadow-[0_0_30px_rgba(20,184,166,0.3)]">
+                            <i class="fa-solid fa-map-location-dot text-3xl text-brand-400"></i>
+                        </div>
+                        <h3 class="font-bold text-white text-xl mb-2">Vista Dinámica 3D</h3>
+                        <p class="text-[10px] font-black uppercase tracking-[0.25em] text-brand-400 bg-brand-500/10 px-4 py-1.5 rounded-full border border-brand-500/20">Próximamente (IN-C02)</p>
+                    </div>
                 </div>
 
-                <!-- 2. FILTROS (Placeholder IN-C01) -->
-                <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
-                    <div class="flex justify-between items-center mb-6">
-                        <h3 class="font-black text-lg text-slate-900 border-b-2 border-blue-600 pb-1 inline-block">Filtros</h3>
+                <!-- FILTROS -->
+                <div class="glass-card rounded-3xl p-7">
+                    <div class="flex justify-between items-center mb-8">
+                        <h3 class="font-bold text-xl text-white flex items-center gap-3">
+                            <i class="fa-solid fa-sliders text-brand-400"></i> Inteligencia Inmobiliaria
+                        </h3>
                     </div>
                     
-                    <div class="space-y-6 opacity-60 pointer-events-none select-none">
+                    <div class="space-y-8 opacity-40 pointer-events-none select-none relative">
+                        <div class="absolute inset-0 z-10"></div> <!-- Bloqueador de clicks -->
+                        
                         <!-- Rango de Precio -->
                         <div>
-                            <h4 class="font-bold text-sm text-slate-700 mb-3 uppercase tracking-wider">Rango de Precio</h4>
-                            <div class="flex items-center gap-2">
-                                <div class="bg-slate-100 rounded-lg p-2 text-center text-xs flex-1 border border-slate-200">Mínimo</div>
-                                <span class="text-slate-400">-</span>
-                                <div class="bg-slate-100 rounded-lg p-2 text-center text-xs flex-1 border border-slate-200">Máximo</div>
+                            <h4 class="font-semibold text-[11px] text-slate-400 mb-4 uppercase tracking-widest">Rango de Inversión</h4>
+                            <div class="flex items-center gap-3">
+                                <div class="bg-dark/60 rounded-xl p-3.5 text-center text-sm flex-1 border border-white/5 text-slate-300 shadow-inner">Min USD</div>
+                                <span class="text-slate-600">-</span>
+                                <div class="bg-dark/60 rounded-xl p-3.5 text-center text-sm flex-1 border border-white/5 text-slate-300 shadow-inner">Max USD</div>
                             </div>
                         </div>
 
                         <!-- Tipo de Inmueble -->
-                        <div class="border-t border-slate-100 pt-5">
-                            <h4 class="font-bold text-sm text-slate-700 mb-3 uppercase tracking-wider">Disponibilidad</h4>
-                            <label class="flex items-center gap-3 mb-2 cursor-pointer">
-                                <div class="w-4 h-4 rounded border border-slate-300 bg-blue-500 border-none flex items-center justify-center"><i class="fa-solid fa-check text-[10px] text-white"></i></div>
-                                <span class="text-sm">Venta de Terrenos</span>
+                        <div class="border-t border-white/5 pt-7">
+                            <h4 class="font-semibold text-[11px] text-slate-400 mb-4 uppercase tracking-widest">Tipo de Propiedad</h4>
+                            <label class="flex items-center gap-4 mb-4">
+                                <div class="w-5 h-5 rounded-md border border-brand-500 bg-brand-500 flex items-center justify-center shadow-[0_0_10px_rgba(20,184,166,0.4)]"><i class="fa-solid fa-check text-xs text-white"></i></div>
+                                <span class="text-white font-medium">Terrenos Exclusivos</span>
                             </label>
-                            <label class="flex items-center gap-3 cursor-pointer">
-                                <div class="w-4 h-4 rounded border border-slate-300"></div>
-                                <span class="text-sm">Alquiler de Cuartos <span class="text-[10px] bg-amber-100 text-amber-700 font-bold px-2 py-0.5 rounded-full ml-1">(IN-R02)</span></span>
+                            <label class="flex items-center gap-4">
+                                <div class="w-5 h-5 rounded-md border border-slate-600 bg-dark/50"></div>
+                                <span class="text-slate-400">Locales Comerciales</span>
                             </label>
-                        </div>
-                        
-                        <!-- Superficie -->
-                        <div class="border-t border-slate-100 pt-5">
-                            <h4 class="font-bold text-sm text-slate-700 mb-3 uppercase tracking-wider">Servicios Básicos</h4>
-                            <div class="flex flex-wrap gap-2">
-                                <span class="text-xs bg-slate-100 border border-slate-200 px-3 py-1.5 rounded-full">Agua</span>
-                                <span class="text-xs bg-slate-100 border border-slate-200 px-3 py-1.5 rounded-full">Luz</span>
-                                <span class="text-xs bg-slate-100 border border-slate-200 px-3 py-1.5 rounded-full">Alcantarillado</span>
-                            </div>
                         </div>
                     </div>
 
-                    <!-- Botón falso filtros -->
-                    <button class="w-full mt-6 bg-slate-100 text-slate-400 font-bold py-3 rounded-xl border border-slate-200 border-dashed text-sm uppercase tracking-widest cursor-not-allowed">
-                        Próximamente (IN-C01)
+                    <button class="w-full mt-8 bg-gradient-to-r from-white/5 to-white/10 text-slate-300 font-bold py-4 rounded-xl border border-white/10 hover:bg-white/10 transition-colors text-xs uppercase tracking-widest cursor-not-allowed">
+                        Filtros Predictivos (Pronto)
                     </button>
                 </div>
-
             </div>
 
-            <!-- ============================================== -->
-            <!-- COLUMNA DERECHA: RESULTADOS (3 Columnas)       -->
-            <!-- ============================================== -->
-            <div class="w-full lg:w-3/4">
+            <!-- COLUMNA DERECHA: RESULTADOS -->
+            <div class="w-full flex-1">
                 
-                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-end mb-6 pb-4 border-b border-slate-200">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-10 pb-6 border-b border-white/10 gap-4">
                     <div>
                         @if(request('search'))
-                            <h2 class="text-2xl font-black text-slate-900 mb-1">Buscando: "<span class="text-blue-600">{{ request('search') }}</span>"</h2>
-                            <p class="text-sm text-slate-500 font-medium line-clamp-1">Explora las opciones de terrenos que coinciden con tu búsqueda.</p>
+                            <h2 class="text-3xl md:text-4xl font-extrabold text-white mb-2 tracking-tight">Buscando: <span class="text-brand-400">"{{ request('search') }}"</span></h2>
+                            <p class="text-slate-400 font-light text-lg">Algoritmo de búsqueda encontró estas coincidencias.</p>
                         @else
-                            <h2 class="text-2xl font-black text-slate-900 mb-1">Terrenos Disponibles</h2>
-                            <p class="text-sm text-slate-500 font-medium">Descubre terrenos con alto potencial cerca de ti.</p>
+                            <h2 class="text-3xl md:text-4xl font-extrabold text-white mb-2 tracking-tight">Catálogo Premium</h2>
+                            <p class="text-slate-400 font-light text-lg">Terrenos de alta plusvalía listos para invertir.</p>
                         @endif
                     </div>
-                    <div class="mt-3 sm:mt-0 font-bold text-sm bg-white border border-slate-200 shadow-sm px-4 py-2 rounded-full whitespace-nowrap">
-                        {{ $terrenos->total() }} <span class="text-slate-500 font-medium">Resultados</span>
+                    <div class="font-medium text-sm glass-panel px-6 py-3 rounded-full text-slate-300 flex items-center gap-3 border-white/10 shadow-lg">
+                        <span class="relative flex h-3 w-3">
+                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-400 opacity-75"></span>
+                            <span class="relative inline-flex rounded-full h-3 w-3 bg-brand-500 shadow-[0_0_10px_rgba(45,212,191,1)]"></span>
+                        </span>
+                        <strong class="text-white text-xl">{{ $terrenos->total() }}</strong> <span class="uppercase tracking-widest text-xs opacity-70">Encontrados</span>
                     </div>
                 </div>
 
                 @if($terrenos->isEmpty())
-                    <!-- 6. EMPTY STATE UI -->
-                    <div class="bg-white rounded-2xl border border-dashed border-slate-300 p-12 text-center mt-6">
-                        <div class="mx-auto h-20 w-20 bg-blue-50 rounded-full flex items-center justify-center mb-5">
-                            <i class="fa-solid fa-magnifying-glass-location text-3xl text-blue-500"></i>
+                    <!-- EMPTY STATE -->
+                    <div class="glass-card rounded-[2rem] p-20 text-center mt-6 flex flex-col items-center border-dashed border-white/20">
+                        <div class="w-28 h-28 bg-dark/60 rounded-[2rem] flex items-center justify-center mb-8 shadow-inner border border-white/5 relative">
+                            <div class="absolute inset-0 bg-brand-500/20 blur-2xl rounded-full"></div>
+                            <i class="fa-solid fa-satellite-dish text-5xl text-brand-400 relative z-10 animate-pulse"></i>
                         </div>
-                        <h3 class="text-2xl font-bold text-slate-900 mb-2">Sin resultados</h3>
-                        <p class="text-slate-500 mb-8 max-w-md mx-auto text-base">No logramos encontrar propiedades que coincidan exacto con tu búsqueda. Intenta probar nombres más amplios.</p>
-                        <a href="{{ route('catalogo.terrenos') }}" class="inline-flex items-center justify-center px-8 py-3 border border-slate-200 shadow-sm text-sm font-bold uppercase tracking-wider rounded-full text-slate-700 bg-white hover:bg-slate-50 hover:text-blue-600 transition-colors">
-                            Limpiar Búsqueda
+                        <h3 class="text-4xl font-extrabold text-white mb-4 tracking-tight">Sin señales en el radar</h3>
+                        <p class="text-slate-400 mb-10 max-w-lg text-lg font-light leading-relaxed">Nuestra red neuronal no encontró propiedades que coincidan exactamente con esos parámetros. Intenta ampliar tu rango.</p>
+                        <a href="{{ route('catalogo.terrenos') }}" class="inline-flex items-center justify-center px-10 py-4 rounded-full text-sm font-extrabold uppercase tracking-widest text-darker bg-white hover:bg-brand-50 hover:shadow-[0_0_30px_rgba(255,255,255,0.4)] transition-all duration-300 hover:-translate-y-1">
+                            Restablecer Radar
                         </a>
                     </div>
                 @else
-                    <!-- 5. GRID DE CARDS MARKETPLACE -->
-                    <!-- Grid Responsive: 1 movil, 2 tablet, 3 desktop -->
-                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-7">
+                    <!-- GRID DE CARDS MARKETPLACE PREMIUM -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
                         @foreach($terrenos as $terreno)
-                            <div class="group bg-white rounded-[20px] shadow-sm hover:shadow-2xl border border-slate-200 hover:border-transparent overflow-hidden hover:-translate-y-1.5 transition-all duration-300 flex flex-col h-full cursor-pointer relative">
+                            <div class="glass-card rounded-3xl overflow-hidden group cursor-pointer flex flex-col h-full relative" onclick="window.location.href='{{ route('catalogo.detalle', $terreno->id) }}'">
                                 
                                 <!-- IMAGEN HEADER -->
-                                <div class="relative w-full h-[220px] bg-slate-100 overflow-hidden">
+                                <div class="relative w-full aspect-[4/3] bg-darker overflow-hidden">
                                     @if($terreno->imagenes->count() > 0)
-                                        <img src="{{ asset($terreno->imagenes->first()->ruta_archivo) }}" alt="Terreno en {{ $terreno->ubicacion }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-in-out">
+                                        <img src="{{ asset($terreno->imagenes->first()->ruta_archivo) }}" alt="Terreno" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-[1.5s] ease-out opacity-80 group-hover:opacity-100">
                                     @else
-                                        <div class="w-full h-full flex flex-col items-center justify-center text-slate-400 bg-slate-200/50">
-                                            <i class="fa-regular fa-images text-4xl mb-2 opacity-50"></i>
-                                            <span class="text-[10px] font-black uppercase tracking-widest">Sin foto</span>
+                                        <div class="w-full h-full flex flex-col items-center justify-center text-slate-600 bg-dark/80 relative">
+                                            <i class="fa-solid fa-gem text-5xl mb-4 opacity-20"></i>
+                                            <span class="text-xs font-bold uppercase tracking-[0.3em] opacity-40">Propiedad Verificada</span>
                                         </div>
                                     @endif
 
-                                    <!-- BADGES SUPERIORES FLOTANTES -->
-                                    <div class="absolute top-4 left-4 flex gap-2 z-10">
-                                        <span class="bg-white/95 backdrop-blur shadow-md text-slate-900 text-xs font-black px-3.5 py-1.5 rounded-full tracking-wide">
-                                            {{ number_format($terreno->metros_cuadrados, 0) }} m²
+                                    <!-- Badges -->
+                                    <div class="absolute top-5 left-5 flex gap-2 z-10">
+                                        <span class="glass-panel text-white text-xs font-bold px-4 py-2 rounded-full tracking-wider border-white/20 shadow-lg backdrop-blur-md flex items-center gap-1.5">
+                                            <i class="fa-solid fa-vector-square text-brand-400"></i> {{ number_format($terreno->metros_cuadrados, 0) }} m²
                                         </span>
                                     </div>
-                                    <div class="absolute top-4 right-4 z-10">
-                                        <span class="bg-emerald-500/90 backdrop-blur text-white text-[10px] font-black uppercase tracking-wider px-3 py-1.5 rounded-full shadow-md">
+                                    <div class="absolute top-5 right-5 z-10">
+                                        <span class="bg-brand-500 text-darker text-[10px] font-black uppercase tracking-widest px-4 py-2 rounded-full shadow-[0_0_20px_rgba(20,184,166,0.6)]">
                                             Venta
                                         </span>
                                     </div>
-                                    <!-- Degradado oscurecedor abajo para que texto resalte si usamos overlay future proof -->
-                                    <div class="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/40 to-transparent"></div>
+
+                                    <!-- Gradiente inferior -->
+                                    <div class="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-dark to-transparent opacity-95"></div>
                                 </div>
 
                                 <!-- INFORMACIÓN TARJETA -->
-                                <div class="px-5 pt-4 pb-5 flex flex-col flex-grow">
+                                <div class="p-7 flex flex-col flex-grow relative z-10 bg-gradient-to-b from-dark/40 to-transparent -mt-10">
                                     
-                                    <!-- Precio Destacado (Marketplace prioritiza el precio) -->
-                                    <div class="mb-3">
-                                        <h4 class="text-2xl font-black text-blue-600 tracking-tight flex items-baseline">
-                                            ${{ number_format($terreno->precio, 2) }} <span class="text-xs font-medium text-slate-400 ml-1 tracking-normal">USD</span>
+                                    <!-- Precio Destacado -->
+                                    <div class="mb-4">
+                                        <h4 class="text-3xl font-extrabold text-white tracking-tight flex items-baseline gap-1 drop-shadow-lg">
+                                            <span class="text-brand-400 font-medium">$</span>{{ number_format($terreno->precio, 2) }} <span class="text-[11px] font-medium text-slate-400 uppercase tracking-widest ml-1">USD</span>
                                         </h4>
                                     </div>
 
                                     <!-- Ubicación -->
-                                    <h3 class="text-base font-bold text-slate-800 group-hover:text-blue-700 transition-colors line-clamp-1 mb-1">
-                                        Lote en {{ Str::words($terreno->ubicacion, 4, '') }}
+                                    <h3 class="text-xl font-bold text-slate-100 group-hover:text-brand-300 transition-colors line-clamp-1 mb-2 tracking-tight">
+                                        {{ Str::words($terreno->ubicacion, 5, '...') }}
                                     </h3>
                                     
-                                    <!-- Sub Ubicación -->
-                                    <div class="flex items-start gap-1.5 mt-1.5 mb-3">
-                                        <i class="fa-solid fa-location-dot text-slate-400 mt-1text-sm"></i>
-                                        <p class="text-[13px] text-slate-500 font-medium leading-tight line-clamp-1">
-                                            {{ $terreno->ubicacion }}
-                                        </p>
-                                    </div>
-                                    
                                     <!-- Descripción Corta -->
-                                    <p class="text-sm text-slate-600 line-clamp-2 leading-relaxed mb-5 flex-grow">
+                                    <p class="text-sm text-slate-400 line-clamp-2 leading-relaxed mb-8 flex-grow font-light">
                                         {{ $terreno->descripcion }}
                                     </p>
 
                                     <!-- BOTÓN DE VER DETALLES -->
-                                    <div class="border-t border-slate-100 pt-4 mt-auto">
-                                        <a href="{{ route('catalogo.detalle', $terreno->id) }}" class="w-full bg-slate-50 group-hover:bg-blue-600 text-slate-600 group-hover:text-white border border-slate-200 group-hover:border-blue-600 font-bold py-2.5 rounded-xl transition-all duration-300 text-sm flex items-center justify-center gap-2 shadow-sm relative overflow-hidden">
-                                            Ver detalles
-                                            <i class="fa-solid fa-arrow-right-long opacity-0 -translate-x-4 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300 absolute right-4"></i>
-                                        </a>
+                                    <div class="mt-auto">
+                                        <span class="w-full bg-white/5 border border-white/10 group-hover:border-brand-500/50 group-hover:bg-brand-500/10 text-white font-semibold py-3.5 rounded-xl transition-all duration-300 text-sm flex items-center justify-between px-6 shadow-inner relative overflow-hidden">
+                                            <span class="relative z-10">Explorar Propiedad</span>
+                                            <i class="fa-solid fa-arrow-right text-brand-400 group-hover:translate-x-2 transition-transform relative z-10"></i>
+                                            <div class="absolute inset-0 bg-gradient-to-r from-brand-500/0 via-brand-500/10 to-brand-500/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></div>
+                                        </span>
                                     </div>
                                 </div>
                             </div>
@@ -207,21 +197,44 @@
                     </div>
 
                     <!-- PAGINACIÓN -->
-                    <div class="mt-14 mb-4 flex justify-center">
-                        <div class="bg-white px-4 py-2 rounded-2xl shadow-sm border border-slate-100">
+                    <div class="mt-20 flex justify-center pb-10">
+                        <div class="glass-panel px-6 py-3 rounded-full border border-white/10 shadow-2xl">
                             {{ $terrenos->links() }}
                         </div>
                     </div>
                 @endif
             </div>
-
         </div>
     </div>
 </div>
 
 <style>
-/* Ajustar estilos menores de la paginación nativa dentro del contenedor para que resalte y no rompa bordes */
+/* Reset de paginación para tema oscuro premium */
 nav[role="navigation"] { display: flex; align-items: center; justify-content: center; gap: 0.5rem; }
-nav[role="navigation"] a, nav[role="navigation"] span[aria-hidden] { border-radius: 9999px !important; }
+nav[role="navigation"] a, nav[role="navigation"] span[aria-hidden] { 
+    border-radius: 9999px !important; 
+    background: transparent !important;
+    border-color: rgba(255,255,255,0.05) !important;
+    color: #94a3b8 !important;
+    font-weight: 500 !important;
+    transition: all 0.3s ease !important;
+}
+nav[role="navigation"] span[aria-current="page"] span {
+    background: #14b8a6 !important; /* brand-500 */
+    border-color: #14b8a6 !important;
+    color: #06080D !important;
+    font-weight: 800 !important;
+    border-radius: 9999px !important;
+    box-shadow: 0 0 15px rgba(20, 184, 166, 0.4) !important;
+}
+nav[role="navigation"] a:hover {
+    background: rgba(255,255,255,0.1) !important;
+    color: white !important;
+    border-color: rgba(255,255,255,0.2) !important;
+}
+nav[role="navigation"] svg {
+    width: 1.25rem !important;
+    height: 1.25rem !important;
+}
 </style>
 @endsection

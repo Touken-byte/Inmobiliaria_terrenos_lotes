@@ -50,6 +50,10 @@ Route::middleware(['auth', 'role:vendedor'])->prefix('vendedor')->name('vendedor
     // Control de lotes
     Route::get('/lotes', [VendedorController::class, 'controlLotes'])->name('lotes');
     Route::post('/lotes/{id}/estado', [VendedorController::class, 'updateLoteEstado'])->name('lotes.estado');
+
+    // Comprobante IT
+    Route::get('/comprobante-it', [\App\Http\Controllers\Vendedor\ComprobanteItController::class, 'index'])->name('comprobante_it');
+    Route::post('/comprobante-it', [\App\Http\Controllers\Vendedor\ComprobanteItController::class, 'store'])->name('comprobante_it.store');
 });
 
 // Rutas compartidas (vendedor y admin) para solicitudes de visita
@@ -92,4 +96,10 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
 
     // Control de lotes
     Route::get('/lotes', [AdminController::class, 'controlLotes'])->name('lotes');
+
+    // Comprobantes IT
+    Route::get('/comprobantes-it', [\App\Http\Controllers\Admin\ComprobanteItController::class, 'index'])->name('comprobantes_it.index');
+    Route::post('/comprobantes-it/{id}/aprobar', [\App\Http\Controllers\Admin\ComprobanteItController::class, 'aprobar'])->name('comprobantes_it.aprobar');
+    Route::post('/comprobantes-it/{id}/rechazar', [\App\Http\Controllers\Admin\ComprobanteItController::class, 'rechazar'])->name('comprobantes_it.rechazar');
+    Route::get('/comprobantes-it/{id}/archivo', [\App\Http\Controllers\Admin\ComprobanteItController::class, 'verArchivo'])->name('comprobantes_it.archivo');
 });
