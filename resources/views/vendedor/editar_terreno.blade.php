@@ -2,6 +2,10 @@
 
 @section('title', 'Editar Terreno')
 
+@push('styles')
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+@endpush
+
 @section('content')
 <div class="card form-card">
     <div class="card-header">
@@ -30,6 +34,24 @@
                 <label for="ubicacion">Ubicación *</label>
                 <input type="text" name="ubicacion" id="ubicacion" class="form-control"
                     value="{{ old('ubicacion', $terreno->ubicacion) }}" required>
+            </div>
+
+            <div class="form-group">
+                <label>Ubicación en el Mapa <small>(Arrastra el pin para ajustar la ubicación exacta)</small></label>
+                <div id="mapaSelector" style="height: 350px; border-radius: 10px; border: 2px solid #ced4da; margin-bottom: 8px;"></div>
+                <div style="display:flex; gap:12px; margin-top:6px;">
+                    <div class="form-group" style="flex:1; margin-bottom:0;">
+                        <label style="font-size:0.85rem;">Latitud</label>
+                        <input type="text" name="latitud" id="latitud" class="form-control"
+                            value="{{ old('latitud', $terreno->latitud) }}" placeholder="Se completa al mover el pin" readonly>
+                    </div>
+                    <div class="form-group" style="flex:1; margin-bottom:0;">
+                        <label style="font-size:0.85rem;">Longitud</label>
+                        <input type="text" name="longitud" id="longitud" class="form-control"
+                            value="{{ old('longitud', $terreno->longitud) }}" placeholder="Se completa al mover el pin" readonly>
+                    </div>
+                </div>
+                <small style="color:#6c757d;">💡 Haz clic en el mapa o arrastra el marcador para ajustar la ubicación exacta.</small>
             </div>
 
             <div class="form-group">
@@ -259,6 +281,9 @@
 </style>
 
 <script>
+    @push('scripts')
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    @endpush
     document.addEventListener('DOMContentLoaded', () => {
         // Contador de caracteres
         const descInput = document.getElementById('descripcion');
@@ -389,5 +414,39 @@
             });
         }
     });
+
+    // ── Mini mapa selector de ubicación ──
+        var savedLat = {{ $terreno->latitud ?? -34.6037 }};
+        var savedLng = {{ $terreno->longitud ?? -58.3816 }};
+
+        var mapaSelector = L.map('mapaSelector').setView([savedLat, savedLng], 15);
+
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+            attribution: '&copy; OSM &copy; CartoDB',
+            subdomains: 'abcd',
+            maxZoom: 19
+        }).addTo(mapaSelector);
+
+        var marker = L.marker([savedLat, savedLng], { draggable: true }).addTo(mapaSelector);
+
+        function actualizarCoordenadas(lat, lng) {
+            document.getElementById('latitud').value = lat.toFixed(8);
+            document.getElementById('longitud').value = lng.toFixed(8);
+        }
+
+        // Si ya tenía coordenadas guardadas, las mostramos
+        @if($terreno->latitud && $terreno->longitud)
+            actualizarCoordenadas(savedLat, savedLng);
+        @endif
+
+        marker.on('dragend', function(e) {
+            var pos = e.target.getLatLng();
+            actualizarCoordenadas(pos.lat, pos.lng);
+        });
+
+        mapaSelector.on('click', function(e) {
+            marker.setLatLng(e.latlng);
+            actualizarCoordenadas(e.latlng.lat, e.latlng.lng);
+        });
 </script>
 @endsection

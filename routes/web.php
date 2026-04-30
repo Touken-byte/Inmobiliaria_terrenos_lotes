@@ -24,6 +24,8 @@ Route::get('/catalogo/{id}', [TerrenoController::class, 'detalle'])->name('catal
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
 Route::post('/login', [AuthController::class, 'login'])->name('login.post');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+Route::get('/registro', [App\Http\Controllers\RegistroController::class, 'showRegister'])->name('registro');
+Route::post('/registro', [App\Http\Controllers\RegistroController::class, 'register'])->name('registro.post');
 
 // Rutas de Vendedor
 Route::middleware(['auth', 'role:vendedor'])->prefix('vendedor')->name('vendedor.')->group(function () {
@@ -102,4 +104,20 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::post('/comprobantes-it/{id}/aprobar', [\App\Http\Controllers\Admin\ComprobanteItController::class, 'aprobar'])->name('comprobantes_it.aprobar');
     Route::post('/comprobantes-it/{id}/rechazar', [\App\Http\Controllers\Admin\ComprobanteItController::class, 'rechazar'])->name('comprobantes_it.rechazar');
     Route::get('/comprobantes-it/{id}/archivo', [\App\Http\Controllers\Admin\ComprobanteItController::class, 'verArchivo'])->name('comprobantes_it.archivo');
+});
+
+Route::get('/mapa', [App\Http\Controllers\MapaController::class, 'index'])->name('mapa.index');
+
+Route::middleware('auth')->group(function () {
+    Route::get('/consulta-folio', [App\Http\Controllers\FolioConsultaController::class, 'form'])->name('folio.consultar.form');
+    Route::post('/consulta-folio', [App\Http\Controllers\FolioConsultaController::class, 'consultar'])->name('folio.consultar.post');
+    Route::get('/folio/{id}/completo', [App\Http\Controllers\FolioConsultaController::class, 'completo'])->name('folio.completo');
+});
+
+// Rutas de folio para vendedor
+Route::middleware(['auth', 'role:vendedor'])->prefix('vendedor')->name('vendedor.')->group(function () {
+    Route::get('/terrenos/{id}/folio/crear', [App\Http\Controllers\FolioVendedorController::class, 'create'])->name('folio.create');
+    Route::post('/terrenos/{id}/folio', [App\Http\Controllers\FolioVendedorController::class, 'store'])->name('folio.store');
+    Route::get('/terrenos/{id}/folio/editar', [App\Http\Controllers\FolioVendedorController::class, 'edit'])->name('folio.edit');
+    Route::put('/terrenos/{id}/folio', [App\Http\Controllers\FolioVendedorController::class, 'update'])->name('folio.update');
 });

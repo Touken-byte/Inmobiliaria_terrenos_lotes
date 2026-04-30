@@ -9,6 +9,7 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    @stack('styles')
 
     <style>
         :root {
@@ -264,8 +265,9 @@
             letter-spacing: .05em;
         }
     </style>
-</head>
-<body>
+    @stack('scripts')
+</body>
+</html>
 
 <!-- ── NAVBAR ── -->
 <nav class="ts-nav">

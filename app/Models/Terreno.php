@@ -21,7 +21,9 @@ class Terreno extends Model
         'motivo_rechazo',
         'id_admin_aprobador',
         'estado_lote',
-        'portada_id',  // <--- NUEVO
+        'portada_id',
+        'latitud',
+        'longitud',
     ];
 
     public $timestamps = false;
@@ -62,5 +64,9 @@ class Terreno extends Model
     public function documentoPropiedad()
     {
         return $this->hasOne(DocumentoPropiedad::class, 'terreno_id');
+    }
+    public function folio()
+    {
+        return $this->hasOne(Folio::class, 'terreno_id');
     }
 }

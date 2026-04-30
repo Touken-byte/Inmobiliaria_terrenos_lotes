@@ -2,74 +2,84 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Usuario;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
     /**
-     * Mostrar formulario de login
+     * Muestra el formulario de login.
      */
     public function showLogin()
     {
         if (Auth::check()) {
-            $user = Auth::user();
-            if ($user->rol === 'admin') {
-                return redirect()->route('admin.panel');
-            } elseif ($user->rol === 'comprador') {
-                return redirect()->route('catalogo.terrenos');
-            }
-            return redirect()->route('vendedor.dashboard');
+            return $this->redirectByRole(Auth::user()->rol);
         }
 
         return view('auth.login');
     }
 
     /**
-     * Procesar autenticación
+     * Procesa el login.
+     *
+     * Flujo de acceso por rol:
+     *  - Admin     → entra si activo = true (siempre verificado)
+     *  - Vendedor  → entra con CUALQUIER estado_verificacion mientras activo = true
+     *                El dashboard del vendedor controla qué puede hacer según su estado:
+     *                  · pendiente  → solo puede subir/ver su CI
+     *                  · rechazado  → puede ver el motivo y volver a subir CI
+     *                  · verificado → acceso completo (crear terrenos, ver solicitudes, etc.)
+     *  - Comprador → entra si activo = true
      */
     public function login(Request $request)
     {
         $request->validate([
-            'email' => 'required|email',
-            'password' => 'required',
+            'email'    => 'required|email',
+            'password' => 'required|string',
         ], [
-            'email.required' => 'El campo correo electrónico es obligatorio.',
-            'password.required' => 'El campo contraseña es obligatorio.',
+            'email.required'    => 'El correo es obligatorio.',
+            'email.email'       => 'El formato del correo no es válido.',
+            'password.required' => 'La contraseña es obligatoria.',
         ]);
 
-        $credentials = [
-            'email' => $request->email,
-            'password' => $request->password,
-            'activo' => 1 // Solo usuarios activos
-        ];
+        $email    = strtolower(trim($request->email));
+        $password = $request->password;
 
-        if (Auth::attempt($credentials)) {
-            $request->session()->regenerate();
-            $user = Auth::user();
-            
-            // Actualizar último login
-            $user->ultimo_login = now();
-            $user->save();
+        $usuario = Usuario::where('email', $email)->first();
 
-            $redirectPath = '/vendedor/dashboard';
-            if ($user->rol === 'admin') {
-                $redirectPath = '/admin/panel';
-            } elseif ($user->rol === 'comprador') {
-                $redirectPath = '/catalogo';
-            }
-
-            return redirect()->intended($redirectPath)
-                             ->with('success', '¡Bienvenido/a, ' . $user->nombre . '!');
+        // Credenciales incorrectas
+        if (!$usuario || !Hash::check($password, $usuario->password)) {
+            return back()
+                ->withInput(['email' => $request->email])
+                ->withErrors(['email' => 'Correo o contraseña incorrectos.']);
         }
 
-        return back()->withErrors([
-            'email' => 'Las credenciales proporcionadas no son correctas o el usuario está inactivo.',
-        ])->onlyInput('email');
+        // Cuenta desactivada por el admin
+        if (!$usuario->activo) {
+            return back()
+                ->withInput(['email' => $request->email])
+                ->withErrors(['email' => 'Tu cuenta está desactivada. Contacta al administrador.']);
+        }
+
+        // ── NO bloqueamos por estado_verificacion aquí ──
+        // El VendedorController::dashboard() ya muestra el estado correcto
+        // y restringe las acciones según pendiente/rechazado/verificado.
+
+        Auth::login($usuario, $request->boolean('remember'));
+
+        // Actualizar último login sin disparar eventos del modelo
+        $usuario->ultimo_login = now();
+        $usuario->saveQuietly();
+
+        $request->session()->regenerate();
+
+        return $this->redirectByRole($usuario->rol);
     }
 
     /**
-     * Cerrar sesión
+     * Cierra la sesión.
      */
     public function logout(Request $request)
     {
@@ -78,6 +88,20 @@ class AuthController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect()->route('login');
+        return redirect('/login')->with('success', 'Sesión cerrada correctamente.');
+    }
+
+    /**
+     * Redirige según el rol del usuario autenticado.
+     */
+    private function redirectByRole(string $rol)
+    {
+        return match($rol) {
+            'admin'     => redirect()->route('admin.panel'),
+            'vendedor'  => redirect()->route('vendedor.dashboard'),
+            'comprador' => redirect()->route('catalogo.terrenos'),
+            default     => redirect('/login')
+                            ->with('error', 'Rol no reconocido. Contacta al administrador.'),
+        };
     }
 }

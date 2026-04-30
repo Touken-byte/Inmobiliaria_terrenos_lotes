@@ -2,6 +2,10 @@
 
 @section('title', 'Detalles del Terreno | TerrenoSur')
 
+@push('styles')
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+@endpush
+
 @section('content')
 <style>
     :root {
@@ -691,9 +695,98 @@
                     </div>
                     <div class="det-feature">
                         <div class="det-feature-dot"></div>
-                        <span class="det-feature-text">Documentación en regla</span>
+                        <span class="det-feature-text">
+                            {{ $terreno->folio ? '✅ Con folio registrado' : '⚠️ Sin folio registrado' }}
+                        </span>
                     </div>
                 </div>
+
+                <!-- Sección de Folio -->
+                <p class="det-section-title">Documentación Legal</p>
+
+                @if($terreno->folio)
+                <div style="background: var(--card); border: 1px solid var(--rim); border-radius: 20px; overflow: hidden; margin-bottom: 2rem;">
+
+                    {{-- Header del folio --}}
+                    <div style="padding: 1.25rem 1.75rem; border-bottom: 1px solid var(--rim); display:flex; align-items:center; justify-content:space-between;">
+                        <div style="display:flex; align-items:center; gap:.75rem;">
+                            <div style="width:38px; height:38px; border-radius:10px; background:rgba(29,186,126,0.15); border:1px solid rgba(29,186,126,0.25); display:flex; align-items:center; justify-content:center; font-size:1rem;">
+                                📄
+                            </div>
+                            <div>
+                                <p style="margin:0; font-size:.62rem; font-weight:700; letter-spacing:.14em; text-transform:uppercase; color: var(--text-3);">Folio Real</p>
+                                <p style="margin:0; font-size:1rem; font-weight:700; color: var(--text-1);">{{ $terreno->folio->numero_folio }}</p>
+                            </div>
+                        </div>
+                        <span style="padding:.35rem .9rem; background:rgba(29,186,126,0.15); border:1px solid rgba(29,186,126,0.3); border-radius:100px; font-size:.65rem; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:#1dba7e;">
+                            ✅ Registrado
+                        </span>
+                    </div>
+
+                    {{-- Datos básicos siempre visibles --}}
+                    <div style="padding: 1.25rem 1.75rem; display:grid; grid-template-columns:1fr 1fr; gap:1rem; border-bottom: 1px solid var(--rim);">
+                        <div>
+                            <p style="margin:0 0 .25rem; font-size:.6rem; font-weight:700; letter-spacing:.14em; text-transform:uppercase; color:var(--text-3);">Superficie</p>
+                            <p style="margin:0; font-size:1rem; font-weight:600; color:var(--text-1);">{{ number_format($terreno->folio->superficie, 2) }} m²</p>
+                        </div>
+                        <div>
+                            <p style="margin:0 0 .25rem; font-size:.6rem; font-weight:700; letter-spacing:.14em; text-transform:uppercase; color:var(--text-3);">Ubicación Registrada</p>
+                            <p style="margin:0; font-size:.88rem; color:var(--text-2); line-height:1.4;">{{ $terreno->folio->ubicacion }}</p>
+                        </div>
+                        @if($terreno->folio->colindancias)
+                        <div style="grid-column: span 2;">
+                            <p style="margin:0 0 .25rem; font-size:.6rem; font-weight:700; letter-spacing:.14em; text-transform:uppercase; color:var(--text-3);">Colindancias</p>
+                            <p style="margin:0; font-size:.88rem; color:var(--text-2); line-height:1.5;">{{ $terreno->folio->colindancias }}</p>
+                        </div>
+                        @endif
+                    </div>
+
+                    {{-- Botones de consulta --}}
+                    <div style="padding: 1.25rem 1.75rem; display:flex; gap:.75rem; flex-wrap:wrap;">
+                        @auth
+                            <a href="{{ route('folio.consultar.form') }}"
+                               style="display:inline-flex; align-items:center; gap:.5rem; padding:.65rem 1.25rem; background:rgba(61,126,245,0.12); border:1px solid rgba(61,126,245,0.25); border-radius:12px; color:#3d7ef5; font-size:.82rem; font-weight:600; text-decoration:none; transition: all .2s;"
+                               onmouseover="this.style.background='rgba(61,126,245,0.2)'"
+                               onmouseout="this.style.background='rgba(61,126,245,0.12)'">
+                                🔍 Información Rápida
+                            </a>
+                            <a href="{{ route('folio.completo', $terreno->folio->id) }}"
+                               style="display:inline-flex; align-items:center; gap:.5rem; padding:.65rem 1.25rem; background:rgba(201,168,76,0.12); border:1px solid rgba(201,168,76,0.25); border-radius:12px; color:#c9a84c; font-size:.82rem; font-weight:600; text-decoration:none; transition: all .2s;"
+                               onmouseover="this.style.background='rgba(201,168,76,0.2)'"
+                               onmouseout="this.style.background='rgba(201,168,76,0.12)'">
+                                📋 Ver Folio Completo
+                            </a>
+                        @else
+                            <p style="margin:0; font-size:.82rem; color:var(--text-3);">
+                                🔒 <a href="{{ route('login') }}" style="color:#3d7ef5;">Inicia sesión</a> para consultar el folio completo de este terreno.
+                            </p>
+                        @endauth
+                    </div>
+
+                </div>
+
+                @else
+
+                <div style="background: var(--card); border: 1px solid var(--rim); border-radius: 20px; padding: 1.75rem; margin-bottom: 2rem; display:flex; align-items:flex-start; gap:1rem;">
+                    <div style="width:42px; height:42px; border-radius:12px; background:rgba(255,193,7,0.12); border:1px solid rgba(255,193,7,0.2); display:flex; align-items:center; justify-content:center; font-size:1.2rem; flex-shrink:0;">
+                        ⚠️
+                    </div>
+                    <div>
+                        <p style="margin:0 0 .4rem; font-size:.95rem; font-weight:600; color:var(--text-1);">Sin folio registrado</p>
+                        <p style="margin:0; font-size:.85rem; color:var(--text-2); line-height:1.6;">
+                            Este terreno aún no tiene datos de folio registrados en el sistema.
+                            Puedes contactar al vendedor para solicitar la documentación legal antes de proceder con la compra.
+                        </p>
+                    </div>
+                </div>
+
+                @endif
+
+                {{-- Mapa de ubicación --}}
+                @if($terreno->latitud && $terreno->longitud)
+                <p class="det-section-title">Ubicación en el Mapa</p>
+                <div id="mapaDetalle" style="height:320px; border-radius:20px; overflow:hidden; border:1px solid var(--rim); margin-bottom:2rem;"></div>
+                @endif
 
             </div>
 
@@ -766,4 +859,35 @@
 
     </div>
 </div>
+@push('scripts')
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+@if($terreno->latitud && $terreno->longitud)
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var lat = {{ $terreno->latitud }};
+    var lng = {{ $terreno->longitud }};
+
+    var mapaDetalle = L.map('mapaDetalle', { zoomControl: true }).setView([lat, lng], 15);
+
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+        attribution: '&copy; OSM &copy; CartoDB',
+        subdomains: 'abcd',
+        maxZoom: 19
+    }).addTo(mapaDetalle);
+
+    var icon = L.divIcon({
+        html: '<div style="width:18px;height:18px;background:#c9a84c;border:3px solid #fff;border-radius:50%;box-shadow:0 0 12px rgba(201,168,76,0.6);"></div>',
+        iconSize: [18, 18],
+        iconAnchor: [9, 9],
+        className: ''
+    });
+
+    L.marker([lat, lng], { icon: icon })
+        .addTo(mapaDetalle)
+        .bindPopup('<strong style="color:#111;">{{ addslashes($terreno->ubicacion) }}</strong>')
+        .openPopup();
+});
+</script>
+@endif
+@endpush
 @endsection

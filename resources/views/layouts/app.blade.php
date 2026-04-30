@@ -12,6 +12,7 @@
         rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('css/style.css') }}">
     <link rel="stylesheet" href="{{ asset('css/dark-theme.css') }}">
+    @stack('styles')
 </head>
 
 <body class="@auth theme-{{ Auth::user()->rol === 'admin' ? 'admin' : 'vendedor' }} @endauth">
@@ -307,6 +308,7 @@
     @endguest
 
     <script src="{{ asset('js/app.js') }}"></script>
+    @stack('scripts')
 </body>
 
 </html>

@@ -55,6 +55,13 @@
 
                         <div class="acciones">
                             <a href="{{ route('vendedor.terrenos.edit', $terreno->id) }}" class="btn btn-sm btn-secondary">Editar</a>
+                            @if($terreno->estado === 'aprobado')
+                                @if($terreno->folio)
+                                    <a href="{{ route('folio.consultar.form') }}" class="btn btn-sm btn-info">📄 Ver Folio</a>
+                                @else
+                                    <a href="{{ route('vendedor.folio.create', $terreno->id) }}" class="btn btn-sm btn-warning">📋 Agregar Folio</a>
+                                @endif
+                            @endif
                         </div>
                     </div>
                 </div>

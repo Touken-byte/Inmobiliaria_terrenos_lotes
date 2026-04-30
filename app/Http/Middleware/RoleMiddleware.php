@@ -12,7 +12,8 @@ class RoleMiddleware
     /**
      * Handle an incoming request.
      *
-     * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
+     * Redirige según el rol real del usuario si intenta acceder
+     * a una ruta que no le corresponde.
      */
     public function handle(Request $request, Closure $next, string ...$roles): Response
     {
@@ -22,15 +23,21 @@ class RoleMiddleware
 
         $user = Auth::user();
 
-        // Validar si el rol del usuario está dentro de los roles permitidos
-        if (!in_array($user->rol, $roles)) {
-            // Si intenta acceder a un lugar indebido, redirigir a su lugar correspondiente
-            if ($user->rol === 'admin') {
-                return redirect('/admin/panel')->with('error', 'No tienes permisos para acceder a esa área.');
-            }
-            return redirect('/vendedor/dashboard')->with('error', 'No tienes permisos para acceder a esa área.');
+        // Si el rol del usuario está dentro de los roles permitidos, continuar
+        if (in_array($user->rol, $roles)) {
+            return $next($request);
         }
 
-        return $next($request);
+        // Redirigir a la zona correcta según el rol real del usuario
+        return match($user->rol) {
+            'admin'     => redirect('/admin/panel')
+                            ->with('error', 'No tienes permisos para acceder a esa área.'),
+            'vendedor'  => redirect('/vendedor/dashboard')
+                            ->with('error', 'No tienes permisos para acceder a esa área.'),
+            'comprador' => redirect('/catalogo')
+                            ->with('error', 'No tienes permisos para acceder a esa área.'),
+            default     => redirect('/login')
+                            ->with('error', 'Tu cuenta no tiene un rol válido. Contacta al administrador.'),
+        };
     }
 }

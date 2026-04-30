@@ -164,6 +164,15 @@
                         </button>
                     </form>
 
+                    <div style="text-align:center; margin: 1.25rem 0 0.5rem;">
+                        <p style="font-size:0.88rem; color:#6c757d;">
+                            ¿Eres nuevo aquí?
+                            <a href="{{ route('registro') }}" style="color:#007bff; font-weight:600; text-decoration:none;">
+                                Crear cuenta de cliente
+                            </a>
+                        </p>
+                    </div>
+
                     <div class="login-footer">
                         <div class="login-security">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">

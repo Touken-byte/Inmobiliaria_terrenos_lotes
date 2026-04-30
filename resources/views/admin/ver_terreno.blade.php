@@ -2,6 +2,10 @@
 
 @section('title', 'Terreno #' . $terreno->id)
 
+@push('styles')
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+@endpush
+
 @section('content')
 
 <div class="page-actions">
@@ -62,6 +66,14 @@
                         <span class="doc-info-label">📍 Ubicación:</span>
                         <span class="doc-info-value">{{ $terreno->ubicacion }}</span>
                     </div>
+                    @if($terreno->latitud && $terreno->longitud)
+                    <div class="doc-info-row">
+                        <span class="doc-info-label">🌐 Coordenadas:</span>
+                        <span class="doc-info-value" style="font-size:0.85rem; color:var(--text-muted);">
+                            {{ $terreno->latitud }}, {{ $terreno->longitud }}
+                        </span>
+                    </div>
+                    @endif
                     <div class="doc-info-row">
                         <span class="doc-info-label">📅 Publicado:</span>
                         <span class="doc-info-value">
@@ -84,6 +96,18 @@
                     </div>
                     <small style="color: var(--text-muted);">{{ Str::length($terreno->descripcion) }} caracteres</small>
                 </div>
+
+                {{-- Mapa de ubicación --}}
+                @if($terreno->latitud && $terreno->longitud)
+                <div style="margin-bottom: 24px;">
+                    <h4 style="margin-bottom: 8px; font-size: 0.95rem; color: var(--text-secondary);">📍 Ubicación en el Mapa</h4>
+                    <div id="mapaAdmin" style="height: 300px; border-radius: 10px; border: 2px solid var(--border-color);"></div>
+                </div>
+                @else
+                <div style="margin-bottom: 24px; padding: 12px 16px; background: var(--bg-light); border-radius: 8px; border: 1px solid var(--border-color);">
+                    <p style="margin:0; color: var(--text-muted); font-size:0.9rem;">⚠️ Este terreno no tiene coordenadas registradas. El vendedor no marcó la ubicación en el mapa.</p>
+                </div>
+                @endif
 
                 {{-- Acciones de Aprobación --}}
                 @if($terreno->estado === 'pendiente')
@@ -224,6 +248,30 @@ function abrirImagen(src) {
     document.getElementById('modalImagenSrc').src = src;
     document.getElementById('modalImagen').style.display = 'flex';
 }
+
+@if($terreno->latitud && $terreno->longitud)
+document.addEventListener('DOMContentLoaded', function() {
+    var lat = {{ $terreno->latitud }};
+    var lng = {{ $terreno->longitud }};
+
+    var mapaAdmin = L.map('mapaAdmin', { zoomControl: true, dragging: true }).setView([lat, lng], 15);
+
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+        attribution: '&copy; OSM &copy; CartoDB',
+        subdomains: 'abcd',
+        maxZoom: 19
+    }).addTo(mapaAdmin);
+
+    L.marker([lat, lng])
+        .addTo(mapaAdmin)
+        .bindPopup('<strong>{{ addslashes($terreno->ubicacion) }}</strong><br>Terreno #{{ $terreno->id }}')
+        .openPopup();
+});
+@endif
 </script>
+
+@push('scripts')
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+@endpush
 
 @endsection

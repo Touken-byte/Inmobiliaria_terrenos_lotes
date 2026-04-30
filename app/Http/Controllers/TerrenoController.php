@@ -114,6 +114,8 @@ class TerrenoController extends Controller
             'metros_cuadrados' => $request->metros_cuadrados,
             'ubicacion' => $request->ubicacion,
             'descripcion' => $request->descripcion,
+            'latitud' => $request->latitud ?: null,
+            'longitud' => $request->longitud ?: null,
             'actualizado_en' => now(),
         ]);
 
@@ -193,6 +195,8 @@ class TerrenoController extends Controller
             'ubicacion' => $request->ubicacion,
             'descripcion' => $request->descripcion,
             'estado' => 'pendiente',
+            'latitud' => $request->latitud ?: null,
+            'longitud' => $request->longitud ?: null,
             'creado_en' => now(),
             'actualizado_en' => now(),
         ]);
