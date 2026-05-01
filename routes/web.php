@@ -5,33 +5,38 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\VendedorController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\TerrenoController;
+use App\Http\Controllers\AlquilerController; // <-- Importante: controlador de alquileres
 use App\Http\Controllers\DocumentoPropiedadController;
 use App\Http\Controllers\SolicitudVisitaController;
 use App\Http\Controllers\MinutaController;
 
-Route::get('/', function () {
+    Route::get('/', function () {
     return redirect()->route('login');
 });
 
 // Rutas Públicas
-Route::get('/terrenos', [TerrenoController::class, 'index'])->name('terrenos.index');
+    Route::get('/terrenos', [TerrenoController::class, 'index'])->name('terrenos.index');
 
-// CATÁLOGO COMPRADOR (Marketplace)
-Route::get('/catalogo', [TerrenoController::class, 'catalogo'])->name('catalogo.terrenos');
+// CATÁLOGO COMPRADOR (Marketplace) - Terrenos
+    Route::get('/catalogo', [TerrenoController::class, 'catalogo'])->name('catalogo.terrenos');
 Route::get('/catalogo/{id}', [TerrenoController::class, 'detalle'])->name('catalogo.detalle');
 
+// CATÁLOGO COMPRADOR (Marketplace) - Alquileres (público)
+Route::get('/alquileres', [AlquilerController::class, 'catalogo'])->name('catalogo.alquileres');
+Route::get('/alquileres/{id}', [AlquilerController::class, 'detalle'])->name('catalogo.detalle.alquiler');
+
 // Autenticación
-Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
-Route::post('/login', [AuthController::class, 'login'])->name('login.post');
-Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
-Route::get('/registro', [App\Http\Controllers\RegistroController::class, 'showRegister'])->name('registro');
-Route::post('/registro', [App\Http\Controllers\RegistroController::class, 'register'])->name('registro.post');
+    Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
+    Route::post('/login', [AuthController::class, 'login'])->name('login.post');
+    Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+    Route::get('/registro', [App\Http\Controllers\RegistroController::class, 'showRegister'])->name('registro');
+    Route::post('/registro', [App\Http\Controllers\RegistroController::class, 'register'])->name('registro.post');
 
 // Rutas de Vendedor
-Route::middleware(['auth', 'role:vendedor'])->prefix('vendedor')->name('vendedor.')->group(function () {
+    Route::middleware(['auth', 'role:vendedor'])->prefix('vendedor')->name('vendedor.')->group(function () {
     Route::get('/dashboard', [VendedorController::class, 'dashboard'])->name('dashboard');
     Route::post('/subir-ci', [VendedorController::class, 'subirCI'])->name('subir_ci');
-    Route::delete('/eliminar-ci', [VendedorController::class, 'eliminarCI'])->name('eliminar_ci'); // ✅ CORREGIDO
+    Route::delete('/eliminar-ci', [VendedorController::class, 'eliminarCI'])->name('eliminar_ci');
     Route::get('/mi-ci', [VendedorController::class, 'servirMiCI'])->name('mi_ci');
     Route::get('/historial', [VendedorController::class, 'historialPropio'])->name('historial');
 
@@ -42,6 +47,16 @@ Route::middleware(['auth', 'role:vendedor'])->prefix('vendedor')->name('vendedor
     Route::get('/mis-terrenos', [TerrenoController::class, 'misTerrenos'])->name('terrenos.mis');
     Route::get('/terrenos/editar/{id}', [TerrenoController::class, 'edit'])->name('terrenos.edit');
     Route::put('/terrenos/{id}', [TerrenoController::class, 'update'])->name('terrenos.update');
+
+    // Alquileres (gestión del vendedor)
+    Route::get('/alquileres', [AlquilerController::class, 'index'])->name('alquileres.index');
+    Route::get('/alquileres/crear', [AlquilerController::class, 'create'])->name('alquileres.create');
+    Route::post('/alquileres', [AlquilerController::class, 'store'])->name('alquileres.store');
+    Route::get('/mis-alquileres', [AlquilerController::class, 'misAlquileres'])->name('alquileres.mis');
+    Route::get('/alquileres/editar/{id}', [AlquilerController::class, 'edit'])->name('alquileres.edit');
+    Route::put('/alquileres/{id}', [AlquilerController::class, 'update'])->name('alquileres.update');
+    Route::delete('/alquileres/{id}', [AlquilerController::class, 'destroy'])->name('alquileres.destroy');
+    Route::post('/alquileres/toggle-estado/{id}', [AlquilerController::class, 'toggleEstado'])->name('alquileres.toggle_estado');
 
     // Documentos propiedad
     Route::get('/terrenos/{id}/documentos', [DocumentoPropiedadController::class, 'mostrarFormularioSubida'])->name('documentos.subir');
@@ -59,7 +74,7 @@ Route::middleware(['auth', 'role:vendedor'])->prefix('vendedor')->name('vendedor
 });
 
 // Rutas compartidas (vendedor y admin) para solicitudes de visita
-Route::middleware(['auth', 'role:vendedor,admin'])->prefix('vendedor')->name('vendedor.')->group(function () {
+    Route::middleware(['auth', 'role:vendedor,admin'])->prefix('vendedor')->name('vendedor.')->group(function () {
     Route::get('/solicitudes', [SolicitudVisitaController::class, 'index'])->name('solicitudes.index');
     Route::get('/solicitudes/calendario', [SolicitudVisitaController::class, 'calendario'])->name('solicitudes.calendario');
     Route::get('/solicitudes/crear', [SolicitudVisitaController::class, 'create'])->name('solicitudes.create');
@@ -73,12 +88,12 @@ Route::middleware(['auth', 'role:vendedor,admin'])->prefix('vendedor')->name('ve
 });
 
 // Rutas de Admin
-Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
+    Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/panel', [AdminController::class, 'panel'])->name('panel');
     Route::get('/ver-ci/{id}', [AdminController::class, 'verCI'])->name('ver_ci');
-    Route::get('/vendedor/{id}/editar', [AdminController::class, 'editVendedor'])->name('editar_vendedor');        // ✅ corregido
-    Route::put('/vendedor/{id}', [AdminController::class, 'updateVendedor'])->name('actualizar_vendedor');      // ✅ corregido
-    Route::delete('/vendedor/{id}', [AdminController::class, 'deleteVendedor'])->name('eliminar_vendedor');     // ✅ corregido
+    Route::get('/vendedor/{id}/editar', [AdminController::class, 'editVendedor'])->name('editar_vendedor');
+    Route::put('/vendedor/{id}', [AdminController::class, 'updateVendedor'])->name('actualizar_vendedor');
+    Route::delete('/vendedor/{id}', [AdminController::class, 'deleteVendedor'])->name('eliminar_vendedor');
     Route::get('/servir-ci/{id}', [AdminController::class, 'servirCI'])->name('servir_ci');
     Route::get('/documentos-propiedad/{id}', [DocumentoPropiedadController::class, 'verDocumento'])->name('documentos.ver');
     Route::post('/procesar-verificacion', [AdminController::class, 'procesarVerificacion'])->name('procesar_verificacion');

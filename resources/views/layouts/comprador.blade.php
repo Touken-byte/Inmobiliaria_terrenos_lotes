@@ -144,6 +144,43 @@
             margin-top: .2rem;
         }
 
+        /* ── NAV LINKS (Terrenos / Alquileres) ── */
+        .ts-nav-links {
+            display: flex;
+            align-items: center;
+            gap: 1.75rem;
+        }
+        .ts-nav-link {
+            font-size: .82rem;
+            font-weight: 600;
+            letter-spacing: .06em;
+            text-decoration: none;
+            color: var(--text-2);
+            transition: color .2s;
+            position: relative;
+            padding-bottom: 2px;
+        }
+        .ts-nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -2px; left: 0;
+            width: 0; height: 1px;
+            background: var(--gold);
+            transition: width .25s;
+        }
+        .ts-nav-link:hover {
+            color: var(--text-1);
+        }
+        .ts-nav-link:hover::after {
+            width: 100%;
+        }
+        .ts-nav-link.active {
+            color: var(--gold);
+        }
+        .ts-nav-link.active::after {
+            width: 100%;
+        }
+
         /* Nav actions */
         .ts-nav-actions {
             display: flex;
@@ -266,8 +303,8 @@
         }
     </style>
     @stack('scripts')
-</body>
-</html>
+</head>
+<body>
 
 <!-- ── NAVBAR ── -->
 <nav class="ts-nav">
@@ -291,6 +328,20 @@
                 <span class="ts-logo-sub">Marketplace Premium</span>
             </div>
         </a>
+
+        {{-- NAV LINKS (Terrenos / Alquileres) --}}
+        <nav class="ts-nav-links">
+            <a href="{{ route('catalogo.terrenos') }}"
+               class="ts-nav-link {{ request()->routeIs('catalogo.terrenos*') ? 'active' : '' }}">
+                <i class="fa-solid fa-map" style="margin-right:.35rem; font-size:.75rem;"></i>
+                Terrenos
+            </a>
+            <a href="{{ route('catalogo.alquileres') }}"
+               class="ts-nav-link {{ request()->routeIs('catalogo.alquileres*') ? 'active' : '' }}">
+                <i class="fa-solid fa-bed" style="margin-right:.35rem; font-size:.75rem;"></i>
+                Alquileres
+            </a>
+        </nav>
 
         <div class="ts-nav-actions">
             @auth
