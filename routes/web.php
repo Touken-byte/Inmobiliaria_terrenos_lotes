@@ -106,10 +106,12 @@ Route::get('/alquileres/{id}', [AlquilerController::class, 'detalle'])->name('ca
 
     // Moderación de anuncios
     Route::get('/moderacion', [AdminController::class, 'moderacionPanel'])->name('moderacion_panel');
-    // Gestión de terrenos
+    // Gestión de terrenos y alquileres
     Route::get('/terrenos', [AdminController::class, 'terrenosPanel'])->name('terrenos_panel');
     Route::get('/terrenos/{id}', [AdminController::class, 'verTerreno'])->name('ver_terreno');
     Route::post('/procesar-terreno', [AdminController::class, 'procesarTerreno'])->name('procesar_terreno');
+    Route::get('/alquileres/{id}', [AdminController::class, 'verAlquiler'])->name('ver_alquiler');
+    Route::post('/procesar-alquiler', [AdminController::class, 'procesarAlquiler'])->name('procesar_alquiler');
 
     // Control de lotes
     Route::get('/lotes', [AdminController::class, 'controlLotes'])->name('lotes');

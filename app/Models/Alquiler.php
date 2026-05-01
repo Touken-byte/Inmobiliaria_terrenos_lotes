@@ -23,6 +23,7 @@ class Alquiler extends Model
         'disponible_desde',
         'user_id',
         'estado',
+        'estado_aprobacion',
     ];
 
     protected $casts = [

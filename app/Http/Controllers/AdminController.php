@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use App\Models\Terreno;
+use App\Models\Alquiler;
 use App\Models\TerrenoImagen;
 use App\Mail\DocumentApproval;
 use App\Mail\DocumentRejection;
@@ -255,16 +256,21 @@ class AdminController extends Controller
     public function moderacionPanel()
     {
         $stats = (object) [
-            'pendientes' => Terreno::where('estado', 'pendiente')->count(),
-            'total_aprobados' => Terreno::where('estado', 'aprobado')->count(),
+            'pendientes' => Terreno::where('estado', 'pendiente')->count() + Alquiler::where('estado_aprobacion', 'pendiente')->count(),
+            'total_aprobados' => Terreno::where('estado', 'aprobado')->count() + Alquiler::where('estado_aprobacion', 'aprobado')->count(),
         ];
 
         $terrenos = Terreno::with(['vendedor', 'imagenes'])
             ->where('estado', 'pendiente')
             ->orderBy('creado_en', 'ASC')
             ->get();
+            
+        $alquileres = Alquiler::with(['usuario', 'imagenes'])
+            ->where('estado_aprobacion', 'pendiente')
+            ->orderBy('created_at', 'ASC')
+            ->get();
 
-        return view('admin.moderacion', compact('stats', 'terrenos'));
+        return view('admin.moderacion', compact('stats', 'terrenos', 'alquileres'));
     }
 
 
@@ -299,6 +305,13 @@ class AdminController extends Controller
         $terreno = Terreno::with(['vendedor', 'imagenes', 'adminAprobador'])->findOrFail($id);
 
         return view('admin.ver_terreno', compact('terreno'));
+    }
+
+    public function verAlquiler($id)
+    {
+        $alquiler = Alquiler::with(['usuario', 'imagenes'])->findOrFail($id);
+        
+        return view('admin.ver_alquiler', compact('alquiler'));
     }
 
     public function procesarTerreno(Request $request)
@@ -349,6 +362,29 @@ class AdminController extends Controller
         $rutaDestino = $isModeracion ? 'admin.moderacion_panel' : 'admin.terrenos_panel';
         
         return redirect()->route($rutaDestino)->with('success', "Terreno #{$terreno->id} {$accionTexto} exitosamente.{$msgExtra}");
+    }
+
+    public function procesarAlquiler(Request $request)
+    {
+        $request->validate([
+            'alquiler_id' => 'required|integer',
+            'accion' => 'required|in:aprobado,rechazado'
+        ]);
+
+        $alquilerId = $request->input('alquiler_id');
+        $accion = $request->input('accion');
+
+        $alquiler = Alquiler::findOrFail($alquilerId);
+        $alquiler->estado_aprobacion = $accion;
+        $alquiler->save();
+
+        $accionTexto = $accion === 'aprobado' ? 'aprobado ✅' : 'rechazado ❌';
+        
+        $previousUrl = url()->previous();
+        $isModeracion = str_contains($previousUrl, route('admin.moderacion_panel'));
+        $rutaDestino = $isModeracion ? 'admin.moderacion_panel' : 'admin.panel';
+        
+        return redirect()->route($rutaDestino)->with('success', "Alquiler #{$alquiler->id} {$accionTexto} exitosamente.");
     }
 
     // ═══════════════════════════════════════════════════════

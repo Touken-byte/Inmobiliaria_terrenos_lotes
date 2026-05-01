@@ -154,6 +154,29 @@
                                 </span>
                                 <span>Mis Terrenos</span>
                             </a>
+                            <a href="{{ route('vendedor.alquileres.create') }}"
+                                class="nav-link {{ request()->is('vendedor/alquileres/crear') ? 'active' : '' }}"
+                                id="nav-alquileres-create">
+                                <span class="nav-icon">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
+                                        <polyline points="9,22 9,12 15,12 15,22" />
+                                    </svg>
+                                </span>
+                                <span>Publicar Alquiler</span>
+                            </a>
+                            <a href="{{ route('vendedor.alquileres.mis') }}"
+                                class="nav-link {{ request()->is('vendedor/mis-alquileres') ? 'active' : '' }}"
+                                id="nav-mis-alquileres">
+                                <span class="nav-icon">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+                                        <path d="M3 9h18" />
+                                        <path d="M9 21V9" />
+                                    </svg>
+                                </span>
+                                <span>Mis Alquileres</span>
+                            </a>
                             <a href="{{ route('vendedor.lotes') }}"
                                 class="nav-link {{ request()->is('vendedor/lotes*') ? 'active' : '' }}" id="nav-lotes-vendedor">
                                 <span class="nav-icon">

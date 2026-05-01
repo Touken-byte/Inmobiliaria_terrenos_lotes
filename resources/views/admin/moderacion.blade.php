@@ -102,6 +102,70 @@
     </div>
 </div>
 
+<!-- ═══ Tabla de Alquileres ═══ -->
+<div class="card mt-4" id="alquileresTableCard">
+    <div class="card-header">
+        <h2 class="card-title">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
+            </svg>
+            Cola de Aprobación - Alquileres
+            <span class="badge badge-secondary">{{ count($alquileres) }}</span>
+        </h2>
+    </div>
+    <div class="card-body no-padding">
+        @if (count($alquileres) === 0)
+            <div class="empty-state">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
+                </svg>
+                <p>No hay alquileres pendientes por revisar.</p>
+            </div>
+        @else
+            <div class="terrenos-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.5rem; padding: 1rem;">
+                @foreach ($alquileres as $a)
+                    <div class="card terreno-card" style="display: flex; flex-direction: column; overflow: hidden; border: 1px solid var(--border-color);">
+                        <div class="terreno-imagen" style="height: 200px; background: #f0f0f0; display: flex; align-items: center; justify-content: center; position: relative;">
+                            @if($a->imagenes->first())
+                                <img src="{{ asset($a->imagenes->first()->ruta_archivo) }}" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.src='https://via.placeholder.com/300x200?text=Error'">
+                                <span class="badge badge-info" style="position: absolute; bottom: 10px; right: 10px;">{{ $a->imagenes->count() }} fotos</span>
+                            @else
+                                <span style="font-size: 2rem; color: #ccc;">📷 Sin imagen</span>
+                            @endif
+                            <span class="badge badge-warning" style="position: absolute; top: 10px; left: 10px;">⏳ Pendiente</span>
+                        </div>
+                        <div class="terreno-info" style="padding: 1rem; flex-grow: 1; display: flex; flex-direction: column;">
+                            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem;">
+                                <strong>#{{ $a->id }}</strong>
+                                <span style="font-size: 0.85em; color: var(--text-muted);">{{ \Carbon\Carbon::parse($a->created_at)->timezone('America/La_Paz')->translatedFormat('d M Y, H:i') }}</span>
+                            </div>
+                            
+                            <h3 style="margin: 0 0 0.5rem 0; font-size: 1.1rem; line-height: 1.3;" title="{{ $a->titulo }}">{{ Str::limit($a->titulo, 50) }}</h3>
+                            <p style="margin: 0 0 0.5rem 0; font-size: 1.2rem; font-weight: bold; color: var(--info-color);">${{ number_format($a->precio_mensual, 2) }} / mes</p>
+                            
+                            <div style="margin-bottom: 1rem; padding: 0.5rem; background: var(--bg-color); border-radius: 6px; font-size: 0.9em;">
+                                <strong>Vendedor:</strong><br>
+                                {{ $a->usuario->nombre ?? 'N/A' }}<br>
+                                <span style="color: var(--text-muted);">{{ $a->usuario->email ?? '' }}</span>
+                            </div>
+
+                            <div style="margin-top: auto; display: flex; gap: 0.5rem;">
+                                <a href="{{ route('admin.ver_alquiler', $a->id) }}" class="btn btn-info text-white" style="flex-grow: 1; justify-content: center;">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px; margin-right: 5px;">
+                                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                                        <circle cx="12" cy="12" r="3" />
+                                    </svg>
+                                    Revisar Alquiler
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+        @endif
+    </div>
+</div>
+
 <script>
 document.addEventListener('DOMContentLoaded', function () {
     const searchInput = document.getElementById('searchTerreno');

@@ -70,6 +70,37 @@
     </div>
 </div>
 
+@if ($estado === 'verificado')
+<div class="dashboard-grid" style="margin-bottom: 20px;">
+    <div class="card" style="text-align: center; padding: 30px;">
+        <div style="margin-bottom: 15px;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2" width="48" height="48">
+                <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+                <line x1="12" y1="8" x2="12" y2="16" />
+                <line x1="8" y1="12" x2="16" y2="12" />
+            </svg>
+        </div>
+        <h3 style="margin-bottom: 10px;">Publicar Terreno</h3>
+        <p style="color: var(--text-muted); margin-bottom: 20px;">Anuncia un nuevo lote o terreno en nuestro catálogo de propiedades.</p>
+        <a href="{{ route('vendedor.terrenos.create') }}" class="btn btn-primary" style="display: inline-block;">Crear Publicación</a>
+    </div>
+
+    <div class="card" style="text-align: center; padding: 30px;">
+        <div style="margin-bottom: 15px;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="var(--info-color, #17a2b8)" stroke-width="2" width="48" height="48">
+                <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
+                <polyline points="9,22 9,12 15,12 15,22" />
+                <line x1="12" y1="8" x2="12" y2="16" />
+                <line x1="8" y1="12" x2="16" y2="12" />
+            </svg>
+        </div>
+        <h3 style="margin-bottom: 10px;">Publicar Alquiler</h3>
+        <p style="color: var(--text-muted); margin-bottom: 20px;">Oferta una habitación o inmueble para alquiler en la plataforma.</p>
+        <a href="{{ route('vendedor.alquileres.create') }}" class="btn btn-primary" style="display: inline-block; background-color: var(--info-color, #17a2b8); border-color: var(--info-color, #17a2b8);">Crear Alquiler</a>
+    </div>
+</div>
+@endif
+
 <div class="dashboard-grid">
     <!-- ═══ Columna Izquierda: Subir Documento ═══ -->
     <div class="card" id="uploadCard">
