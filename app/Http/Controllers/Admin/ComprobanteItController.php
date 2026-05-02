@@ -47,10 +47,10 @@ class ComprobanteItController extends Controller
     {
         $comprobante = ComprobanteIt::findOrFail($id);
 
-        if (!Storage::disk('local')->exists($comprobante->archivo)) {
+        if (!Storage::disk('public')->exists($comprobante->archivo)) {
             abort(404, 'El archivo no fue encontrado en el servidor.');
         }
 
-        return Storage::disk('local')->response($comprobante->archivo);
+        return Storage::disk('public')->response($comprobante->archivo);
     }
 }

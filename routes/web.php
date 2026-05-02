@@ -5,10 +5,11 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\VendedorController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\TerrenoController;
-use App\Http\Controllers\AlquilerController; // <-- Importante: controlador de alquileres
+use App\Http\Controllers\AlquilerController;
 use App\Http\Controllers\DocumentoPropiedadController;
 use App\Http\Controllers\SolicitudVisitaController;
 use App\Http\Controllers\MinutaController;
+use App\Http\Controllers\Admin\TramiteLegalController;
 
     Route::get('/', function () {
     return redirect()->route('login');
@@ -68,9 +69,16 @@ Route::get('/alquileres/{id}', [AlquilerController::class, 'detalle'])->name('ca
     Route::get('/lotes', [VendedorController::class, 'controlLotes'])->name('lotes');
     Route::post('/lotes/{id}/estado', [VendedorController::class, 'updateLoteEstado'])->name('lotes.estado');
 
-    // Comprobante IT
+    // Comprobante IT (ruta original intacta)
     Route::get('/comprobante-it', [\App\Http\Controllers\Vendedor\ComprobanteItController::class, 'index'])->name('comprobante_it');
     Route::post('/comprobante-it', [\App\Http\Controllers\Vendedor\ComprobanteItController::class, 'store'])->name('comprobante_it.store');
+
+    // ── NUEVO: Proceso Legal de Venta (Minuta + IT unificado) ──
+    Route::get('/proceso-legal', [MinutaController::class, 'tramiteLegal'])->name('proceso_legal');
+    Route::get('/historial-legal', [MinutaController::class, 'historialLegal'])->name('historial_legal');
+    Route::get('/minuta/{id}/archivo', [MinutaController::class, 'verArchivo'])->name('minuta.archivo');
+    Route::get('/comprobante-it/{id}/archivo', [\App\Http\Controllers\Vendedor\ComprobanteItController::class, 'verArchivo'])->name('comprobante_it.archivo');
+    Route::post('/proceso-legal/minuta', [MinutaController::class, 'storeVendedor'])->name('proceso_legal.minuta.store');
 });
 
 // Rutas compartidas (vendedor y admin) para solicitudes de visita
@@ -116,11 +124,20 @@ Route::get('/alquileres/{id}', [AlquilerController::class, 'detalle'])->name('ca
     // Control de lotes
     Route::get('/lotes', [AdminController::class, 'controlLotes'])->name('lotes');
 
-    // Comprobantes IT
+    // Comprobantes IT (ruta original intacta)
     Route::get('/comprobantes-it', [\App\Http\Controllers\Admin\ComprobanteItController::class, 'index'])->name('comprobantes_it.index');
     Route::post('/comprobantes-it/{id}/aprobar', [\App\Http\Controllers\Admin\ComprobanteItController::class, 'aprobar'])->name('comprobantes_it.aprobar');
     Route::post('/comprobantes-it/{id}/rechazar', [\App\Http\Controllers\Admin\ComprobanteItController::class, 'rechazar'])->name('comprobantes_it.rechazar');
     Route::get('/comprobantes-it/{id}/archivo', [\App\Http\Controllers\Admin\ComprobanteItController::class, 'verArchivo'])->name('comprobantes_it.archivo');
+
+    // ── Gestión Legal unificada (Admin) ──
+    Route::get('/tramites-legales', [TramiteLegalController::class, 'index'])->name('tramites_legales.index');
+    Route::post('/tramites-legales/{id}/aprobar-minuta', [TramiteLegalController::class, 'aprobarMinuta'])->name('tramites_legales.aprobar_minuta');
+    Route::post('/tramites-legales/{id}/rechazar-minuta', [TramiteLegalController::class, 'rechazarMinuta'])->name('tramites_legales.rechazar_minuta');
+    Route::post('/tramites-legales/{id}/aprobar-it', [TramiteLegalController::class, 'aprobarIT'])->name('tramites_legales.aprobar_it');
+    Route::post('/tramites-legales/{id}/rechazar-it', [TramiteLegalController::class, 'rechazarIT'])->name('tramites_legales.rechazar_it');
+    Route::post('/tramites-legales/{id}/finalizar', [TramiteLegalController::class, 'finalizarTramite'])->name('tramites_legales.finalizar');
+    Route::get('/tramites-legales/{id}/minuta-archivo', [TramiteLegalController::class, 'verMinuta'])->name('tramites_legales.ver_minuta');
 });
 
 Route::get('/mapa', [App\Http\Controllers\MapaController::class, 'index'])->name('mapa.index');

@@ -10,6 +10,7 @@ class ComprobanteIt extends Model
 
     protected $fillable = [
         'user_id',
+        'minuta_id',
         'numero_recibo',
         'fecha_pago',
         'monto',

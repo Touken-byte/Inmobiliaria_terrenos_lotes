@@ -95,18 +95,15 @@
                                 </span>
                                 <span>Control de Lotes</span>
                             </a>
-                            <a href="{{ route('admin.comprobantes_it.index') }}"
-                                class="nav-link {{ request()->is('admin/comprobantes-it*') ? 'active' : '' }}" id="nav-comprobantes-it-admin">
+
+                            <a href="{{ route('admin.tramites_legales.index') }}"
+                                class="nav-link {{ request()->is('admin/tramites-legales*') ? 'active' : '' }}" id="nav-tramites-legales-admin">
                                 <span class="nav-icon">
                                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                                        <polyline points="14 2 14 8 20 8"></polyline>
-                                        <line x1="16" y1="13" x2="8" y2="13"></line>
-                                        <line x1="16" y1="17" x2="8" y2="17"></line>
-                                        <polyline points="10 9 9 9 8 9"></polyline>
+                                        <path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
                                     </svg>
                                 </span>
-                                <span>Comprobantes IT</span>
+                                <span>Gestión Legal</span>
                             </a>
                             <a href="{{ route('vendedor.solicitudes.index') }}"
                                 class="nav-link {{ request()->is('vendedor/solicitudes*') ? 'active' : '' }}" id="nav-solicitudes-admin">
@@ -189,18 +186,24 @@
                                 </span>
                                 <span>Control de Lotes</span>
                             </a>
-                            <a href="{{ route('vendedor.comprobante_it') }}"
-                                class="nav-link {{ request()->is('vendedor/comprobante-it*') ? 'active' : '' }}" id="nav-comprobante-it">
+
+                            <a href="{{ route('vendedor.proceso_legal') }}"
+                                class="nav-link {{ request()->is('vendedor/proceso-legal*') ? 'active' : '' }}" id="nav-proceso-legal">
                                 <span class="nav-icon">
                                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                                        <polyline points="14 2 14 8 20 8"></polyline>
-                                        <line x1="16" y1="13" x2="8" y2="13"></line>
-                                        <line x1="16" y1="17" x2="8" y2="17"></line>
-                                        <polyline points="10 9 9 9 8 9"></polyline>
+                                        <path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
                                     </svg>
                                 </span>
-                                <span>Comprobante IT</span>
+                                <span>Proceso Legal de Venta</span>
+                            </a>
+                            <a href="{{ route('vendedor.historial_legal') }}"
+                                class="nav-link {{ request()->is('vendedor/historial-legal*') ? 'active' : '' }}" id="nav-historial-legal">
+                                <span class="nav-icon">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/>
+                                    </svg>
+                                </span>
+                                <span>Historial Legal</span>
                             </a>
                             <a href="{{ route('vendedor.solicitudes.index') }}"
                                 class="nav-link {{ request()->is('vendedor/solicitudes*') ? 'active' : '' }}" id="nav-solicitudes">
@@ -318,10 +321,12 @@
                     @yield('content')
                 </main>
 
+                @if(!request()->routeIs('vendedor.proceso_legal') && !request()->routeIs('vendedor.historial_legal'))
                 <footer class="app-footer">
                     <p>&copy; {{ date('Y') }} TerrenoSur — Módulos IN-A01 Verificación de Usuarios · IN-U01 Publicación de
                         Terrenos</p>
                 </footer>
+                @endif
             </div>
         </div>
     @endauth
