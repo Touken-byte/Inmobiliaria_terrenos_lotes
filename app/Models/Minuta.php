@@ -14,7 +14,14 @@ class Minuta extends Model
         'vendedor_id',
         'monto',
         'fecha',
-        'archivo'
+        'archivo',
+        'estado',
+        'observacion',
+    ];
+
+    protected $casts = [
+        'fecha' => 'date',
+        'monto' => 'decimal:2',
     ];
 
     public function terreno()

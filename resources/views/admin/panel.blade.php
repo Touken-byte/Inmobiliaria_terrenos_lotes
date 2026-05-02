@@ -168,37 +168,25 @@
     <div class="minutas-quick-left">
         <div class="minutas-quick-icon">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
-                <polyline points="14,2 14,8 20,8"/>
-                <line x1="16" y1="13" x2="8" y2="13"/>
-                <line x1="16" y1="17" x2="8" y2="17"/>
-                <polyline points="10,9 9,9 8,9"/>
+                <path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
             </svg>
         </div>
         <div>
-            <p class="minutas-quick-title">Minutas de Compraventa</p>
-            <p class="minutas-quick-sub">Gestiona y registra minutas del sistema</p>
+            <p class="minutas-quick-title">Gestión Legal Unificada</p>
+            <p class="minutas-quick-sub">Supervisa el flujo de Minutas y Comprobantes IT de los vendedores.</p>
         </div>
     </div>
     <div class="minutas-quick-actions">
-        <a href="{{ route('admin.minutas.index') }}" class="btn-minuta-ver">
+        <a href="{{ route('admin.tramites_legales.index') }}" class="btn-minuta-nueva" style="background: linear-gradient(135deg, #7c3aed, #4f46e5); box-shadow: 0 4px 15px rgba(124,58,237,0.3);">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
                 <circle cx="12" cy="12" r="3"/>
             </svg>
-            Ver Minutas
-        </a>
-        <a href="{{ route('admin.minutas.create') }}" class="btn-minuta-nueva">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <line x1="12" y1="5" x2="12" y2="19"/>
-                <line x1="5" y1="12" x2="19" y2="12"/>
-            </svg>
-            Registrar Minuta
+            Entrar a Gestión Legal
         </a>
     </div>
 </div>
 
-{{-- ═══ Filtros y Búsqueda ═══ --}}
 <div class="card" id="filtersCard">
     <div class="card-body">
         <div class="filters-row">
