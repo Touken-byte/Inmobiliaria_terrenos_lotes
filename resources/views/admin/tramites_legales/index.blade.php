@@ -108,12 +108,27 @@
                                     </div>
                                 @endif
 
-                                {{-- Botón Finalizar (Habilitado si la minuta está aprobada y el IT existe) --}}
-                                @if($minuta->estado === 'aprobada' && $comp)
+                                {{-- Sección Protocolización (Testimonio) --}}
+                                @if($minuta->protocolizacion)
+                                    <div style="width: 2px; height: 20px; background: rgba(255,255,255,0.1);"></div>
+                                    <div style="display: flex; gap: 5px; background: rgba(255,255,255,0.03); padding: 5px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);">
+                                        @if($minuta->protocolizacion->archivo_testimonio)
+                                            <a href="{{ route('admin.tramites_legales.ver_testimonio', $minuta->protocolizacion->id) }}" target="_blank" class="action-btn-circle" title="Ver Testimonio">🖋️</a>
+                                        @endif
+
+                                        @if($minuta->protocolizacion->estado === 'pendiente')
+                                            <button class="action-btn-circle btn-success" title="Aprobar Protocolización" onclick="openModal('aprobar-prot', {{ $minuta->protocolizacion->id }}, '{{ addslashes($minuta->vendedor->nombre) }}')">P ✓</button>
+                                            <button class="action-btn-circle btn-danger" title="Rechazar Protocolización" onclick="openModal('rechazar-prot', {{ $minuta->protocolizacion->id }})">P ✗</button>
+                                        @endif
+                                    </div>
+                                @endif
+
+                                {{-- Botón Finalizar (Habilitado si la protocolización está aprobada) --}}
+                                @if($minuta->protocolizacion && $minuta->protocolizacion->estado === 'aprobado')
                                     <button type="button" class="btn btn-primary btn-sm" 
                                             style="height: 34px; border-radius: 10px; margin-left: 10px; font-weight: 700; background: linear-gradient(135deg, #7c3aed, #4f46e5);"
                                             onclick="openModal('finalizar', {{ $minuta->id }}, '{{ addslashes($minuta->vendedor->nombre) }}')">
-                                        🏆 Finalizar
+                                        🏆 Finalizar Venta
                                     </button>
                                 @endif
                             </div>
@@ -195,11 +210,24 @@ function openModal(type, id, name = '') {
         obs.style.display = 'block';
         submit.innerText = 'Rechazar Comprobante';
         submit.className = 'btn btn-danger';
+    } else if(type === 'aprobar-prot') {
+        title.innerText = '¿Aprobar Protocolización?';
+        msg.innerText = `Confirmas que el testimonio notarial presentado por ${name} es correcto.`;
+        form.action = `/admin/tramites-legales/${id}/aprobar-protocolizacion`;
+        submit.innerText = 'Sí, Aprobar Protocolización';
+        submit.className = 'btn btn-success';
+    } else if(type === 'rechazar-prot') {
+        title.innerText = 'Rechazar Protocolización';
+        msg.innerText = 'Indique qué problema encontró en el testimonio notarial.';
+        form.action = `/admin/tramites-legales/${id}/rechazar-protocolizacion`;
+        obs.style.display = 'block';
+        submit.innerText = 'Rechazar Testimonio';
+        submit.className = 'btn btn-danger';
     } else if(type === 'finalizar') {
-        title.innerText = '🏆 Finalizar Proceso Legal';
-        msg.innerHTML = `Estás a punto de completar oficialmente el trámite de <strong>${name}</strong>.<br><br>Ambos documentos (Minuta e IT) se marcarán como completados y el proceso se cerrará.`;
+        title.innerText = '🏆 Finalizar Venta Oficialmente';
+        msg.innerHTML = `Estás a punto de completar el cierre legal de <strong>${name}</strong>.<br><br>El lote se marcará como <strong>VENDIDO</strong> y el trámite quedará archivado como finalizado.`;
         form.action = `/admin/tramites-legales/${id}/finalizar`;
-        submit.innerText = 'Sí, Finalizar Trámite';
+        submit.innerText = 'Confirmar Venta Cerrada';
         submit.className = 'btn btn-primary';
     }
 

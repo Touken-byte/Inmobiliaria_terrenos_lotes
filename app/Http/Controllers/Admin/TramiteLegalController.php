@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Minuta;
 use App\Models\ComprobanteIt;
+use App\Models\Protocolizacion;
 use App\Models\Usuario;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -22,10 +23,10 @@ class TramiteLegalController extends Controller
             ->latest()
             ->paginate(15);
 
-        // Para cada minuta, buscamos su comprobante IT vinculado
+        // Para cada minuta, buscamos su comprobante IT y Protocolización vinculado
         $minutas->getCollection()->transform(function ($minuta) {
-            $minuta->comprobante = ComprobanteIt::where('minuta_id', $minuta->id)
-                ->first();
+            $minuta->comprobante = ComprobanteIt::where('minuta_id', $minuta->id)->first();
+            $minuta->protocolizacion = Protocolizacion::where('minuta_id', $minuta->id)->first();
             return $minuta;
         });
 
@@ -95,7 +96,36 @@ class TramiteLegalController extends Controller
         return redirect()->route('admin.tramites_legales.index')
             ->with('success', 'Comprobante IT rechazado. Se solicitó corrección al vendedor.');
     }
+    /**
+     * Aprobar la protocolización.
+     */
+    public function aprobarProtocolizacion($id)
+    {
+        $prot = Protocolizacion::findOrFail($id);
+        $prot->update(['estado' => 'aprobado', 'observacion' => null]);
 
+        return redirect()->route('admin.tramites_legales.index')
+            ->with('success', 'Testimonio notarial aprobado correctamente.');
+    }
+
+    /**
+     * Rechazar la protocolización.
+     */
+    public function rechazarProtocolizacion(Request $request, $id)
+    {
+        $request->validate([
+            'observacion' => 'required|string|min:5',
+        ]);
+
+        $prot = Protocolizacion::findOrFail($id);
+        $prot->update([
+            'estado'      => 'rechazado',
+            'observacion' => $request->observacion,
+        ]);
+
+        return redirect()->route('admin.tramites_legales.index')
+            ->with('success', 'Testimonio rechazado. Se notificó al vendedor.');
+    }
     /**
      * Marcar el trámite completo (cuando Minuta e IT están aprobados).
      */
@@ -105,13 +135,14 @@ class TramiteLegalController extends Controller
         $terreno = $minuta->terreno;
         $adminId = Auth::id();
         
-        // 1. Marcamos ambos documentos como completados oficialmente
+        // 1. Marcamos documentos como completados oficialmente
         $minuta->update(['estado' => 'completada']);
         
         $comp = ComprobanteIt::where('minuta_id', $minuta->id)->first();
-        if ($comp) {
-            $comp->update(['estado' => 'completado']);
-        }
+        if ($comp) $comp->update(['estado' => 'completado']);
+
+        $prot = Protocolizacion::where('minuta_id', $minuta->id)->first();
+        if ($prot) $prot->update(['estado' => 'completado']);
 
         // 2. REGISTRO OFICIAL DE VENTA: Actualizamos el estado del lote a 'vendido'
         if ($terreno) {
@@ -144,5 +175,15 @@ class TramiteLegalController extends Controller
         }
 
         return Storage::disk('public')->response($minuta->archivo);
+    }
+    public function verTestimonio($id)
+    {
+        $prot = Protocolizacion::findOrFail($id);
+
+        if (!$prot->archivo_testimonio || !Storage::disk('public')->exists($prot->archivo_testimonio)) {
+            abort(404, 'El archivo del testimonio no fue encontrado.');
+        }
+
+        return Storage::disk('public')->response($prot->archivo_testimonio);
     }
 }
