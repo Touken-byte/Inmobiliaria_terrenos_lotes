@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Folio;
 use App\Models\Terreno;
+use App\Helpers\Auditoria;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -44,15 +45,25 @@ class FolioVendedorController extends Controller
         ]);
 
         Folio::create([
-            'numero_folio' => strtoupper(trim($request->numero_folio)),
-            'terreno_id'   => $terreno->id,
-            'superficie'   => $request->superficie,
-            'ubicacion'    => $request->ubicacion,
-            'colindancias' => $request->colindancias,
+            'numero_folio'  => strtoupper(trim($request->numero_folio)),
+            'terreno_id'    => $terreno->id,
+            'superficie'    => $request->superficie,
+            'ubicacion'     => $request->ubicacion,
+            'colindancias'  => $request->colindancias,
+            'estado'        => 'pendiente',
+            'verificado_por' => null,
         ]);
 
+        // Registrar en auditoría para que el admin lo vea
+        Auditoria::registrar(
+            'registro_folio',
+            'folio',
+            $terreno->id,
+            "Vendedor registró folio '{$request->numero_folio}' para el terreno #{$terreno->id}"
+        );
+
         return redirect()->route('vendedor.terrenos.mis')
-            ->with('success', 'Datos del folio registrados correctamente.');
+            ->with('success', 'Datos del folio registrados correctamente. El administrador los revisará pronto.');
     }
 
     public function edit($terrenoId)
@@ -76,6 +87,12 @@ class FolioVendedorController extends Controller
 
         $folio = Folio::where('terreno_id', $terreno->id)->firstOrFail();
 
+        // Si ya está verificado, no se puede editar
+        if ($folio->estado === 'verificado') {
+            return redirect()->route('vendedor.terrenos.mis')
+                ->with('error', 'Este folio ya fue verificado y no puede modificarse.');
+        }
+
         $request->validate([
             'numero_folio' => 'required|string|max:50|unique:folios,numero_folio,' . $folio->id,
             'superficie'   => 'required|numeric|min:0',
@@ -89,6 +106,13 @@ class FolioVendedorController extends Controller
             'ubicacion'    => $request->ubicacion,
             'colindancias' => $request->colindancias,
         ]);
+
+        Auditoria::registrar(
+            'edicion_folio',
+            'folio',
+            $folio->id,
+            "Vendedor editó folio '{$folio->numero_folio}' del terreno #{$terreno->id}"
+        );
 
         return redirect()->route('vendedor.terrenos.mis')
             ->with('success', 'Datos del folio actualizados correctamente.');

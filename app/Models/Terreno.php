@@ -29,10 +29,12 @@ class Terreno extends Model
     public $timestamps = false;
 
     protected $casts = [
-        'precio' => 'decimal:2',
-        'metros_cuadrados' => 'decimal:2',
-        'creado_en' => 'datetime',
-        'actualizado_en' => 'datetime',
+        'precio'          => 'decimal:2',
+        'metros_cuadrados'=> 'decimal:2',
+        'creado_en'       => 'datetime',
+        'actualizado_en'  => 'datetime',
+        'latitud'         => 'float',   // ← NUEVO: fuerza número flotante
+        'longitud'        => 'float',   // ← NUEVO: fuerza número flotante
     ];
 
     public function vendedor()
@@ -50,21 +52,16 @@ class Terreno extends Model
         return $this->hasMany(TerrenoImagen::class, 'terreno_id')->orderBy('orden');
     }
 
-    /**
-     * Relación con la imagen de portada.
-     */
     public function portada()
     {
         return $this->belongsTo(TerrenoImagen::class, 'portada_id');
     }
 
-    /**
-     * Relación con el documento de propiedad (título).
-     */
     public function documentoPropiedad()
     {
         return $this->hasOne(DocumentoPropiedad::class, 'terreno_id');
     }
+
     public function folio()
     {
         return $this->hasOne(Folio::class, 'terreno_id');

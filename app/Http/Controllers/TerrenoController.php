@@ -33,10 +33,15 @@ class TerrenoController extends Controller
 
     public function detalle($id)
     {
-        // Buscar el terreno asegurando que esté aprobado
-        $terreno = Terreno::with('imagenes')->where('estado', 'aprobado')->findOrFail($id);
+        $terreno = Terreno::with(['imagenes', 'folio'])->where('estado', 'aprobado')->findOrFail($id);
 
-        return view('comprador.detalle', compact('terreno'));
+        // Folio solo visible si el admin lo verificó
+        $folio = null;
+        if ($terreno->folio && $terreno->folio->estado === 'verificado') {
+            $folio = $terreno->folio;
+        }
+
+        return view('comprador.detalle', compact('terreno', 'folio'));
     }
 
     // Mostrar y buscar terrenos disponibles (Público)

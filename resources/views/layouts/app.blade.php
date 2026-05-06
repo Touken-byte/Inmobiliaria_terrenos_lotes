@@ -95,7 +95,6 @@
                                 </span>
                                 <span>Control de Lotes</span>
                             </a>
-
                             <a href="{{ route('admin.tramites_legales.index') }}"
                                 class="nav-link {{ request()->is('admin/tramites-legales*') ? 'active' : '' }}" id="nav-tramites-legales-admin">
                                 <span class="nav-icon">
@@ -105,6 +104,45 @@
                                 </span>
                                 <span>Gestión Legal</span>
                             </a>
+
+                            {{-- ═══ FOLIOS ═══ --}}
+                            <a href="{{ route('admin.folios_panel') }}"
+                                class="nav-link {{ request()->is('admin/folios*') ? 'active' : '' }}" id="nav-folios-admin">
+                                <span class="nav-icon">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+                                        <polyline points="14,2 14,8 20,8"/>
+                                        <line x1="16" y1="13" x2="8" y2="13"/>
+                                        <line x1="16" y1="17" x2="8" y2="17"/>
+                                        <polyline points="10,9 9,9 8,9"/>
+                                    </svg>
+                                </span>
+                                <span>Folios</span>
+                            </a>
+
+                            {{-- ═══ INSCRIPCIONES DERECHOS REALES ═══ --}}
+                            <a href="{{ route('admin.inscripciones') }}"
+                                class="nav-link {{ request()->is('admin/inscripciones*') ? 'active' : '' }}" id="nav-inscripciones-admin">
+                                <span class="nav-icon">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                                        <path d="M9 12l2 2 4-4"/>
+                                    </svg>
+                                </span>
+                                <span>Derechos Reales</span>
+                            </a>
+
+                            {{-- ═══ AUDITORÍA ═══ --}}
+                            <a href="{{ route('admin.auditoria') }}"
+                                class="nav-link {{ request()->is('admin/auditoria*') ? 'active' : '' }}" id="nav-auditoria-admin">
+                                <span class="nav-icon">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                                    </svg>
+                                </span>
+                                <span>Auditoría</span>
+                            </a>
+
                             <a href="{{ route('vendedor.solicitudes.index') }}"
                                 class="nav-link {{ request()->is('vendedor/solicitudes*') ? 'active' : '' }}" id="nav-solicitudes-admin">
                                 <span class="nav-icon">
@@ -186,7 +224,6 @@
                                 </span>
                                 <span>Control de Lotes</span>
                             </a>
-
                             <a href="{{ route('vendedor.proceso_legal') }}"
                                 class="nav-link {{ request()->is('vendedor/proceso-legal*') ? 'active' : '' }}" id="nav-proceso-legal">
                                 <span class="nav-icon">

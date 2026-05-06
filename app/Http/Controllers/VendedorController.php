@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use App\Models\Terreno;
+use App\Helpers\Auditoria;
 use File;
 
 class VendedorController extends Controller
@@ -39,7 +40,6 @@ class VendedorController extends Controller
             'historial' => $historial
         ]);
     }
-
 
     public function subirCI(Request $request)
     {
@@ -78,10 +78,15 @@ class VendedorController extends Controller
         $user->estado_verificacion = 'pendiente';
         $user->save();
 
+        Auditoria::registrar(
+            'subida_documento_ci',
+            'vendedor',
+            $user->id,
+            "Vendedor subió nuevo documento CI: {$file->getClientOriginalName()}"
+        );
+
         return redirect()->route('vendedor.dashboard')->with('success', 'Documento subido exitosamente. Será revisado por un administrador.');
     }
-
-
 
     public function servirMiCI()
     {
@@ -127,8 +132,6 @@ class VendedorController extends Controller
         return floatval(sprintf("%.2f", $bytes / pow($k, $i))) . ' ' . $sizes[$i];
     }
 
-
-
     // ═══════════════════════════════════════════════════════
     // CONTROL DE LOTES
     // ═══════════════════════════════════════════════════════
@@ -140,7 +143,7 @@ class VendedorController extends Controller
             ->orderBy('actualizado_en', 'DESC')
             ->orderBy('creado_en', 'DESC')
             ->get();
-            
+                    
         return view('shared.lotes', compact('terrenos'));
     }
 
@@ -174,6 +177,13 @@ class VendedorController extends Controller
         $terreno->actualizado_en = now();
         $terreno->save();
 
+        Auditoria::registrar(
+            'cambio_estado_lote',
+            'terreno',
+            $terreno->id,
+            "Vendedor cambió estado del lote #{$terreno->id}: {$estadoAnterior} → {$estadoNuevo}"
+        );
+
         return redirect()->back()->with('success', "El estado de tu lote #{$terreno->id} se ha actualizado a '{$terreno->estado_lote}'.");
     }
 
@@ -199,6 +209,4 @@ class VendedorController extends Controller
 
         return redirect()->route('vendedor.dashboard')->with('success', 'Documento eliminado correctamente. Puedes subir uno nuevo.');
     }
-
 }
-

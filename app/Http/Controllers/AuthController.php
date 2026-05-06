@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Usuario;
+use App\Helpers\Auditoria;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -75,6 +76,15 @@ class AuthController extends Controller
 
         $request->session()->regenerate();
 
+        // Registrar auditoría de login
+        Auditoria::registrar(
+            'login',
+            'usuario',
+            $usuario->id,
+            "Login exitoso — rol: {$usuario->rol}",
+            $usuario->id
+        );
+
         return $this->redirectByRole($usuario->rol);
     }
 
@@ -83,6 +93,16 @@ class AuthController extends Controller
      */
     public function logout(Request $request)
     {
+        // Registrar auditoría de logout antes de cerrar sesión
+        if (Auth::check()) {
+            Auditoria::registrar(
+                'logout',
+                'usuario',
+                Auth::id(),
+                'Sesión cerrada correctamente'
+            );
+        }
+
         Auth::logout();
 
         $request->session()->invalidate();
@@ -96,12 +116,15 @@ class AuthController extends Controller
      */
     private function redirectByRole(string $rol)
     {
-        return match($rol) {
-            'admin'     => redirect()->route('admin.panel'),
-            'vendedor'  => redirect()->route('vendedor.dashboard'),
-            'comprador' => redirect()->route('catalogo.terrenos'),
-            default     => redirect('/login')
-                            ->with('error', 'Rol no reconocido. Contacta al administrador.'),
-        };
+        switch ($rol) {
+            case 'admin':
+                return redirect()->route('admin.panel');
+            case 'vendedor':
+                return redirect()->route('vendedor.dashboard');
+            case 'comprador':
+                return redirect()->route('catalogo.terrenos');
+            default:
+                return redirect('/login')->with('error', 'Rol no reconocido. Contacta al administrador.');
+        }
     }
 }

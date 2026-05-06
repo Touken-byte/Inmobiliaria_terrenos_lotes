@@ -696,7 +696,13 @@
                     <div class="det-feature">
                         <div class="det-feature-dot"></div>
                         <span class="det-feature-text">
-                            {{ $terreno->folio ? '✅ Con folio registrado' : '⚠️ Sin folio registrado' }}
+                            @if($terreno->folio && $terreno->folio->estado === 'verificado')
+                                ✅ Con folio verificado
+                            @elseif($terreno->folio)
+                                🕐 Folio en revisión
+                            @else
+                                ⚠️ Sin folio registrado
+                            @endif
                         </span>
                     </div>
                 </div>
@@ -704,7 +710,8 @@
                 <!-- Sección de Folio -->
                 <p class="det-section-title">Documentación Legal</p>
 
-                @if($terreno->folio)
+                @if($terreno->folio && $terreno->folio->estado === 'verificado')
+
                 <div style="background: var(--card); border: 1px solid var(--rim); border-radius: 20px; overflow: hidden; margin-bottom: 2rem;">
 
                     {{-- Header del folio --}}
@@ -765,6 +772,7 @@
 
                 </div>
 
+
                 @else
 
                 <div style="background: var(--card); border: 1px solid var(--rim); border-radius: 20px; padding: 1.75rem; margin-bottom: 2rem; display:flex; align-items:flex-start; gap:1rem;">
@@ -772,14 +780,64 @@
                         ⚠️
                     </div>
                     <div>
-                        <p style="margin:0 0 .4rem; font-size:.95rem; font-weight:600; color:var(--text-1);">Sin folio registrado</p>
-                        <p style="margin:0; font-size:.85rem; color:var(--text-2); line-height:1.6;">
-                            Este terreno aún no tiene datos de folio registrados en el sistema.
-                            Puedes contactar al vendedor para solicitar la documentación legal antes de proceder con la compra.
-                        </p>
+                        @if($terreno->folio && $terreno->folio->estado === 'pendiente')
+                            <p style="margin:0 0 .4rem; font-size:.95rem; font-weight:600; color:var(--text-1);">Folio en revisión</p>
+                            <p style="margin:0; font-size:.85rem; color:var(--text-2); line-height:1.6;">
+                                La documentación de este terreno está siendo revisada por nuestro equipo.
+                                Estará disponible una vez que sea verificada.
+                            </p>
+                        @else
+                            <p style="margin:0 0 .4rem; font-size:.95rem; font-weight:600; color:var(--text-1);">Sin folio registrado</p>
+                            <p style="margin:0; font-size:.85rem; color:var(--text-2); line-height:1.6;">
+                                Este terreno aún no tiene datos de folio registrados en el sistema.
+                                Puedes contactar al vendedor para solicitar la documentación legal antes de proceder con la compra.
+                            </p>
+                        @endif
                     </div>
                 </div>
 
+                @endif
+
+                {{-- Inscripción Derechos Reales --}}
+                @if($terreno->folio && $terreno->folio->estado === 'verificado' && $terreno->folio->inscripcionDerechosReales && $terreno->folio->inscripcionDerechosReales->estado === 'inscrito')
+                <p class="det-section-title">Inscripción Derechos Reales</p>
+                <div style="background:var(--card); border:1px solid var(--rim); border-radius:20px; overflow:hidden; margin-bottom:2rem;">
+                    <div style="padding:1.25rem 1.75rem; border-bottom:1px solid var(--rim); display:flex; align-items:center; justify-content:space-between;">
+                        <div style="display:flex; align-items:center; gap:.75rem;">
+                            <div style="width:38px; height:38px; border-radius:10px; background:rgba(29,186,126,0.15); border:1px solid rgba(29,186,126,0.25); display:flex; align-items:center; justify-content:center; font-size:1rem;">🏛️</div>
+                            <div>
+                                <p style="margin:0; font-size:.62rem; font-weight:700; letter-spacing:.14em; text-transform:uppercase; color:var(--text-3);">Derechos Reales</p>
+                                <p style="margin:0; font-size:1rem; font-weight:700; color:var(--text-1);">
+                                    {{ $terreno->folio->inscripcionDerechosReales->numero_matricula ?? 'Matrícula registrada' }}
+                                </p>
+                            </div>
+                        </div>
+                        <span style="padding:.35rem .9rem; background:rgba(29,186,126,0.15); border:1px solid rgba(29,186,126,0.3); border-radius:100px; font-size:.65rem; font-weight:700; color:#1dba7e;">
+                            ✅ Inscrito
+                        </span>
+                    </div>
+                    @php $ins = $terreno->folio->inscripcionDerechosReales; @endphp
+                    <div style="padding:1.25rem 1.75rem; display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
+                        @if($ins->fecha_entrada)
+                        <div>
+                            <p style="margin:0 0 .25rem; font-size:.6rem; font-weight:700; letter-spacing:.14em; text-transform:uppercase; color:var(--text-3);">Fecha Entrada</p>
+                            <p style="margin:0; font-size:.9rem; color:var(--text-1);">{{ \Carbon\Carbon::parse($ins->fecha_entrada)->format('d/m/Y') }}</p>
+                        </div>
+                        @endif
+                        @if($ins->fecha_salida)
+                        <div>
+                            <p style="margin:0 0 .25rem; font-size:.6rem; font-weight:700; letter-spacing:.14em; text-transform:uppercase; color:var(--text-3);">Fecha Salida</p>
+                            <p style="margin:0; font-size:.9rem; color:var(--text-1);">{{ \Carbon\Carbon::parse($ins->fecha_salida)->format('d/m/Y') }}</p>
+                        </div>
+                        @endif
+                        @if($ins->tasa_pagada)
+                        <div>
+                            <p style="margin:0 0 .25rem; font-size:.6rem; font-weight:700; letter-spacing:.14em; text-transform:uppercase; color:var(--text-3);">Tasa Pagada</p>
+                            <p style="margin:0; font-size:.9rem; color:var(--text-1);">Bs. {{ number_format($ins->tasa_pagada, 2) }}</p>
+                        </div>
+                        @endif
+                    </div>
+                </div>
                 @endif
 
                 {{-- Mapa de ubicación --}}

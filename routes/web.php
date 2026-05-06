@@ -10,6 +10,8 @@ use App\Http\Controllers\DocumentoPropiedadController;
 use App\Http\Controllers\SolicitudVisitaController;
 use App\Http\Controllers\MinutaController;
 use App\Http\Controllers\Admin\TramiteLegalController;
+use App\Http\Controllers\AuditoriaController;
+use App\Http\Controllers\InscripcionController;
 
     Route::get('/', function () {
     return redirect()->route('login');
@@ -108,6 +110,13 @@ Route::get('/alquileres/{id}', [AlquilerController::class, 'detalle'])->name('ca
     Route::get('/historial', [AdminController::class, 'historial'])->name('historial');
     Route::post('/crear-vendedor', [AdminController::class, 'crearVendedor'])->name('crear_vendedor');
     Route::get('/minutas', [MinutaController::class, 'index'])->name('minutas.index');
+    // Gestión de folios
+    Route::get('/folios', [AdminController::class, 'foliosPanel'])->name('folios_panel');
+    Route::post('/folios/verificar', [AdminController::class, 'verificarFolio'])->name('folio.verificar');
+    // Inscripciones Derechos Reales (admin)
+    Route::get('/inscripciones', [InscripcionController::class, 'adminIndex'])->name('inscripciones');
+    Route::post('/inscripciones/procesar', [InscripcionController::class, 'adminProcesar'])->name('inscripcion.procesar');
+    Route::get('/inscripciones/{id}/archivo', [InscripcionController::class, 'verArchivo'])->name('inscripcion.archivo');
     // Minutas
     Route::get('/minutas/create', [MinutaController::class, 'create'])->name('minutas.create');
     Route::post('/minutas', [MinutaController::class, 'store'])->name('minutas.store');
@@ -117,12 +126,17 @@ Route::get('/alquileres/{id}', [AlquilerController::class, 'detalle'])->name('ca
     // Gestión de terrenos y alquileres
     Route::get('/terrenos', [AdminController::class, 'terrenosPanel'])->name('terrenos_panel');
     Route::get('/terrenos/{id}', [AdminController::class, 'verTerreno'])->name('ver_terreno');
+    Route::put('/terrenos/{id}/coordenadas', [AdminController::class, 'actualizarCoordenadas'])->name('terreno.actualizar_coordenadas');
     Route::post('/procesar-terreno', [AdminController::class, 'procesarTerreno'])->name('procesar_terreno');
     Route::get('/alquileres/{id}', [AdminController::class, 'verAlquiler'])->name('ver_alquiler');
     Route::post('/procesar-alquiler', [AdminController::class, 'procesarAlquiler'])->name('procesar_alquiler');
 
     // Control de lotes
     Route::get('/lotes', [AdminController::class, 'controlLotes'])->name('lotes');
+
+    // Auditoría (IN-A05)
+    Route::get('/auditoria', [AuditoriaController::class, 'index'])->name('auditoria');
+    Route::get('/auditoria/exportar', [AuditoriaController::class, 'exportarCsv'])->name('auditoria.exportar');
 
     // Comprobantes IT (ruta original intacta)
     Route::get('/comprobantes-it', [\App\Http\Controllers\Admin\ComprobanteItController::class, 'index'])->name('comprobantes_it.index');
@@ -154,4 +168,8 @@ Route::middleware(['auth', 'role:vendedor'])->prefix('vendedor')->name('vendedor
     Route::post('/terrenos/{id}/folio', [App\Http\Controllers\FolioVendedorController::class, 'store'])->name('folio.store');
     Route::get('/terrenos/{id}/folio/editar', [App\Http\Controllers\FolioVendedorController::class, 'edit'])->name('folio.edit');
     Route::put('/terrenos/{id}/folio', [App\Http\Controllers\FolioVendedorController::class, 'update'])->name('folio.update');
+    // Inscripción Derechos Reales (vendedor)
+    Route::get('/folio/{folioId}/inscripcion', [InscripcionController::class, 'create'])->name('inscripcion.create');
+    Route::post('/folio/{folioId}/inscripcion', [InscripcionController::class, 'store'])->name('inscripcion.store');
+    Route::get('/inscripcion/{id}/archivo', [InscripcionController::class, 'verArchivo'])->name('inscripcion.archivo');
 });

@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use App\Models\Terreno;
 use App\Models\Alquiler;
+use App\Helpers\Auditoria;
 use App\Models\TerrenoImagen;
 use App\Mail\DocumentApproval;
 use App\Mail\DocumentRejection;
@@ -45,9 +46,6 @@ class AdminController extends Controller
             $query->where('usuarios.estado_verificacion', $filtroActual);
         }
 
-        /* Order by custom condition like in Express: 
-           ORDER BY CASE u.estado_verificacion WHEN 'pendiente' THEN 1 WHEN 'rechazado' THEN 2 WHEN 'verificado' THEN 3 ELSE 4 END
-        */
         $query->orderByRaw("CASE usuarios.estado_verificacion WHEN 'pendiente' THEN 1 WHEN 'rechazado' THEN 2 WHEN 'verificado' THEN 3 ELSE 4 END")
             ->orderBy('usuarios.fecha_registro', 'DESC');
 
@@ -111,6 +109,13 @@ class AdminController extends Controller
 
         $vendedor->update($data);
 
+        Auditoria::registrar(
+            'edicion_vendedor',
+            'vendedor',
+            $vendedor->id,
+            "Admin editó datos del vendedor: {$vendedor->nombre}"
+        );
+
         return redirect()->route('admin.panel')->with('success', "Vendedor {$vendedor->nombre} actualizado correctamente.");
     }
 
@@ -119,7 +124,13 @@ class AdminController extends Controller
         $vendedor = Usuario::where('id', $id)->where('rol', 'vendedor')->firstOrFail();
         $nombre = $vendedor->nombre;
 
-        // Opcional: eliminar también documentos, terrenos, etc.
+        Auditoria::registrar(
+            'eliminacion_vendedor',
+            'vendedor',
+            $id,
+            "Admin eliminó al vendedor: {$nombre}"
+        );
+
         $vendedor->delete();
 
         return redirect()->route('admin.panel')->with('success', "Vendedor {$nombre} eliminado permanentemente.");
@@ -179,6 +190,14 @@ class AdminController extends Controller
         } catch (\Exception $e) {
             \Log::error('Error al enviar email de notificación: ' . $e->getMessage());
         }
+
+        // Registrar auditoría
+        Auditoria::registrar(
+            $accion === 'aprobado' ? 'aprobacion_vendedor' : 'rechazo_vendedor',
+            'vendedor',
+            $vendedorId,
+            ($accion === 'aprobado' ? 'Vendedor aprobado' : 'Vendedor rechazado') . ": {$vendedor->nombre}" . ($comentario ? " — Motivo: {$comentario}" : '')
+        );
 
         $accionTexto = $accion === 'aprobado' ? 'aprobado ✅' : 'rechazado ❌';
         return redirect()->route('admin.panel')->with('success', "Vendedor \"{$vendedor->nombre}\" {$accionTexto} exitosamente.");
@@ -264,7 +283,7 @@ class AdminController extends Controller
             ->where('estado', 'pendiente')
             ->orderBy('creado_en', 'ASC')
             ->get();
-            
+                    
         $alquileres = Alquiler::with(['usuario', 'imagenes'])
             ->where('estado_aprobacion', 'pendiente')
             ->orderBy('created_at', 'ASC')
@@ -272,7 +291,6 @@ class AdminController extends Controller
 
         return view('admin.moderacion', compact('stats', 'terrenos', 'alquileres'));
     }
-
 
     public function terrenosPanel(Request $request)
     {
@@ -302,7 +320,7 @@ class AdminController extends Controller
 
     public function verTerreno($id)
     {
-        $terreno = Terreno::with(['vendedor', 'imagenes', 'adminAprobador'])->findOrFail($id);
+        $terreno = Terreno::with(['vendedor', 'imagenes', 'adminAprobador', 'folio.adminVerificador'])->findOrFail($id);
 
         return view('admin.ver_terreno', compact('terreno'));
     }
@@ -310,7 +328,7 @@ class AdminController extends Controller
     public function verAlquiler($id)
     {
         $alquiler = Alquiler::with(['usuario', 'imagenes'])->findOrFail($id);
-        
+                
         return view('admin.ver_alquiler', compact('alquiler'));
     }
 
@@ -332,13 +350,13 @@ class AdminController extends Controller
         $terreno->estado = $accion;
         $terreno->id_admin_aprobador = $adminId;
         $terreno->actualizado_en = now();
-        
+                
         if ($accion === 'rechazado') {
             $terreno->motivo_rechazo = $observacion;
         } else {
             $terreno->motivo_rechazo = null; // Limpiar motivo si fue aprobado
         }
-        
+                
         $terreno->save();
 
         // Enviar correos
@@ -352,15 +370,21 @@ class AdminController extends Controller
             \Log::error('Error al enviar email de terreno: ' . $e->getMessage());
         }
 
+        // Registrar auditoría
+        Auditoria::registrar(
+            $accion === 'aprobado' ? 'aprobacion_terreno' : 'rechazo_terreno',
+            'terreno',
+            $terrenoId,
+            ($accion === 'aprobado' ? 'Terreno aprobado' : 'Terreno rechazado') . ": #{$terreno->id}" . ($observacion ? " — Observación: {$observacion}" : '')
+        );
+
         $accionTexto = $accion === 'aprobado' ? 'aprobado ✅' : 'rechazado ❌';
         $msgExtra = $observacion ? " Observación: {$observacion}" : '';
-        
-        // Si venimos de moderacion, volver a moderacion, si no, a terrenos_panel
-        // Note: back()->getTargetUrl() is tricky, let's just use url()->previous()
+                
         $previousUrl = url()->previous();
         $isModeracion = str_contains($previousUrl, route('admin.moderacion_panel'));
         $rutaDestino = $isModeracion ? 'admin.moderacion_panel' : 'admin.terrenos_panel';
-        
+                
         return redirect()->route($rutaDestino)->with('success', "Terreno #{$terreno->id} {$accionTexto} exitosamente.{$msgExtra}");
     }
 
@@ -379,11 +403,11 @@ class AdminController extends Controller
         $alquiler->save();
 
         $accionTexto = $accion === 'aprobado' ? 'aprobado ✅' : 'rechazado ❌';
-        
+                
         $previousUrl = url()->previous();
         $isModeracion = str_contains($previousUrl, route('admin.moderacion_panel'));
         $rutaDestino = $isModeracion ? 'admin.moderacion_panel' : 'admin.panel';
-        
+                
         return redirect()->route($rutaDestino)->with('success', "Alquiler #{$alquiler->id} {$accionTexto} exitosamente.");
     }
 
@@ -396,5 +420,73 @@ class AdminController extends Controller
         $terrenos = Terreno::orderBy('actualizado_en', 'DESC')->orderBy('creado_en', 'DESC')->get();
         return view('shared.lotes', compact('terrenos'));
     }
-}
 
+    // ═══════════════════════════════════════════════════════
+    // GESTIÓN DE FOLIOS
+    // ═══════════════════════════════════════════════════════
+
+    public function foliosPanel()
+    {
+        $folios = \App\Models\Folio::with(['terreno.vendedor'])
+            ->orderByRaw("CASE estado WHEN 'pendiente' THEN 1 WHEN 'verificado' THEN 2 ELSE 3 END")
+            ->orderBy('created_at', 'DESC')
+            ->get();
+
+        return view('admin.folios', compact('folios'));
+    }
+
+    public function verificarFolio(Request $request)
+    {
+        $request->validate([
+            'folio_id' => 'required|integer',
+            'accion'   => 'required|in:verificado,rechazado',
+        ]);
+
+        $folio = \App\Models\Folio::findOrFail($request->folio_id);
+
+        $folio->update([
+            'estado'         => $request->accion,
+            'verificado_por' => Auth::id(),
+        ]);
+
+        // Registrar auditoría
+        Auditoria::registrar(
+            $request->accion === 'verificado' ? 'verificacion_folio' : 'rechazo_folio',
+            'folio',
+            $folio->id,
+            ($request->accion === 'verificado' ? 'Folio verificado' : 'Folio rechazado') . ": {$folio->numero_folio}"
+        );
+
+        $accionTexto = $request->accion === 'verificado' ? 'verificado ✅' : 'rechazado ❌';
+
+        return redirect()->route('admin.folios_panel')
+            ->with('success', "Folio #{$folio->numero_folio} {$accionTexto} exitosamente.");
+    }
+
+    public function actualizarCoordenadas(Request $request, $id)
+    {
+        $request->validate([
+            'latitud'  => 'required|numeric|between:-90,90',
+            'longitud' => 'required|numeric|between:-180,180',
+        ], [
+            'latitud.between'  => 'La latitud debe estar entre -90 y 90.',
+            'longitud.between' => 'La longitud debe estar entre -180 y 180.',
+        ]);
+
+        $terreno = Terreno::findOrFail($id);
+        $terreno->latitud     = $request->latitud;
+        $terreno->longitud    = $request->longitud;
+        $terreno->actualizado_en = now();
+        $terreno->save();
+
+        Auditoria::registrar(
+            'edicion_coordenadas',
+            'terreno',
+            $terreno->id,
+            "Admin actualizó coordenadas del terreno #{$terreno->id}: lat {$request->latitud}, lng {$request->longitud}"
+        );
+
+        return redirect()->route('admin.ver_terreno', $terreno->id)
+            ->with('success_mapa', '✅ Coordenadas actualizadas correctamente.');
+    }
+}

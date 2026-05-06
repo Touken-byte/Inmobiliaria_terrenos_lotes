@@ -9,15 +9,26 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('minutas', function (Blueprint $table) {
-            $table->enum('estado', ['pendiente', 'aprobada', 'rechazada'])->default('pendiente')->after('archivo');
-            $table->text('observacion')->nullable()->after('estado');
+            if (!Schema::hasColumn('minutas', 'estado')) {
+                $table->enum('estado', ['pendiente', 'aprobada', 'rechazada', 'completada'])
+                      ->default('pendiente')
+                      ->after('archivo');
+            }
+            if (!Schema::hasColumn('minutas', 'observacion')) {
+                $table->text('observacion')->nullable()->after('estado');
+            }
         });
     }
 
     public function down(): void
     {
         Schema::table('minutas', function (Blueprint $table) {
-            $table->dropColumn(['estado', 'observacion']);
+            if (Schema::hasColumn('minutas', 'estado')) {
+                $table->dropColumn('estado');
+            }
+            if (Schema::hasColumn('minutas', 'observacion')) {
+                $table->dropColumn('observacion');
+            }
         });
     }
 };

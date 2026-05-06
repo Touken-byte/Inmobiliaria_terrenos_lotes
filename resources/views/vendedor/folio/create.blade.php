@@ -23,6 +23,17 @@
         <form action="{{ route('vendedor.folio.store', $terreno->id) }}" method="POST">
             @csrf
 
+            @if($errors->any())
+                <div class="alert alert-danger" style="margin-bottom:1.25rem;">
+                    <strong>⚠️ Corrige los siguientes errores:</strong>
+                    <ul style="margin:.5rem 0 0 1.2rem;">
+                        @foreach($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
+
             <div class="form-group">
                 <label for="numero_folio">Número de Folio <span class="required">*</span></label>
                 <input type="text" name="numero_folio" id="numero_folio" class="form-control"
@@ -53,8 +64,9 @@
             </div>
 
             <div class="alert" style="background: var(--bg-light); border: 1px solid var(--border-color); border-radius: 8px; padding: 1rem; margin-bottom:1.5rem;">
-                <strong>⚠️ Nota:</strong> Una vez registrado el folio, los compradores podrán consultar esta información.
-                Los datos deben ser exactos y coincidir con los documentos oficiales.
+                <strong>⚠️ Nota:</strong> El folio quedará en estado <strong>pendiente</strong> hasta que
+                el administrador lo revise y verifique. Solo entonces será visible para los compradores.
+                Los datos deben coincidir exactamente con los documentos oficiales.
             </div>
 
             <div style="display:flex; gap:1rem;">

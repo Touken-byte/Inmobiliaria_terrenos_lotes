@@ -38,4 +38,10 @@ class Minuta extends Model
     {
         return $this->belongsTo(Usuario::class, 'vendedor_id');
     }
+
+    // ← NUEVO: relación con el comprobante IT vinculado
+    public function comprobante()
+    {
+        return $this->hasOne(ComprobanteIt::class, 'minuta_id');
+    }
 }

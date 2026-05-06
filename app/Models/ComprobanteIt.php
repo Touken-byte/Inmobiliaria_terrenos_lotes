@@ -21,11 +21,17 @@ class ComprobanteIt extends Model
 
     protected $casts = [
         'fecha_pago' => 'date',
-        'monto' => 'decimal:2',
+        'monto'      => 'decimal:2',
     ];
 
     public function usuario()
     {
         return $this->belongsTo(Usuario::class, 'user_id');
+    }
+
+    // ← NUEVO: relación inversa con la minuta
+    public function minuta()
+    {
+        return $this->belongsTo(Minuta::class, 'minuta_id');
     }
 }

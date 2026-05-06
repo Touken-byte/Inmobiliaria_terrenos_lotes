@@ -10,8 +10,19 @@ class Folio extends Model
     use HasFactory;
 
     protected $fillable = [
-        'numero_folio', 'terreno_id', 'superficie', 'ubicacion', 'colindancias'
+        'numero_folio',
+        'terreno_id',
+        'superficie',
+        'ubicacion',
+        'colindancias',
+        'estado',
+        'verificado_por',
     ];
+
+    public function scopeVerificado($query)
+    {
+        return $query->where('estado', 'verificado');
+    }
 
     public function terreno()
     {
@@ -41,6 +52,17 @@ class Folio extends Model
     public function historialAccesos()
     {
         return $this->hasMany(HistorialAcceso::class);
+    }
+
+    public function adminVerificador()
+    {
+        return $this->belongsTo(Usuario::class, 'verificado_por');
+    }
+
+    // ← NUEVO
+    public function inscripcionDerechosReales()
+    {
+        return $this->hasOne(InscripcionDerechosReales::class);
     }
 
     public function propietariosVigentes()

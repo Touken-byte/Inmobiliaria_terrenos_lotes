@@ -281,83 +281,86 @@
 </style>
 
 <script>
+    </div>{{-- Cierre card-body --}}
+    </div>{{-- Cierre card --}}
+
     @push('scripts')
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    @endpush
-    document.addEventListener('DOMContentLoaded', () => {
-        // Contador de caracteres
-        const descInput = document.getElementById('descripcion');
-        const charCount = document.getElementById('charCount');
+    <script>
+    document.addEventListener('DOMContentLoaded', function () {
+
+        // ── Contador de caracteres ──
+        var descInput = document.getElementById('descripcion');
+        var charCount = document.getElementById('charCount');
         if (descInput && charCount) {
-            descInput.addEventListener('input', () => charCount.textContent = descInput.value.length);
+            descInput.addEventListener('input', function () {
+                charCount.textContent = descInput.value.length;
+            });
         }
 
-        // Eliminar imágenes existentes con fetch a la ruta correcta
-        const removeBtns = document.querySelectorAll('.remove-img');
-        removeBtns.forEach(btn => {
+        // ── Eliminar imágenes existentes ──
+        document.querySelectorAll('.remove-img').forEach(function(btn) {
             btn.addEventListener('click', function(e) {
                 e.preventDefault();
-                const imgId = this.getAttribute('data-id');
+                var imgId = this.getAttribute('data-id');
                 if (confirm('¿Eliminar esta imagen permanentemente?')) {
-                    fetch(`/vendedor/terreno-imagen/${imgId}`, {
+                    fetch('/vendedor/terreno-imagen/' + imgId, {
                         method: 'DELETE',
                         headers: {
                             'X-CSRF-TOKEN': '{{ csrf_token() }}',
                             'Content-Type': 'application/json'
                         }
-                    }).then(response => {
+                    }).then(function(response) {
                         if (response.ok) {
-                            this.closest('.existing-img').remove();
-                            alert('Imagen eliminada');
-                            // Recargar para actualizar portadas (opcional)
-                            location.reload();
+                            btn.closest('.existing-img').remove();
                         } else {
                             alert('Error al eliminar imagen. Código: ' + response.status);
                         }
-                    }).catch(err => {
+                    }).catch(function(err) {
                         alert('Error de red: ' + err);
                     });
                 }
             });
         });
 
-        // Subir nuevas imágenes
-        const dropzone = document.getElementById('imagesDropzone');
-        const fileInput = document.getElementById('imagenesInput');
-        const previewGrid = document.getElementById('imagesPreviewGrid');
-        let selectedFiles = [];
+        // ── Subir nuevas imágenes ──
+        var dropzone    = document.getElementById('imagesDropzone');
+        var fileInput   = document.getElementById('imagenesInput');
+        var previewGrid = document.getElementById('imagesPreviewGrid');
+        var selectedFiles = [];
 
         if (dropzone && fileInput) {
-            dropzone.addEventListener('click', () => fileInput.click());
-            fileInput.addEventListener('change', (e) => handleFiles(e.target.files));
+            dropzone.addEventListener('click', function() { fileInput.click(); });
+            fileInput.addEventListener('change', function(e) { handleFiles(e.target.files); });
         }
 
         function handleFiles(filesList) {
-            const files = Array.from(filesList);
-            let errors = [];
-            files.forEach(file => {
+            var files  = Array.from(filesList);
+            var errors = [];
+            files.forEach(function(file) {
                 if (file.size > 5 * 1024 * 1024) {
-                    errors.push(`${file.name} excede 5MB`);
+                    errors.push(file.name + ' excede 5MB');
                 } else if (!file.type.match('image/(jpeg|jpg|png)')) {
-                    errors.push(`${file.name} no es JPG/PNG`);
+                    errors.push(file.name + ' no es JPG/PNG');
                 } else {
                     selectedFiles.push(file);
                 }
             });
             if (errors.length) alert(errors.join('\n'));
             renderPreviews();
-            updateFileInput();
+            syncFileInput();
         }
 
         function renderPreviews() {
             if (!previewGrid) return;
             previewGrid.innerHTML = '';
-            selectedFiles.forEach((file, index) => {
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    const div = document.createElement('div');
+            selectedFiles.forEach(function(file, index) {
+                var reader = new FileReader();
+                reader.onload = function(e) {
+                    var div = document.createElement('div');
                     div.className = 'preview-item';
-                    div.innerHTML = `<img src="${e.target.result}"><button type="button" class="remove-btn" onclick="removeNewFile(${index})">✖</button>`;
+                    div.innerHTML = '<img src="' + e.target.result + '">' +
+                        '<button type="button" class="remove-btn" onclick="window.removeNewFile(' + index + ')">✖</button>';
                     previewGrid.appendChild(div);
                 };
                 reader.readAsDataURL(file);
@@ -366,19 +369,22 @@
         }
 
         function updatePortadaSelector() {
-            const selectorDiv = document.getElementById('portadaSelector');
-            const optionsDiv = document.getElementById('portadaOptions');
+            var selectorDiv = document.getElementById('portadaSelector');
+            var optionsDiv  = document.getElementById('portadaOptions');
+            if (!selectorDiv || !optionsDiv) return;
             if (selectedFiles.length > 0) {
                 selectorDiv.style.display = 'block';
                 optionsDiv.innerHTML = '';
-                selectedFiles.forEach((file, idx) => {
-                    const reader = new FileReader();
-                    reader.onload = (e) => {
-                        const opt = document.createElement('div');
-                        opt.className = `portada-option ${idx === 0 ? 'selected' : ''}`;
-                        opt.innerHTML = `<img src="${e.target.result}"><span>Nueva ${idx+1}</span>`;
-                        opt.onclick = () => {
-                            document.querySelectorAll('#portadaOptions .portada-option').forEach(o => o.classList.remove('selected'));
+                selectedFiles.forEach(function(file, idx) {
+                    var reader = new FileReader();
+                    reader.onload = function(e) {
+                        var opt = document.createElement('div');
+                        opt.className = 'portada-option' + (idx === 0 ? ' selected' : '');
+                        opt.innerHTML = '<img src="' + e.target.result + '"><span>Nueva ' + (idx+1) + '</span>';
+                        opt.onclick = function() {
+                            document.querySelectorAll('#portadaOptions .portada-option').forEach(function(o) {
+                                o.classList.remove('selected');
+                            });
                             opt.classList.add('selected');
                             document.getElementById('portadaIndex').value = idx;
                         };
@@ -391,35 +397,42 @@
             }
         }
 
-        window.removeNewFile = (index) => {
+        window.removeNewFile = function(index) {
             selectedFiles.splice(index, 1);
             renderPreviews();
-            updateFileInput();
+            syncFileInput();
         };
 
-        function updateFileInput() {
-            const dt = new DataTransfer();
-            selectedFiles.forEach(f => dt.items.add(f));
-            fileInput.files = dt.files;
+        function syncFileInput() {
+            try {
+                var dt = new DataTransfer();
+                selectedFiles.forEach(function(f) { dt.items.add(f); });
+                fileInput.files = dt.files;
+            } catch(e) {
+                console.warn('DataTransfer no disponible:', e);
+            }
         }
 
-        // Validación antes de enviar
-        const form = document.getElementById('editForm');
+        // ── Validación del formulario ──
+        var form = document.getElementById('editForm');
         if (form) {
-            form.addEventListener('submit', (e) => {
+            form.addEventListener('submit', function(e) {
                 if (descInput && descInput.value.length < 50) {
                     e.preventDefault();
                     alert('La descripción debe tener al menos 50 caracteres.');
                 }
             });
         }
-    });
 
-    // ── Mini mapa selector de ubicación ──
-        var savedLat = {{ $terreno->latitud ?? -34.6037 }};
-        var savedLng = {{ $terreno->longitud ?? -58.3816 }};
+        // ══════════════════════════════════════════════════════
+        // ── MAPA LEAFLET — CORRECCIÓN PRINCIPAL ──────────────
+        // ══════════════════════════════════════════════════════
+        var latGuardada = parseFloat('{{ $terreno->latitud ?? 0 }}') || -22.0186;
+        var lngGuardada = parseFloat('{{ $terreno->longitud ?? 0 }}') || -63.6774;
+        var tieneCoords = {{ ($terreno->latitud && $terreno->longitud) ? 'true' : 'false' }};
 
-        var mapaSelector = L.map('mapaSelector').setView([savedLat, savedLng], 15);
+        // Inicializar mapa con las coordenadas guardadas o por defecto
+        var mapaSelector = L.map('mapaSelector').setView([latGuardada, lngGuardada], tieneCoords ? 15 : 13);
 
         L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
             attribution: '&copy; OSM &copy; CartoDB',
@@ -427,17 +440,18 @@
             maxZoom: 19
         }).addTo(mapaSelector);
 
-        var marker = L.marker([savedLat, savedLng], { draggable: true }).addTo(mapaSelector);
+        var marker = L.marker([latGuardada, lngGuardada], { draggable: true }).addTo(mapaSelector);
 
-        function actualizarCoordenadas(lat, lng) {
-            document.getElementById('latitud').value = lat.toFixed(8);
-            document.getElementById('longitud').value = lng.toFixed(8);
+        // Si tenía coords guardadas, las mostramos en los inputs al cargar
+        if (tieneCoords) {
+            document.getElementById('latitud').value  = latGuardada.toFixed(8);
+            document.getElementById('longitud').value = lngGuardada.toFixed(8);
         }
 
-        // Si ya tenía coordenadas guardadas, las mostramos
-        @if($terreno->latitud && $terreno->longitud)
-            actualizarCoordenadas(savedLat, savedLng);
-        @endif
+        function actualizarCoordenadas(lat, lng) {
+            document.getElementById('latitud').value  = lat.toFixed(8);
+            document.getElementById('longitud').value = lng.toFixed(8);
+        }
 
         marker.on('dragend', function(e) {
             var pos = e.target.getLatLng();
@@ -448,5 +462,14 @@
             marker.setLatLng(e.latlng);
             actualizarCoordenadas(e.latlng.lat, e.latlng.lng);
         });
-</script>
-@endsection
+
+        // Fix crítico: forzar redibujado del mapa después de que el DOM termine
+        // (sin esto Leaflet no calcula bien el tamaño del contenedor)
+        setTimeout(function() {
+            mapaSelector.invalidateSize();
+        }, 300);
+
+    });
+    </script>
+    @endpush
+    @endsection

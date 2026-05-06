@@ -97,17 +97,129 @@
                     <small style="color: var(--text-muted);">{{ Str::length($terreno->descripcion) }} caracteres</small>
                 </div>
 
-                {{-- Mapa de ubicación --}}
-                @if($terreno->latitud && $terreno->longitud)
+                {{-- Mapa editable por Admin --}}
                 <div style="margin-bottom: 24px;">
-                    <h4 style="margin-bottom: 8px; font-size: 0.95rem; color: var(--text-secondary);">📍 Ubicación en el Mapa</h4>
-                    <div id="mapaAdmin" style="height: 300px; border-radius: 10px; border: 2px solid var(--border-color);"></div>
+                    <h4 style="margin-bottom: 8px; font-size: 0.95rem; color: var(--text-secondary);">
+                        📍 Ubicación en el Mapa
+                        <span style="font-size:.78rem; font-weight:400; color:var(--text-muted); margin-left:.5rem;">
+                            (haz clic en el mapa para mover el marcador)
+                        </span>
+                    </h4>
+
+                    <div id="mapaAdmin" style="height: 340px; border-radius: 10px; border: 2px solid var(--border-color); margin-bottom:.75rem;"></div>
+
+                    <form action="{{ route('admin.terreno.actualizar_coordenadas', $terreno->id) }}" method="POST"
+                          style="display:flex; gap:.75rem; align-items:flex-end; flex-wrap:wrap;">
+                        @csrf
+                        @method('PUT')
+                        <div style="flex:1; min-width:160px;">
+                            <label style="display:block; font-size:.75rem; font-weight:600; margin-bottom:.3rem; color:var(--text-muted);">LATITUD</label>
+                            <input type="text" name="latitud" id="inputLatitud" class="form-control"
+                                   value="{{ $terreno->latitud }}" placeholder="Ej: -21.5355"
+                                   style="font-size:.88rem;">
+                        </div>
+                        <div style="flex:1; min-width:160px;">
+                            <label style="display:block; font-size:.75rem; font-weight:600; margin-bottom:.3rem; color:var(--text-muted);">LONGITUD</label>
+                            <input type="text" name="longitud" id="inputLongitud" class="form-control"
+                                   value="{{ $terreno->longitud }}" placeholder="Ej: -64.7295"
+                                   style="font-size:.88rem;">
+                        </div>
+                        <button type="submit" class="btn btn-primary" style="white-space:nowrap;">
+                            💾 Guardar Ubicación
+                        </button>
+                    </form>
+
+                    @if(session('success_mapa'))
+                        <div class="alert alert-success" style="margin-top:.75rem;">{{ session('success_mapa') }}</div>
+                    @endif
                 </div>
-                @else
-                <div style="margin-bottom: 24px; padding: 12px 16px; background: var(--bg-light); border-radius: 8px; border: 1px solid var(--border-color);">
-                    <p style="margin:0; color: var(--text-muted); font-size:0.9rem;">⚠️ Este terreno no tiene coordenadas registradas. El vendedor no marcó la ubicación en el mapa.</p>
+
+                {{-- ═══ SECCIÓN: FOLIO REGISTRADO ═══ --}}
+                <div style="margin-bottom:24px;">
+                    <h4 style="margin-bottom:12px; font-size:.95rem; color:var(--text-secondary); display:flex; align-items:center; gap:.5rem;">
+                        📋 Folio Real
+                    </h4>
+
+                    @if($terreno->folio)
+                        <div style="border:1px solid var(--border-color); border-radius:10px; overflow:hidden;">
+
+                            {{-- Header del folio --}}
+                            <div style="padding:12px 16px; background:var(--bg-light); border-bottom:1px solid var(--border-color); display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:.5rem;">
+                                <div>
+                                    <span style="font-size:.7rem; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--text-muted);">N° Folio</span>
+                                    <p style="margin:0; font-size:1.1rem; font-weight:700;">{{ $terreno->folio->numero_folio }}</p>
+                                </div>
+                                @php
+                                    $estadoFolio = $terreno->folio->estado;
+                                    $badgesFolio = [
+                                        'pendiente'  => ['bg'=>'#fff3cd','border'=>'#ffeeba','color'=>'#856404','txt'=>'🕐 Pendiente'],
+                                        'verificado' => ['bg'=>'#d4edda','border'=>'#c3e6cb','color'=>'#155724','txt'=>'✅ Verificado'],
+                                        'rechazado'  => ['bg'=>'#f8d7da','border'=>'#f5c6cb','color'=>'#721c24','txt'=>'❌ Rechazado'],
+                                    ];
+                                    $bf = $badgesFolio[$estadoFolio] ?? $badgesFolio['pendiente'];
+                                @endphp
+                                <span style="padding:.3rem .9rem; background:{{ $bf['bg'] }}; border:1px solid {{ $bf['border'] }}; border-radius:100px; font-size:.78rem; font-weight:700; color:{{ $bf['color'] }};">
+                                    {{ $bf['txt'] }}
+                                </span>
+                            </div>
+
+                            {{-- Datos del folio --}}
+                            <div style="padding:12px 16px; display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+                                <div>
+                                    <p style="margin:0 0 .2rem; font-size:.68rem; font-weight:700; text-transform:uppercase; color:var(--text-muted);">Superficie</p>
+                                    <p style="margin:0; font-size:.95rem; font-weight:600;">{{ number_format($terreno->folio->superficie, 2) }} m²</p>
+                                </div>
+                                <div>
+                                    <p style="margin:0 0 .2rem; font-size:.68rem; font-weight:700; text-transform:uppercase; color:var(--text-muted);">Registrado</p>
+                                    <p style="margin:0; font-size:.88rem;">{{ \Carbon\Carbon::parse($terreno->folio->created_at)->format('d/m/Y') }}</p>
+                                </div>
+                                <div style="grid-column:span 2;">
+                                    <p style="margin:0 0 .2rem; font-size:.68rem; font-weight:700; text-transform:uppercase; color:var(--text-muted);">Ubicación registrada</p>
+                                    <p style="margin:0; font-size:.88rem; color:var(--text-secondary);">{{ $terreno->folio->ubicacion }}</p>
+                                </div>
+                                @if($terreno->folio->colindancias)
+                                <div style="grid-column:span 2;">
+                                    <p style="margin:0 0 .2rem; font-size:.68rem; font-weight:700; text-transform:uppercase; color:var(--text-muted);">Colindancias</p>
+                                    <p style="margin:0; font-size:.88rem; color:var(--text-secondary);">{{ $terreno->folio->colindancias }}</p>
+                                </div>
+                                @endif
+                            </div>
+
+                            {{-- Botones de acción si está pendiente --}}
+                            @if($estadoFolio === 'pendiente')
+                            <div style="padding:12px 16px; border-top:1px solid var(--border-color); display:flex; gap:.6rem;">
+                                <form action="{{ route('admin.folio.verificar') }}" method="POST" style="display:inline;">
+                                    @csrf
+                                    <input type="hidden" name="folio_id" value="{{ $terreno->folio->id }}">
+                                    <input type="hidden" name="accion" value="verificado">
+                                    <button type="submit" class="btn btn-success btn-sm"
+                                            onclick="return confirm('¿Verificar el folio {{ $terreno->folio->numero_folio }}?')">
+                                        ✅ Verificar Folio
+                                    </button>
+                                </form>
+                                <form action="{{ route('admin.folio.verificar') }}" method="POST" style="display:inline;">
+                                    @csrf
+                                    <input type="hidden" name="folio_id" value="{{ $terreno->folio->id }}">
+                                    <input type="hidden" name="accion" value="rechazado">
+                                    <button type="submit" class="btn btn-danger btn-sm"
+                                            onclick="return confirm('¿Rechazar el folio {{ $terreno->folio->numero_folio }}?')">
+                                        ❌ Rechazar Folio
+                                    </button>
+                                </form>
+                            </div>
+                            @elseif($estadoFolio === 'verificado')
+                            <div style="padding:10px 16px; border-top:1px solid var(--border-color); font-size:.82rem; color:#155724;">
+                                Verificado por {{ $terreno->folio->adminVerificador->nombre ?? 'Admin' }}
+                            </div>
+                            @endif
+
+                        </div>
+                    @else
+                        <div style="padding:12px 16px; background:var(--bg-light); border:1px solid var(--border-color); border-radius:8px; color:var(--text-muted); font-size:.9rem;">
+                            ⚠️ Este terreno no tiene folio registrado por el vendedor todavía.
+                        </div>
+                    @endif
                 </div>
-                @endif
 
                 {{-- Acciones de Aprobación --}}
                 @if($terreno->estado === 'pendiente')
@@ -243,18 +355,20 @@
     </div>
 </div>
 
+@push('scripts')
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
 function abrirImagen(src) {
     document.getElementById('modalImagenSrc').src = src;
     document.getElementById('modalImagen').style.display = 'flex';
 }
 
-@if($terreno->latitud && $terreno->longitud)
 document.addEventListener('DOMContentLoaded', function() {
-    var lat = {{ $terreno->latitud }};
-    var lng = {{ $terreno->longitud }};
+    var lat  = {{ $terreno->latitud  ?? -17.7863 }};
+    var lng  = {{ $terreno->longitud ?? -63.1812 }};
+    var zoom = {{ $terreno->latitud ? 15 : 6 }};
 
-    var mapaAdmin = L.map('mapaAdmin', { zoomControl: true, dragging: true }).setView([lat, lng], 15);
+    var mapaAdmin = L.map('mapaAdmin', { zoomControl: true }).setView([lat, lng], zoom);
 
     L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
         attribution: '&copy; OSM &copy; CartoDB',
@@ -262,16 +376,25 @@ document.addEventListener('DOMContentLoaded', function() {
         maxZoom: 19
     }).addTo(mapaAdmin);
 
-    L.marker([lat, lng])
-        .addTo(mapaAdmin)
-        .bindPopup('<strong>{{ addslashes($terreno->ubicacion) }}</strong><br>Terreno #{{ $terreno->id }}')
-        .openPopup();
-});
-@endif
-</script>
+    // Marcador arrastrable
+    var marker = L.marker([lat, lng], { draggable: true }).addTo(mapaAdmin);
+    marker.bindPopup('<strong>{{ addslashes($terreno->ubicacion) }}</strong>').openPopup();
 
-@push('scripts')
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    // Al arrastrar el marcador → actualizar inputs
+    marker.on('dragend', function(e) {
+        var pos = e.target.getLatLng();
+        document.getElementById('inputLatitud').value  = pos.lat.toFixed(6);
+        document.getElementById('inputLongitud').value = pos.lng.toFixed(6);
+    });
+
+    // Al hacer clic en el mapa → mover marcador y actualizar inputs
+    mapaAdmin.on('click', function(e) {
+        marker.setLatLng(e.latlng);
+        document.getElementById('inputLatitud').value  = e.latlng.lat.toFixed(6);
+        document.getElementById('inputLongitud').value = e.latlng.lng.toFixed(6);
+    });
+});
+</script>
 @endpush
 
 @endsection

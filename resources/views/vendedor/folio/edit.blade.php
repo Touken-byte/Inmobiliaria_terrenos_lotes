@@ -14,10 +14,32 @@
     </div>
     <div class="card-body">
 
-        <div class="alert alert-info" style="margin-bottom:1.5rem;">
-            <strong>📄 Folio:</strong> {{ $folio->numero_folio }} —
-            Registrado el {{ \Carbon\Carbon::parse($folio->created_at)->translatedFormat('d \d\e F \d\e Y') }}
+        {{-- Badge de estado --}}
+        <div class="alert alert-info" style="margin-bottom:1.5rem; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:.75rem;">
+            <div>
+                <strong>📄 Folio:</strong> {{ $folio->numero_folio }} —
+                Registrado el {{ \Carbon\Carbon::parse($folio->created_at)->translatedFormat('d \d\e F \d\e Y') }}
+            </div>
+            @if($folio->estado === 'verificado')
+                <span style="padding:.3rem .9rem; background:#d4edda; border:1px solid #c3e6cb; border-radius:100px; font-size:.8rem; font-weight:700; color:#155724;">
+                    ✅ Verificado
+                </span>
+            @else
+                <span style="padding:.3rem .9rem; background:#fff3cd; border:1px solid #ffeeba; border-radius:100px; font-size:.8rem; font-weight:700; color:#856404;">
+                    🕐 Pendiente de verificación
+                </span>
+            @endif
         </div>
+
+        {{-- Bloqueo si ya está verificado --}}
+        @if($folio->estado === 'verificado')
+            <div class="alert" style="background:#d4edda; border:1px solid #c3e6cb; border-radius:8px; padding:1rem; margin-bottom:1.5rem;">
+                <strong>🔒 Folio verificado.</strong> Este folio ya fue aprobado por el administrador y no puede modificarse.
+            </div>
+            <a href="{{ route('vendedor.terrenos.mis') }}" class="btn btn-secondary" style="width:100%; text-align:center; display:block;">
+                ← Volver a mis terrenos
+            </a>
+        @else
 
         <form action="{{ route('vendedor.folio.update', $terreno->id) }}" method="POST">
             @csrf
@@ -63,6 +85,7 @@
                 </button>
             </div>
         </form>
+        @endif
     </div>
 </div>
 
