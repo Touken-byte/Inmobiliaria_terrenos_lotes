@@ -137,6 +137,9 @@ Route::get('/alquileres/{id}', [AlquilerController::class, 'detalle'])->name('ca
 
     // Control de lotes
     Route::get('/lotes', [AdminController::class, 'controlLotes'])->name('lotes');
+    
+    // 👇 NUEVO: Endpoint para el reporte de inventario
+    Route::get('/api/inventario-stats', [AdminController::class, 'getInventarioStats'])->name('api.inventario_stats');
 
     // Auditoría (IN-A05)
     Route::get('/auditoria', [AuditoriaController::class, 'index'])->name('auditoria');
