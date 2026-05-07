@@ -125,13 +125,13 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover { opacity: 1; }
                 $estadoGeneral = 'Iniciado';
                 $claseGeneral  = 'badge-info';
                 if ($paso === 3) { $estadoGeneral = 'En Revisión'; $claseGeneral = 'badge-warning'; }
+                if ($minuta && $minuta->estado === 'aprobada' && $comprobante && $comprobante->estado === 'aprobado') { 
+                    $estadoGeneral = 'Finalizado'; $claseGeneral = 'badge-success'; 
+                }
                 if ($minuta && $minuta->estado === 'completada') { 
                     $estadoGeneral = 'Finalizado'; $claseGeneral = 'badge-success'; 
                 }
-                if ($protocolizacion && $protocolizacion->estado === 'pendiente') {
-                    $estadoGeneral = 'Protocolización en Revisión'; $claseGeneral = 'badge-warning';
-                }
-                if (($minuta && $minuta->estado === 'rechazada') || ($comprobante && $comprobante->estado === 'rechazado') || ($protocolizacion && $protocolizacion->estado === 'rechazado')) {
+                if (($minuta && $minuta->estado === 'rechazada') || ($comprobante && $comprobante->estado === 'rechazado')) {
                     $estadoGeneral = 'Requiere Corrección'; $claseGeneral = 'badge-danger';
                 }
             @endphp
@@ -145,32 +145,14 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover { opacity: 1; }
             </div>
         @endif
 
-    {{-- Progress Enhanced Design --}}
-    <div class="progress-wrapper" style="margin-bottom: 3rem; padding: 0 1rem;">
-        <div class="steps-labels" style="display: flex; justify-content: space-between; margin-bottom: 10px;">
-            <div class="step-label {{ $paso >= 1 ? 'active' : '' }}" style="width: 25%; text-align: center; font-size: 0.65rem; font-weight: 800; letter-spacing: 0.5px; opacity: {{ $paso >= 1 ? '1' : '0.3' }}; transition: 0.3s;">1. MINUTA</div>
-            <div class="step-label {{ $paso >= 2 ? 'active' : '' }}" style="width: 25%; text-align: center; font-size: 0.65rem; font-weight: 800; letter-spacing: 0.5px; opacity: {{ $paso >= 2 ? '1' : '0.3' }}; transition: 0.3s;">2. IMPUESTO IT</div>
-            <div class="step-label {{ $paso >= 3 ? 'active' : '' }}" style="width: 25%; text-align: center; font-size: 0.65rem; font-weight: 800; letter-spacing: 0.5px; opacity: {{ $paso >= 3 ? '1' : '0.3' }}; transition: 0.3s;">3. PROTOCOLIZACIÓN</div>
-            <div class="step-label {{ $paso >= 4 ? 'active' : '' }}" style="width: 25%; text-align: center; font-size: 0.65rem; font-weight: 800; letter-spacing: 0.5px; opacity: {{ $paso >= 4 ? '1' : '0.3' }}; transition: 0.3s;">4. FINALIZADO</div>
+    {{-- Progress --}}
+    <div class="progress-container">
+        <div style="display: flex; justify-content: space-between; font-size: 0.7rem; font-weight: 800; opacity: 0.4; text-transform: uppercase;">
+            <span>1. Minuta</span><span>2. Impuesto IT</span><span>3. Finalización</span>
         </div>
-        <div class="progress-bar-track" style="height: 6px; background: rgba(255,255,255,0.05); border-radius: 10px; position: relative; overflow: visible;">
-            @php 
-                // Lógica de progreso precisa
-                $percent = 0;
-                if ($paso == 1) $percent = 12.5;
-                elseif ($paso == 2) $percent = 37.5;
-                elseif ($paso == 3) $percent = 62.5;
-                elseif ($paso == 4) $percent = 100;
-            @endphp
-            <div class="progress-bar-fill" style="position: absolute; left: 0; top: 0; height: 100%; width: {{ $percent }}%; background: linear-gradient(90deg, #7c3aed, #06b6d4); border-radius: 10px; transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 0 15px rgba(6, 182, 212, 0.4);">
-                <div style="position: absolute; right: -5px; top: -4px; width: 14px; height: 14px; background: #06b6d4; border: 3px solid #1a1a2e; border-radius: 50%; box-shadow: 0 0 10px #06b6d4;"></div>
-            </div>
-            
-            {{-- Puntos de anclaje visual --}}
-            <div style="position: absolute; left: 12.5%; top: 50%; transform: translate(-50%, -50%); width: 8px; height: 8px; background: {{ $paso >= 1 ? '#7c3aed' : 'rgba(255,255,255,0.1)' }}; border-radius: 50%;"></div>
-            <div style="position: absolute; left: 37.5%; top: 50%; transform: translate(-50%, -50%); width: 8px; height: 8px; background: {{ $paso >= 2 ? '#6366f1' : 'rgba(255,255,255,0.1)' }}; border-radius: 50%;"></div>
-            <div style="position: absolute; left: 62.5%; top: 50%; transform: translate(-50%, -50%); width: 8px; height: 8px; background: {{ $paso >= 3 ? '#3b82f6' : 'rgba(255,255,255,0.1)' }}; border-radius: 50%;"></div>
-            <div style="position: absolute; left: 87.5%; top: 50%; transform: translate(-50%, -50%); width: 8px; height: 8px; background: {{ $paso >= 4 ? '#06b6d4' : 'rgba(255,255,255,0.1)' }}; border-radius: 50%;"></div>
+        <div class="progress-bar-track">
+            @php $progreso = $paso === 1 ? 15 : ($paso === 2 ? 50 : 100); @endphp
+            <div class="progress-bar-fill" style="width: {{ $progreso }}%;"></div>
         </div>
     </div>
 
@@ -438,128 +420,22 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover { opacity: 1; }
     </div>
 
     {{-- STEP 3 --}}
-    {{-- STEP 3 --}}
-    @php
-        $itAprobado = ($comprobante && in_array($comprobante->estado, ['aprobado', 'completado']));
-    @endphp
-    <div class="proceso-step {{ !$itAprobado ? 'bloqueado' : ($protocolizacion ? 'completado' : 'activo') }}">
-        <div class="step-badge {{ !$itAprobado ? 'bloqueado' : ($protocolizacion ? 'completado' : 'activo') }}">
-            @if($protocolizacion && in_array($protocolizacion->estado, ['aprobado', 'completado'])) ✓ @else 3 @endif
-        </div>
-        <div style="margin-bottom: 1.5rem;">
-            <h3 style="margin: 0; font-size: 1.25rem; font-weight: 700;">Protocolización Notarial</h3>
-            <p style="margin: 0; font-size: 0.85rem; opacity: 0.5;">Cierre notarial y obtención del testimonio de propiedad.</p>
-        </div>
-
-        @if(!$itAprobado)
-            <div class="card" style="border: 2px dashed var(--glass-border); background: transparent; text-align: center; padding: 3rem;">
-                <div style="font-size: 2rem; margin-bottom: 1rem; opacity: 0.3;">🔒</div>
-                <h4 style="margin: 0; font-weight: 700;">Paso Bloqueado</h4>
-                <p style="opacity: 0.4; font-size: 0.85rem; margin-top: 5px;">Debe completar la minuta y el comprobante IT antes de continuar.</p>
-            </div>
-        @elseif($protocolizacion)
-            <div class="card" style="border-radius: 20px; background: var(--glass);">
-                <div class="card-body" style="padding: 1.75rem;">
-                    <div class="info-grid">
-                        <div>
-                            <span class="info-label">N° Protocolo</span>
-                            <div class="info-value">{{ $protocolizacion->numero_protocolo }}</div>
-                        </div>
-                        <div>
-                            <span class="info-label">Fecha Prot.</span>
-                            <div class="info-value">{{ $protocolizacion->fecha_protocolizacion->format('d/m/Y') }}</div>
-                        </div>
-                        <div>
-                            <span class="info-label">Estado</span>
-                            <div style="margin-top: 3px;">
-                                <span class="estado-badge estado-{{ in_array($protocolizacion->estado, ['aprobado', 'completado']) ? 'aprobado' : ($protocolizacion->estado === 'rechazado' ? 'rechazado' : 'pendiente') }}">
-                                    {{ ucfirst($protocolizacion->estado) }}
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-
-                    @if($protocolizacion->estado === 'rechazado' && $protocolizacion->observacion)
-                        <div class="obs-box">
-                            <strong>⚠️ Observación Admin:</strong><br>
-                            {{ $protocolizacion->observacion }}
-                        </div>
-                    @endif
-
-                    <div style="margin-top: 1.5rem; display: flex; gap: 12px;">
-                        @if($protocolizacion->archivo_testimonio)
-                            <a href="{{ route('vendedor.protocolizacion.archivo', $protocolizacion->id) }}" target="_blank" class="btn btn-secondary btn-sm" style="border-radius: 8px;">
-                                📄 Ver Testimonio
-                            </a>
-                        @endif
-                        @if($minuta?->estado !== 'completada')
-                            <button onclick="toggleElement('form-protocolizacion')" class="btn btn-primary btn-sm" style="border-radius: 8px;">
-                                {{ $protocolizacion->estado === 'rechazado' ? '🔄 Reemplazar Testimonio' : '✏️ Editar Datos' }}
-                            </button>
-                        @endif
-                    </div>
-                </div>
-            </div>
-            <div id="form-protocolizacion" style="display: none; margin-top: 1.5rem;">
-        @else
-            <div id="form-protocolizacion">
-        @endif
-            <div class="card" style="border-radius: 20px;">
-                <div class="card-body" style="padding: 2rem;">
-                    <form action="{{ route('vendedor.protocolizacion.store') }}" method="POST" enctype="multipart/form-data">
-                        @csrf
-                        <div class="row g-4">
-                            <div class="col-md-6">
-                                <div class="form-group mb-3">
-                                    <label>N° de Protocolo *</label>
-                                    <input type="text" name="numero_protocolo" class="input-premium" placeholder="Ej: 154/2026" value="{{ old('numero_protocolo', $protocolizacion?->numero_protocolo) }}" required>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group mb-3">
-                                    <label>Fecha de Protocolización *</label>
-                                    <input type="date" name="fecha_protocolizacion" class="input-premium" value="{{ old('fecha_protocolizacion', $protocolizacion?->fecha_protocolizacion?->format('Y-m-d')) }}" required>
-                                </div>
-                            </div>
-                            <div class="col-12">
-                                <div class="form-group">
-                                    <label>Testimonio Notarial (PDF/Imagen) *</label>
-                                    <div class="upload-area" id="dropzone-protocolizacion">
-                                        <span class="upload-icon">🖋️</span>
-                                        <span class="upload-text">Subir Testimonio Notarial</span>
-                                        <span class="upload-hint">Haz clic o arrastra el archivo aquí</span>
-                                        <input type="file" name="archivo_testimonio" accept="image/*,application/pdf" {{ !$protocolizacion ? 'required' : '' }} onchange="updateFileName(this)">
-                                        <div class="file-name-preview mt-2 text-primary font-weight-bold" style="display:none;"></div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <button type="submit" class="btn btn-primary mt-4" style="width: 100%; border-radius: 12px; height: 50px; font-weight: 700; background: linear-gradient(135deg, #7c3aed, #4f46e5);">
-                            🚀 Finalizar trámite legal
-                        </button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    {{-- STEP 4 --}}
-    <div class="proceso-step {{ $minuta?->estado === 'completada' ? 'completado' : 'bloqueado' }}" style="margin-bottom: 2rem;">
-        <div class="step-badge {{ $minuta?->estado === 'completada' ? 'completado' : 'bloqueado' }}">
-            @if($minuta?->estado === 'completada') ✓ @else 4 @endif
+    <div class="proceso-step {{ in_array($minuta?->estado, ['completada']) ? 'completado' : ($paso === 3 ? 'activo' : 'bloqueado') }}" style="margin-bottom: 2rem;">
+        <div class="step-badge {{ in_array($minuta?->estado, ['completada']) ? 'completado' : ($paso === 3 ? 'activo' : 'bloqueado') }}">
+            @if($minuta?->estado === 'completada') ✓ @else 3 @endif
         </div>
         <div>
-            <h3 style="margin: 0; font-size: 1.25rem; font-weight: 700;">Finalización y Entrega</h3>
-            <p style="margin: 0; font-size: 0.85rem; opacity: 0.5;">Trámite legal cerrado y propiedad transferida.</p>
+            <h3 style="margin: 0; font-size: 1.25rem; font-weight: 700;">Revisión y Finalización</h3>
+            <p style="margin: 0; font-size: 0.85rem; opacity: 0.5;">Validación administrativa final para cierre de venta.</p>
         </div>
 
-        @if($protocolizacion || $minuta?->estado === 'completada')
+        @if($paso === 3 || $minuta?->estado === 'completada')
             <div class="card" style="margin-top: 1.5rem; border-radius: 20px; border-color: {{ $minuta?->estado === 'completada' ? '#10b981' : 'rgba(251,191,36,0.3)' }}; background: {{ $minuta?->estado === 'completada' ? 'rgba(16,185,129,0.05)' : 'rgba(251,191,36,0.05)' }};">
                 <div class="card-body" style="text-align: center; padding: 2rem;">
                     <div style="font-size: 3rem; margin-bottom: 1rem;">{{ $minuta?->estado === 'completada' ? '🏆' : '⏳' }}</div>
-                    <h4 style="font-weight: 700; margin-bottom: 0.5rem;">{{ $minuta?->estado === 'completada' ? '¡Venta Finalizada!' : 'En Revisión Final' }}</h4>
+                    <h4 style="font-weight: 700; margin-bottom: 0.5rem;">{{ $minuta?->estado === 'completada' ? '¡Venta Finalizada!' : 'Documentación completa' }}</h4>
                     <p style="opacity: 0.6; max-width: 420px; margin: 0 auto;">
-                        {{ $minuta?->estado === 'completada' ? 'El proceso legal ha concluido con éxito. El terreno ya ha sido transferido legalmente.' : 'Su testimonio notarial está siendo revisado. Le notificaremos cuando el proceso esté 100% finalizado.' }}
+                        {{ $minuta?->estado === 'completada' ? 'El proceso legal ha concluido con éxito. El terreno ya ha sido transferido legalmente.' : 'Su trámite está siendo revisado por el equipo administrativo. Le notificaremos el resultado a la brevedad.' }}
                     </p>
                 </div>
             </div>

@@ -81,10 +81,6 @@ Route::get('/alquileres/{id}', [AlquilerController::class, 'detalle'])->name('ca
     Route::get('/minuta/{id}/archivo', [MinutaController::class, 'verArchivo'])->name('minuta.archivo');
     Route::get('/comprobante-it/{id}/archivo', [\App\Http\Controllers\Vendedor\ComprobanteItController::class, 'verArchivo'])->name('comprobante_it.archivo');
     Route::post('/proceso-legal/minuta', [MinutaController::class, 'storeVendedor'])->name('proceso_legal.minuta.store');
-    
-    // Protocolización (Paso 3)
-    Route::post('/protocolizacion', [\App\Http\Controllers\Vendedor\ProtocolizacionController::class, 'store'])->name('protocolizacion.store');
-    Route::get('/protocolizacion/{id}/archivo', [\App\Http\Controllers\Vendedor\ProtocolizacionController::class, 'verArchivo'])->name('protocolizacion.archivo');
 });
 
 // Rutas compartidas (vendedor y admin) para solicitudes de visita
@@ -156,11 +152,6 @@ Route::get('/alquileres/{id}', [AlquilerController::class, 'detalle'])->name('ca
     Route::post('/tramites-legales/{id}/rechazar-it', [TramiteLegalController::class, 'rechazarIT'])->name('tramites_legales.rechazar_it');
     Route::post('/tramites-legales/{id}/finalizar', [TramiteLegalController::class, 'finalizarTramite'])->name('tramites_legales.finalizar');
     Route::get('/tramites-legales/{id}/minuta-archivo', [TramiteLegalController::class, 'verMinuta'])->name('tramites_legales.ver_minuta');
-
-    // Protocolización Review (Paso 3 Admin)
-    Route::post('/tramites-legales/{id}/aprobar-protocolizacion', [TramiteLegalController::class, 'aprobarProtocolizacion'])->name('tramites_legales.aprobar_protocolizacion');
-    Route::post('/tramites-legales/{id}/rechazar-protocolizacion', [TramiteLegalController::class, 'rechazarProtocolizacion'])->name('tramites_legales.rechazar_protocolizacion');
-    Route::get('/tramites-legales/{id}/testimonio-archivo', [TramiteLegalController::class, 'verTestimonio'])->name('tramites_legales.ver_testimonio');
 });
 
 Route::get('/mapa', [App\Http\Controllers\MapaController::class, 'index'])->name('mapa.index');

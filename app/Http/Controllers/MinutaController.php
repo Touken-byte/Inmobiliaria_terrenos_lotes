@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Minuta;
 use App\Models\ComprobanteIt;
-use App\Models\Protocolizacion;
 use App\Models\Terreno;
 use App\Models\Usuario;
 use Illuminate\Support\Facades\Auth;
@@ -79,20 +78,11 @@ class MinutaController extends Controller
                 ->first();
         }
 
-        // Protocolización (Paso 3)
-        $protocolizacion = null;
-        if ($minuta) {
-            $protocolizacion = Protocolizacion::where('minuta_id', $minuta->id)
-                ->latest()
-                ->first();
-        }
-
         // SI EL TRÁMITE ESTÁ COMPLETADO: "Limpiamos" las variables activas para 
         // que el vendedor pueda iniciar un NUEVO trámite desde cero.
         if ($minuta && $minuta->estado === 'completada') {
             $minuta = null;
             $comprobante = null;
-            $protocolizacion = null;
         }
 
         // Lista de terrenos del vendedor para el formulario de minuta
@@ -101,9 +91,8 @@ class MinutaController extends Controller
             ->pluck('terreno_id')
             ->toArray();
 
-        // Terrenos del vendedor que estén APROBADOS, libres O que pertenecen a su trámite actual
+        // Terrenos del vendedor que están libres O que pertenecen a su trámite actual (si está editando)
         $terrenos = Terreno::where('usuario_id', $user->id)
-            ->where('estado', 'aprobado')
             ->where(function($query) use ($terrenosOcupados, $minuta) {
                 $query->whereNotIn('id', $terrenosOcupados);
                 if ($minuta) {
@@ -116,11 +105,10 @@ class MinutaController extends Controller
         // Calcular paso activo para la UI
         $paso = 1;
         if ($minuta) $paso = 2;
-        if ($minuta && $comprobante && $comprobante->estado === 'aprobado') $paso = 3;
-        if ($minuta && $comprobante && $protocolizacion) $paso = 4; // Paso 4 es revisión final / finalizado
+        if ($minuta && $comprobante) $paso = 3;
 
         return view('vendedor.proceso_legal', compact(
-            'minuta', 'comprobante', 'protocolizacion', 'terrenos', 'compradores', 'paso'
+            'minuta', 'comprobante', 'terrenos', 'compradores', 'paso'
         ));
     }
 
@@ -164,15 +152,6 @@ class MinutaController extends Controller
             'archivo.mimes'         => 'Solo se aceptan PDF, JPG o PNG.',
             'archivo.max'           => 'El archivo no puede pesar más de 5MB.',
         ]);
-
-        // Validación extra de seguridad: El terreno debe estar aprobado
-        $terreno = Terreno::where('id', $request->terreno_id)
-            ->where('usuario_id', $user->id)
-            ->first();
-
-        if (!$terreno || $terreno->estado !== 'aprobado') {
-            return redirect()->back()->with('error', '⚠️ Solo puede iniciar trámites legales con terrenos que hayan sido aprobados por la administración.');
-        }
 
         $ruta = null;
         if ($request->hasFile('archivo')) {
