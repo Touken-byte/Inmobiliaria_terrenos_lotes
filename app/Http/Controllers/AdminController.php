@@ -307,6 +307,32 @@ class AdminController extends Controller
         return view('admin.ver_terreno', compact('terreno'));
     }
 
+    public function alquileresPanel(Request $request)
+    {
+        $filtroActual = $request->query('filtro', 'todos');
+
+        $stats = (object) [
+            'total' => Alquiler::count(),
+            'pendientes' => Alquiler::where('estado_aprobacion', 'pendiente')->count(),
+            'aprobados' => Alquiler::where('estado_aprobacion', 'aprobado')->count(),
+            'rechazados' => Alquiler::where('estado_aprobacion', 'rechazado')->count(),
+        ];
+
+        $query = Alquiler::with(['usuario', 'imagenes'])
+            ->select('alquileres.*');
+
+        if ($filtroActual !== 'todos') {
+            $query->where('alquileres.estado_aprobacion', $filtroActual);
+        }
+
+        $query->orderByRaw("CASE alquileres.estado_aprobacion WHEN 'pendiente' THEN 1 WHEN 'rechazado' THEN 2 WHEN 'aprobado' THEN 3 ELSE 4 END")
+            ->orderBy('alquileres.created_at', 'DESC');
+
+        $alquileres = $query->get();
+
+        return view('admin.alquileres', compact('stats', 'alquileres', 'filtroActual'));
+    }
+
     public function verAlquiler($id)
     {
         $alquiler = Alquiler::with(['usuario', 'imagenes'])->findOrFail($id);
@@ -382,7 +408,7 @@ class AdminController extends Controller
         
         $previousUrl = url()->previous();
         $isModeracion = str_contains($previousUrl, route('admin.moderacion_panel'));
-        $rutaDestino = $isModeracion ? 'admin.moderacion_panel' : 'admin.panel';
+        $rutaDestino = $isModeracion ? 'admin.moderacion_panel' : 'admin.alquileres_panel';
         
         return redirect()->route($rutaDestino)->with('success', "Alquiler #{$alquiler->id} {$accionTexto} exitosamente.");
     }

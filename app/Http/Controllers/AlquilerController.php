@@ -9,14 +9,32 @@ use Illuminate\Support\Facades\Storage;
 
 class AlquilerController extends Controller
 {
-    public function catalogo()
-    {
-        $alquileres = Alquiler::where('estado', 'disponible')
-                              ->where('estado_aprobacion', 'aprobado')
-                              ->latest()
-                              ->paginate(12);
-        return view('Alquiler.index', compact('alquileres'));
+    public function catalogo(Request $request)
+{
+    $query = Alquiler::where('estado', 'disponible')
+                     ->where('estado_aprobacion', 'aprobado');
+
+    if ($request->filled('search')) {
+        $search = $request->search;
+        $query->where(function($q) use ($search) {
+            $q->where('titulo', 'like', "%{$search}%")
+              ->orWhere('ubicacion', 'like', "%{$search}%")
+              ->orWhere('descripcion', 'like', "%{$search}%");
+        });
     }
+
+    if ($request->filled('precio_min')) {
+        $query->where('precio_mensual', '>=', $request->precio_min);
+    }
+
+    if ($request->filled('precio_max')) {
+        $query->where('precio_mensual', '<=', $request->precio_max);
+    }
+
+    $alquileres = $query->latest()->paginate(12)->withQueryString();
+
+    return view('Alquiler.index', compact('alquileres'));
+}
 
     public function detalle($id)
     {

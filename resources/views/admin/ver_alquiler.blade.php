@@ -5,12 +5,12 @@
 @section('content')
 
 <div class="page-actions">
-    <a href="{{ route('admin.moderacion_panel') }}" class="btn btn-secondary" id="backToModeracion">
+    <a href="{{ route('admin.alquileres_panel') }}" class="btn btn-secondary" id="backToAlquileres">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <line x1="19" y1="12" x2="5" y2="12"/>
             <polyline points="12,19 5,12 12,5"/>
         </svg>
-        Volver a Moderación
+        Volver a Alquileres
     </a>
 </div>
 

@@ -83,6 +83,16 @@
                                 </span>
                                 <span>Gestión Terrenos</span>
                             </a>
+                            <a href="{{ url('/admin/alquileres') }}"
+                                class="nav-link {{ request()->is('admin/alquileres*') ? 'active' : '' }}" id="nav-alquileres-admin">
+                                <span class="nav-icon">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
+                                        <polyline points="9,22 9,12 15,12 15,22" />
+                                    </svg>
+                                </span>
+                                <span>Gestión Alquileres</span>
+                            </a>
                             <a href="{{ route('admin.lotes') }}"
                                 class="nav-link {{ request()->is('admin/lotes*') ? 'active' : '' }}" id="nav-lotes-admin">
                                 <span class="nav-icon">

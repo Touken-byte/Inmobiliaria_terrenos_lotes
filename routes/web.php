@@ -110,6 +110,7 @@ Route::get('/alquileres/{id}', [AlquilerController::class, 'detalle'])->name('ca
     Route::get('/terrenos', [AdminController::class, 'terrenosPanel'])->name('terrenos_panel');
     Route::get('/terrenos/{id}', [AdminController::class, 'verTerreno'])->name('ver_terreno');
     Route::post('/procesar-terreno', [AdminController::class, 'procesarTerreno'])->name('procesar_terreno');
+    Route::get('/alquileres', [AdminController::class, 'alquileresPanel'])->name('alquileres_panel');
     Route::get('/alquileres/{id}', [AdminController::class, 'verAlquiler'])->name('ver_alquiler');
     Route::post('/procesar-alquiler', [AdminController::class, 'procesarAlquiler'])->name('procesar_alquiler');
 
