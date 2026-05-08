@@ -418,7 +418,147 @@ class AdminController extends Controller
     public function controlLotes()
     {
         $terrenos = Terreno::orderBy('actualizado_en', 'DESC')->orderBy('creado_en', 'DESC')->get();
-        return view('shared.lotes', compact('terrenos'));
+        // 👇 NUEVO: Obtener vendedores
+        $vendedores = \App\Models\Usuario::where('rol', 'vendedor')->get();
+        
+        return view('shared.lotes', compact('terrenos', 'vendedores'));
+    }
+
+    public function getInventarioStats(Request $request)
+    {
+        $fechaDesde = $request->query('fecha_desde');
+        $fechaHasta = $request->query('fecha_hasta');
+        $ubicacion = $request->query('ubicacion');
+        $vendedorId = $request->query('vendedor_id');
+
+        $query = Terreno::query();
+
+        if ($fechaDesde) {
+            $query->whereDate('creado_en', '>=', $fechaDesde);
+        }
+        if ($fechaHasta) {
+            $query->whereDate('creado_en', '<=', $fechaHasta);
+        }
+        if ($ubicacion) {
+            $query->where('ubicacion', 'like', '%' . $ubicacion . '%');
+        }
+        if ($vendedorId) {
+            $query->where('vendedor_id', $vendedorId);
+        }
+
+        $terrenos = $query->select('id', 'creado_en', 'actualizado_en', 'estado_lote', 'precio')->get();
+
+        $data = [];
+        $meses = [];
+        
+        // Variables para Distribución (Dona) y KPIs
+        $globalCounts = ['disponible' => 0, 'vendido' => 0, 'reservado' => 0];
+        $financials = ['disponible' => 0, 'vendido' => 0, 'reservado' => 0];
+        
+        $ventasEsteMes = 0;
+        $ventasMesPasado = 0;
+        $tiempoVentaTotal = 0; // en días
+        
+        $hoy = \Carbon\Carbon::now();
+        $mesActual = $hoy->format('Y-m');
+        $mesPasado = $hoy->copy()->subMonth()->format('Y-m');
+
+        foreach ($terrenos as $t) {
+            // Totales globales y financieros
+            $estado = strtolower($t->estado_lote ?? 'disponible');
+            $precio = (float)($t->precio ?? 0);
+            
+            if (isset($globalCounts[$estado])) {
+                $globalCounts[$estado]++;
+                $financials[$estado] += $precio;
+            } else {
+                $globalCounts['disponible']++;
+                $financials['disponible'] += $precio;
+            }
+
+            // Agrupación por meses para barras
+            if ($t->creado_en) {
+                $mes = \Carbon\Carbon::parse($t->creado_en)->format('Y-m');
+                
+                if (!in_array($mes, $meses)) {
+                    $meses[] = $mes;
+                    $data[$mes] = ['disponible' => 0, 'vendido' => 0, 'reservado' => 0, 'dinero_vendido' => 0];
+                }
+                
+                if (isset($data[$mes][$estado])) {
+                    $data[$mes][$estado]++;
+                    if ($estado === 'vendido') {
+                        $data[$mes]['dinero_vendido'] += $precio;
+                    }
+                } else {
+                    $data[$mes]['disponible']++;
+                }
+            }
+            
+            // Lógica para KPIs
+            if ($estado === 'vendido') {
+                $fechaVenta = $t->actualizado_en ? \Carbon\Carbon::parse($t->actualizado_en) : null;
+                $fechaCreacion = $t->creado_en ? \Carbon\Carbon::parse($t->creado_en) : null;
+                
+                if ($fechaVenta && $fechaCreacion) {
+                    $dias = $fechaCreacion->diffInDays($fechaVenta);
+                    $tiempoVentaTotal += $dias;
+                }
+                
+                if ($fechaVenta) {
+                    $mesVenta = $fechaVenta->format('Y-m');
+                    if ($mesVenta === $mesActual) {
+                        $ventasEsteMes++;
+                    } elseif ($mesVenta === $mesPasado) {
+                        $ventasMesPasado++;
+                    }
+                }
+            }
+        }
+
+        sort($meses);
+
+        $labels = [];
+        $disponibles = [];
+        $vendidos = [];
+        $reservados = [];
+        $dinero_vendido = [];
+
+        foreach ($meses as $mes) {
+            $labelFormateado = \Carbon\Carbon::createFromFormat('Y-m', $mes)->locale('es')->translatedFormat('M Y');
+            $labels[] = ucfirst($labelFormateado);
+            $disponibles[] = $data[$mes]['disponible'];
+            $vendidos[] = $data[$mes]['vendido'];
+            $reservados[] = $data[$mes]['reservado'];
+            $dinero_vendido[] = $data[$mes]['dinero_vendido'];
+        }
+        
+        // Calcular crecimiento
+        $crecimientoPorcentaje = 0;
+        if ($ventasMesPasado > 0) {
+            $crecimientoPorcentaje = (($ventasEsteMes - $ventasMesPasado) / $ventasMesPasado) * 100;
+        } elseif ($ventasEsteMes > 0) {
+            $crecimientoPorcentaje = 100; // Si antes era 0 y ahora vendió algo, crecimiento del 100%
+        }
+        
+        // Calcular promedio venta
+        $promedioDiasVenta = $globalCounts['vendido'] > 0 ? round($tiempoVentaTotal / $globalCounts['vendido']) : 0;
+
+        return response()->json([
+            'labels' => $labels,
+            'disponibles' => $disponibles,
+            'vendidos' => $vendidos,
+            'reservados' => $reservados,
+            'dinero_vendido' => $dinero_vendido,
+            'global' => $globalCounts,
+            'financials' => $financials,
+            'kpis' => [
+                'ventas_mes' => $ventasEsteMes,
+                'crecimiento' => round($crecimientoPorcentaje),
+                'disponibles_total' => $globalCounts['disponible'],
+                'promedio_dias' => $promedioDiasVenta
+            ]
+        ]);
     }
 
     // ═══════════════════════════════════════════════════════
