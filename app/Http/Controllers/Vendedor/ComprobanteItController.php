@@ -50,6 +50,12 @@ class ComprobanteItController extends Controller
         // CÁLCULO AUTOMÁTICO: 3% del monto de la minuta
         $montoCalculado = $minuta->monto * 0.03;
 
+        // CÁLCULO AUTOMÁTICO DE PLAZO (10 días hábiles desde la firma de la minuta)
+        $fechaLimite = \Carbon\Carbon::parse($minuta->fecha)->addWeekdays(10);
+        $fechaPago = \Carbon\Carbon::parse($request->fecha_pago);
+        
+        $alertaMulta = $fechaPago->greaterThan($fechaLimite);
+
         $path = $archivo->storeAs(
             'comprobantes_it', 
             'it_' . $user->id . '_' . time() . '.' . $archivo->getClientOriginalExtension(), 
@@ -68,6 +74,7 @@ class ComprobanteItController extends Controller
                 'archivo'       => $path,
                 'estado'        => 'pendiente',
                 'observacion'   => null,
+                'alerta_multa'  => $alertaMulta,
             ]
         );
 

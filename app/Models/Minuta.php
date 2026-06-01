@@ -44,4 +44,15 @@ class Minuta extends Model
     {
         return $this->hasOne(ComprobanteIt::class, 'minuta_id');
     }
+
+    // ← NUEVO: relación con la protocolización
+    public function protocolizacion()
+    {
+        return $this->hasOne(Protocolizacion::class, 'minuta_id');
+    }
+
+    public function alertasLegales()
+    {
+        return $this->morphMany(AlertaLegal::class, 'alertable');
+    }
 }

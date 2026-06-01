@@ -15,7 +15,7 @@
         </div>
         <div class="stat-info">
             <span class="stat-number">{{ $stats->total }}</span>
-            <span class="stat-label">Total Terrenos</span>
+            <span class="stat-label">Total Publicaciones</span>
         </div>
     </div>
     <div class="stat-card stat-pending">
@@ -87,7 +87,7 @@
                 <line x1="3" y1="9" x2="21" y2="9" />
                 <line x1="9" y1="21" x2="9" y2="9" />
             </svg>
-            Publicaciones de Terrenos
+            Publicaciones de Terrenos y Lotes
             <span class="badge badge-secondary">{{ count($terrenos) }}</span>
         </h2>
     </div>
@@ -99,7 +99,7 @@
                     <line x1="3" y1="9" x2="21" y2="9" />
                     <line x1="9" y1="21" x2="9" y2="9" />
                 </svg>
-                <p>No se encontraron terrenos con el filtro seleccionado.</p>
+                <p>No se encontraron publicaciones con el filtro seleccionado.</p>
             </div>
         @else
             <div class="table-responsive">
@@ -107,6 +107,7 @@
                     <thead>
                         <tr>
                             <th>#</th>
+                            <th>Tipo</th>
                             <th>Vendedor</th>
                             <th>Ubicación</th>
                             <th>Precio (USD)</th>
@@ -122,6 +123,11 @@
                             <tr class="terreno-row">
                                 <td class="id-cell">{{ $t->id }}</td>
                                 <td>
+                                    <span class="badge badge-{{ ($t->tipo ?? 'terreno') === 'lote' ? 'info' : 'primary' }}">
+                                        {{ ($t->tipo ?? 'terreno') === 'lote' ? 'Lote' : 'Terreno' }}
+                                    </span>
+                                </td>
+                                <td>
                                     <div class="user-cell">
                                         <span class="user-name-text">{{ $t->vendedor->nombre ?? 'N/A' }}</span>
                                         <span class="user-email-text">{{ $t->vendedor->email ?? '' }}</span>
@@ -136,7 +142,7 @@
                                     @if($t->imagenes->first())
                                         <img src="{{ $t->imagenes->first()->url }}" 
                                         style="width: 60px; height: 60px; object-fit: cover; border-radius: 8px;"
-                                        onerror="this.src='https://via.placeholder.com/60?text=Error'">
+                                        onerror="if(!this.dataset.err){this.dataset.err='1';this.style.display='none';this.insertAdjacentHTML('afterend','<div style=\'height:180px;display:flex;align-items:center;justify-content:center;background:var(--bg-light);color:var(--text-muted);font-size:.85rem;\'>Imagen no disponible</div>');}"
                                         <span class="badge badge-info" style="margin-left: 5px;">{{ $t->imagenes->count() }}</span>
                                     @else
                                         <span class="badge badge-secondary">Sin imagen</span>

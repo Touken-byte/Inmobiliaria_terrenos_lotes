@@ -71,32 +71,44 @@
 </div>
 
 @if ($estado === 'verificado')
-<div class="dashboard-grid" style="margin-bottom: 20px;">
-    <div class="card" style="text-align: center; padding: 30px;">
-        <div style="margin-bottom: 15px;">
-            <svg viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2" width="48" height="48">
-                <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
-                <line x1="12" y1="8" x2="12" y2="16" />
-                <line x1="8" y1="12" x2="16" y2="12" />
-            </svg>
+<div style="margin-bottom: 20px;">
+    <div class="card" style="padding: 0; overflow: hidden; border-radius: 20px; background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%); box-shadow: 0 12px 40px rgba(59, 130, 246, 0.25);">
+        <div style="padding: 2.5rem 3rem; color: #ffffff; position: relative;">
+            <div style="display: flex; align-items: center; gap: 2rem; flex-wrap: wrap;">
+                <div style="flex-shrink: 0; width: 72px; height: 72px; background: rgba(255,255,255,0.15); border-radius: 20px; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(4px);">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="36" height="36">
+                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+                        <line x1="12" y1="8" x2="12" y2="16" />
+                        <line x1="8" y1="12" x2="16" y2="12" />
+                    </svg>
+                </div>
+                <div style="flex: 1; min-width: 200px;">
+                    <h2 style="margin: 0; font-size: 1.65rem; font-weight: 800; letter-spacing: -0.5px;">Publicar Propiedad</h2>
+                    <p style="margin: 0.4rem 0 0; opacity: 0.85; font-size: 0.95rem; max-width: 500px;">Elige entre Terreno, Lote o Alquiler y crea una publicación atractiva para tus clientes.</p>
+                </div>
+                <a href="{{ route('vendedor.publicar_propiedad') }}" class="btn btn-primary" style="background: #ffffff; color: #1e3a8a; border: none; font-weight: 700; padding: 0.85rem 2rem; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); transition: all 0.3s; font-size: 0.95rem; display: inline-flex; align-items: center; gap: 0.5rem;">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="18" height="18">
+                        <line x1="12" y1="5" x2="12" y2="19" />
+                        <line x1="5" y1="12" x2="19" y2="12" />
+                    </svg>
+                    Nueva Publicación
+                </a>
+            </div>
+            <div style="margin-top: 1.5rem; display: flex; gap: 1rem; flex-wrap: wrap;">
+                <div style="display: flex; align-items: center; gap: 0.6rem; background: rgba(255,255,255,0.1); padding: 0.6rem 1.2rem; border-radius: 100px; backdrop-filter: blur(2px);">
+                    <span style="font-size: 1.2rem;">🌄</span>
+                    <span style="font-weight: 600; font-size: 0.85rem;">Terreno</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 0.6rem; background: rgba(255,255,255,0.1); padding: 0.6rem 1.2rem; border-radius: 100px; backdrop-filter: blur(2px);">
+                    <span style="font-size: 1.2rem;">🟩</span>
+                    <span style="font-weight: 600; font-size: 0.85rem;">Lote</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 0.6rem; background: rgba(255,255,255,0.1); padding: 0.6rem 1.2rem; border-radius: 100px; backdrop-filter: blur(2px);">
+                    <span style="font-size: 1.2rem;">🔑</span>
+                    <span style="font-weight: 600; font-size: 0.85rem;">Alquiler</span>
+                </div>
+            </div>
         </div>
-        <h3 style="margin-bottom: 10px;">Publicar Terreno</h3>
-        <p style="color: var(--text-muted); margin-bottom: 20px;">Anuncia un nuevo lote o terreno en nuestro catálogo de propiedades.</p>
-        <a href="{{ route('vendedor.terrenos.create') }}" class="btn btn-primary" style="display: inline-block;">Crear Publicación</a>
-    </div>
-
-    <div class="card" style="text-align: center; padding: 30px;">
-        <div style="margin-bottom: 15px;">
-            <svg viewBox="0 0 24 24" fill="none" stroke="var(--info-color, #17a2b8)" stroke-width="2" width="48" height="48">
-                <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
-                <polyline points="9,22 9,12 15,12 15,22" />
-                <line x1="12" y1="8" x2="12" y2="16" />
-                <line x1="8" y1="12" x2="16" y2="12" />
-            </svg>
-        </div>
-        <h3 style="margin-bottom: 10px;">Publicar Alquiler</h3>
-        <p style="color: var(--text-muted); margin-bottom: 20px;">Oferta una habitación o inmueble para alquiler en la plataforma.</p>
-        <a href="{{ route('vendedor.alquileres.create') }}" class="btn btn-primary" style="display: inline-block; background-color: var(--info-color, #17a2b8); border-color: var(--info-color, #17a2b8);">Crear Alquiler</a>
     </div>
 </div>
 @endif

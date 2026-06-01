@@ -35,9 +35,22 @@
                         </div>
                     </div>
 
-                    <div class="mb-3">
-                        <label for="ubicacion" class="form-label fw-bold">Ubicación / Dirección</label>
-                        <input type="text" class="form-control" id="ubicacion" name="ubicacion" value="{{ old('ubicacion', $alquiler->ubicacion) }}" required>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="categoria_id" class="form-label fw-bold">Categoría</label>
+                            <select class="form-control" id="categoria_id" name="categoria_id" required>
+                                <option value="">Seleccione una categoría</option>
+                                @foreach($categorias as $cat)
+                                    <option value="{{ $cat->id }}" {{ old('categoria_id', $alquiler->categoria_id) == $cat->id ? 'selected' : '' }}>
+                                        {{ $cat->nombre }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="ubicacion" class="form-label fw-bold">Ubicación / Dirección</label>
+                            <input type="text" class="form-control" id="ubicacion" name="ubicacion" value="{{ old('ubicacion', $alquiler->ubicacion) }}" required>
+                        </div>
                     </div>
 
                     <div class="row mb-3">

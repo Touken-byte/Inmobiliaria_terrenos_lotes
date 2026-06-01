@@ -14,6 +14,7 @@ class LoteGeoController extends Controller
         // Asumo que tienes columnas 'latitud' y 'longitud' en terrenos.
         // Si no las tienes, deberás agregarlas. Por ahora, simulo con datos de ejemplo.
         $terrenos = Terreno::where('estado', 'aprobado')
+            ->where('tipo', 'lote')
             ->select('id', 'precio', 'metros_cuadrados', 'ubicacion', 'estado_lote', 'latitud', 'longitud')
             ->limit(200)
             ->get();
@@ -52,7 +53,10 @@ class LoteGeoController extends Controller
 
     public function show($id)
     {
-        $terreno = Terreno::with('imagenes')->where('estado', 'aprobado')->findOrFail($id);
+        $terreno = Terreno::with('imagenes')
+            ->where('estado', 'aprobado')
+            ->where('tipo', 'lote')
+            ->findOrFail($id);
         return response()->json($terreno);
     }
 }

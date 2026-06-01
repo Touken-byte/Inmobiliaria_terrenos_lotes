@@ -22,7 +22,13 @@ class SolicitudVisitaController extends Controller
     public function calendario()
     {
         $terrenos = Terreno::where('estado', 'aprobado')->get();
-        $vendedores = Usuario::where('rol', 'vendedor')->where('activo', 1)->get();
+        $vendedores = Usuario::where('rol', 'vendedor')
+            ->where('activo', 1)
+            ->where(function($query) {
+                $query->whereHas('terrenos')
+                      ->orWhereHas('alquileres');
+            })
+            ->get();
 
         return view('solicitudes.calendario', compact('terrenos', 'vendedores'));
     }
@@ -52,7 +58,13 @@ class SolicitudVisitaController extends Controller
     public function create()
     {
         $terrenos = Terreno::where('estado', 'aprobado')->get();
-        $vendedores = Usuario::where('rol', 'vendedor')->where('activo', 1)->get();
+        $vendedores = Usuario::where('rol', 'vendedor')
+            ->where('activo', 1)
+            ->where(function($query) {
+                $query->whereHas('terrenos')
+                      ->orWhereHas('alquileres');
+            })
+            ->get();
         
         return view('solicitudes.create', compact('terrenos', 'vendedores'));
     }
@@ -138,7 +150,7 @@ class SolicitudVisitaController extends Controller
     /**
      * LOGICA FLEXIBLE: No bloquea si no hay registros en disponibilidad_vendedors.
      */
-    private function verificarConflicto($vendedorId, $fecha, $horaInicio, $horaFin)
+    private function verificarConflicto($vendedorId, $fecha, $horaInicio, $horaFin, $excluirId = null)
     {
         $diaSemana = $this->obtenerDiaSemanaEspanol($fecha);
         
@@ -156,14 +168,19 @@ class SolicitudVisitaController extends Controller
         }
 
         // Comprobamos si choca con OTRA visita ya aprobada o pendiente
-        return SolicitudVisita::where('vendedor_id', $vendedorId)
+        $query = SolicitudVisita::where('vendedor_id', $vendedorId)
             ->where('fecha_visita', $fecha)
             ->whereNotIn('estado', ['cancelada', 'rechazada'])
             ->where(function($query) use ($horaInicio, $horaFin) {
                 $query->where('hora_inicio', '<', $horaFin)
                       ->where('hora_fin', '>', $horaInicio);
-            })
-            ->exists();
+            });
+
+        if ($excluirId) {
+            $query->where('id', '!=', $excluirId);
+        }
+
+        return $query->exists();
     }
 
     private function obtenerDiaSemanaEspanol($fecha): string
@@ -203,8 +220,65 @@ class SolicitudVisitaController extends Controller
         return ['pendiente' => '#ffc107', 'aprobada' => '#28a745', 'rechazada' => '#dc3545', 'cancelada' => '#6c757d'][$estado] ?? '#007bff';
     }
 
-    public function show($id) { return view('solicitudes.show', ['solicitud' => SolicitudVisita::with(['usuario', 'terreno', 'vendedor'])->findOrFail($id)]); }
+    public function show($id) { return view('solicitudes.show', ['solicitud' => SolicitudVisita::with(['usuario', 'terreno', 'alquiler', 'vendedor'])->findOrFail($id)]); }
     public function aprobar($id) { SolicitudVisita::findOrFail($id)->aprobar(Auth::id()); return back()->with('success', 'Aprobada.'); }
     public function rechazar(Request $request, $id) { SolicitudVisita::findOrFail($id)->rechazar($request->motivo, Auth::id()); return back()->with('success', 'Rechazada.'); }
     public function cancelar($id) { SolicitudVisita::findOrFail($id)->cancelar(Auth::id()); return back()->with('success', 'Cancelada.'); }
+
+    /**
+     * Muestra las solicitudes para una propiedad específica.
+     */
+    public function solicitudesPorPropiedad($tipo, $id)
+    {
+        if ($tipo === 'alquiler') {
+            $propiedad = \App\Models\Alquiler::findOrFail($id);
+            $solicitudes = SolicitudVisita::where('alquiler_id', $id)
+                ->with(['usuario', 'vendedor'])
+                ->orderByDesc('id')
+                ->get();
+        } else {
+            $propiedad = Terreno::findOrFail($id);
+            $solicitudes = SolicitudVisita::where('terreno_id', $id)
+                ->with(['usuario', 'vendedor'])
+                ->orderByDesc('id')
+                ->get();
+        }
+
+        return view('vendedor.solicitudes_propiedad', compact('propiedad', 'solicitudes', 'tipo'));
+    }
+
+    /**
+     * Reprogramar una visita
+     */
+    public function reprogramar(Request $request, $id)
+    {
+        $request->validate([
+            'fecha_visita' => 'required|date|after_or_equal:today',
+            'hora_inicio' => 'required',
+            'hora_fin' => 'required|after:hora_inicio',
+        ]);
+
+        $solicitud = SolicitudVisita::findOrFail($id);
+
+        $conflicto = $this->verificarConflicto(
+            $solicitud->vendedor_id,
+            $request->fecha_visita,
+            $request->hora_inicio,
+            $request->hora_fin,
+            $solicitud->id
+        );
+
+        if ($conflicto) {
+            return back()->withErrors(['horario' => 'El horario seleccionado tiene conflicto con la agenda del vendedor.'])->withInput();
+        }
+
+        $solicitud->update([
+            'fecha_visita' => $request->fecha_visita,
+            'hora_inicio' => $request->hora_inicio,
+            'hora_fin' => $request->hora_fin,
+            'estado' => 'pendiente' // Restablecemos a pendiente para requerir nueva aprobación tras reprogramar
+        ]);
+
+        return back()->with('success', 'La solicitud de visita ha sido reprogramada y quedó pendiente de aprobación.');
+    }
 }

@@ -39,7 +39,7 @@ class MinutaController extends Controller
             $ruta = $request->file('archivo')->store('minutas', 'public');
         }
 
-        Minuta::create([
+        $minutaInstancia = Minuta::create([
             'terreno_id'   => $request->terreno_id,
             'comprador_id' => $request->comprador_id,
             'vendedor_id'  => $request->vendedor_id,
@@ -48,6 +48,10 @@ class MinutaController extends Controller
             'archivo'      => $ruta,
             'estado'       => 'pendiente',
         ]);
+
+        // Ejecutar validador de consistencia legal (IN-L07)
+        $validator = new \App\Services\LegalValidatorService();
+        $validator->validarMinuta($minutaInstancia);
 
         return redirect()->back()->with('success', 'Minuta registrada correctamente');
     }
@@ -60,7 +64,7 @@ class MinutaController extends Controller
     }
 
     // ─── VENDEDOR: Vista unificada Proceso Legal ──────────────────────────────
-    public function tramiteLegal()
+    public function tramiteLegal(Request $request)
     {
         $user = Auth::user();
 
@@ -70,19 +74,23 @@ class MinutaController extends Controller
             ->latest()
             ->first();
 
-        // Comprobante IT más reciente del vendedor vinculado a ESTA minuta
         $comprobante = null;
+        $protocolizacion = null;
         if ($minuta) {
             $comprobante = ComprobanteIt::where('minuta_id', $minuta->id)
                 ->latest()
                 ->first();
+            $protocolizacion = \App\Models\Protocolizacion::where('minuta_id', $minuta->id)
+                ->latest()
+                ->first();
         }
 
-        // SI EL TRÁMITE ESTÁ COMPLETADO: "Limpiamos" las variables activas para 
-        // que el vendedor pueda iniciar un NUEVO trámite desde cero.
-        if ($minuta && $minuta->estado === 'completada') {
+        // Si el usuario quiere forzar el inicio de un trámite nuevo (viene de ?nuevo=1)
+        // o si queremos limpiar explícitamente para otro.
+        if ($request->has('nuevo')) {
             $minuta = null;
             $comprobante = null;
+            $protocolizacion = null;
         }
 
         // Lista de terrenos del vendedor para el formulario de minuta
@@ -93,6 +101,7 @@ class MinutaController extends Controller
 
         // Terrenos del vendedor que están libres O que pertenecen a su trámite actual (si está editando)
         $terrenos = Terreno::where('usuario_id', $user->id)
+            ->where('estado', 'aprobado') // SOLO terrenos aprobados por el admin
             ->where(function($query) use ($terrenosOcupados, $minuta) {
                 $query->whereNotIn('id', $terrenosOcupados);
                 if ($minuta) {
@@ -106,9 +115,10 @@ class MinutaController extends Controller
         $paso = 1;
         if ($minuta) $paso = 2;
         if ($minuta && $comprobante) $paso = 3;
+        if ($minuta && $comprobante && $protocolizacion) $paso = 4;
 
         return view('vendedor.proceso_legal', compact(
-            'minuta', 'comprobante', 'terrenos', 'compradores', 'paso'
+            'minuta', 'comprobante', 'protocolizacion', 'terrenos', 'compradores', 'paso'
         ));
     }
 
@@ -124,9 +134,10 @@ class MinutaController extends Controller
             ->latest()
             ->get();
 
-        // Para el historial, adjuntamos el IT de cada una si existe
+        // Para el historial, adjuntamos el IT y Protocolización de cada una si existe
         $historial->transform(function ($m) {
             $m->it = ComprobanteIt::where('minuta_id', $m->id)->first();
+            $m->protocolizacion = \App\Models\Protocolizacion::where('minuta_id', $m->id)->first();
             return $m;
         });
 
@@ -142,13 +153,12 @@ class MinutaController extends Controller
             'terreno_id'   => 'required|exists:terrenos,id',
             'comprador_id' => 'required|exists:usuarios,id',
             'monto'        => 'required|numeric|min:0.01',
-            'fecha'        => 'required|date|before_or_equal:today',
+            'fecha'        => 'required|date',
             'archivo'      => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:5120',
         ], [
             'terreno_id.required'   => 'Seleccione un terreno.',
             'comprador_id.required' => 'Seleccione un comprador.',
             'monto.min'             => 'El monto debe ser mayor a 0.',
-            'fecha.before_or_equal' => 'La fecha no puede ser futura.',
             'archivo.mimes'         => 'Solo se aceptan PDF, JPG o PNG.',
             'archivo.max'           => 'El archivo no puede pesar más de 5MB.',
         ]);
@@ -182,9 +192,14 @@ class MinutaController extends Controller
 
         if ($minutaActual) {
             $minutaActual->update($datos);
+            $minutaInstancia = $minutaActual;
         } else {
-            Minuta::create($datos);
+            $minutaInstancia = Minuta::create($datos);
         }
+
+        // Ejecutar validador de consistencia legal (IN-L07)
+        $validator = new \App\Services\LegalValidatorService();
+        $validator->validarMinuta($minutaInstancia);
 
         return redirect()->route('vendedor.proceso_legal')
             ->with('success', '✅ Minuta registrada. Ahora suba el comprobante del Impuesto de Transferencia.');

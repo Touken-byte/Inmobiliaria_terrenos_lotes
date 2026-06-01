@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Editar Terreno')
+@section('title', 'Editar Propiedad')
 
 @push('styles')
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -9,13 +9,28 @@
 @section('content')
 <div class="card form-card">
     <div class="card-header">
-        <h2 class="card-title">Editar Terreno #{{ $terreno->id }}</h2>
+        <h2 class="card-title">Editar {{ ($terreno->tipo ?? 'terreno') === 'lote' ? 'Lote' : 'Terreno' }} #{{ $terreno->id }}</h2>
     </div>
     <div class="card-body">
         <form action="{{ route('vendedor.terrenos.update', $terreno->id) }}" method="POST" enctype="multipart/form-data"
             id="editForm">
             @csrf
             @method('PUT')
+
+            @if(($terreno->tipo ?? 'terreno') === 'lote')
+            <div class="form-group">
+                <label for="parent_id">Terreno Padre *</label>
+                <select name="parent_id" id="parent_id" class="form-control" required>
+                    <option value="">Seleccione el terreno padre...</option>
+                    @foreach($terrenosPadre as $tp)
+                        <option value="{{ $tp->id }}" {{ old('parent_id', $terreno->parent_id) == $tp->id ? 'selected' : '' }}>
+                            {{ $tp->ubicacion }} ({{ number_format($tp->metros_cuadrados, 0) }} m²)
+                        </option>
+                    @endforeach
+                </select>
+                <small>Este lote debe permanecer asociado a uno de tus terrenos aprobados.</small>
+            </div>
+            @endif
 
             <div class="form-row">
                 <div class="form-group">
@@ -30,10 +45,23 @@
                 </div>
             </div>
 
-            <div class="form-group">
-                <label for="ubicacion">Ubicación *</label>
-                <input type="text" name="ubicacion" id="ubicacion" class="form-control"
-                    value="{{ old('ubicacion', $terreno->ubicacion) }}" required>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="categoria_id">Categoría *</label>
+                    <select name="categoria_id" id="categoria_id" class="form-control" required>
+                        <option value="">Seleccione una categoría...</option>
+                        @foreach($categorias as $cat)
+                            <option value="{{ $cat->id }}" {{ old('categoria_id', $terreno->categoria_id) == $cat->id ? 'selected' : '' }}>
+                                {{ $cat->nombre }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="ubicacion">Ubicación *</label>
+                    <input type="text" name="ubicacion" id="ubicacion" class="form-control"
+                        value="{{ old('ubicacion', $terreno->ubicacion) }}" required>
+                </div>
             </div>
 
             <div class="form-group">
@@ -52,6 +80,15 @@
                     </div>
                 </div>
                 <small style="color:#6c757d;">💡 Haz clic en el mapa o arrastra el marcador para ajustar la ubicación exacta.</small>
+            </div>
+            <!-- Estado comercial -->
+            <div class="form-group">
+                <label for="estado_lote">Estado comercial *</label>
+                <select name="estado_lote" id="estado_lote" class="form-control" required>
+                    <option value="disponible" {{ $terreno->estado_lote == 'disponible' ? 'selected' : '' }}>Disponible</option>
+                    <option value="vendido" {{ $terreno->estado_lote == 'vendido' ? 'selected' : '' }}>Vendido</option>
+                </select>
+                <small>Marcar como "Vendido" ocultará el terreno del catálogo y eliminará automáticamente de los favoritos de los compradores.</small>
             </div>
 
             <div class="form-group">
@@ -427,8 +464,8 @@
         // ══════════════════════════════════════════════════════
         // ── MAPA LEAFLET — CORRECCIÓN PRINCIPAL ──────────────
         // ══════════════════════════════════════════════════════
-        var latGuardada = parseFloat('{{ $terreno->latitud ?? 0 }}') || -22.0186;
-        var lngGuardada = parseFloat('{{ $terreno->longitud ?? 0 }}') || -63.6774;
+        var latGuardada = parseFloat('{{ $terreno->latitud ?? 0 }}') || -22.0167;
+        var lngGuardada = parseFloat('{{ $terreno->longitud ?? 0 }}') || -63.6833;
         var tieneCoords = {{ ($terreno->latitud && $terreno->longitud) ? 'true' : 'false' }};
 
         // Inicializar mapa con las coordenadas guardadas o por defecto

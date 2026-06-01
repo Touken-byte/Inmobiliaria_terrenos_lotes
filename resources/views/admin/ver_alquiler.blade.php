@@ -120,15 +120,36 @@
                         </form>
 
                         {{-- Rechazar --}}
-                        <form action="{{ route('admin.procesar_alquiler') }}" method="POST"
-                              style="display:inline;" id="rejectAlquiler">
+                        <button type="button" class="btn btn-danger btn-lg"
+                                id="showRejectAlquilerBtn"
+                                onclick="document.getElementById('rejectAlquilerSection').style.display='block'; this.style.display='none';">
+                            ❌ Rechazar Alquiler
+                        </button>
+                    </div>
+
+                    <div id="rejectAlquilerSection" style="display:none; margin-top: 16px;">
+                        <form action="{{ route('admin.procesar_alquiler') }}" method="POST" id="rejectAlquilerForm">
                             @csrf
                             <input type="hidden" name="alquiler_id" value="{{ $alquiler->id }}">
                             <input type="hidden" name="accion" value="rechazado">
-                            <button type="submit" class="btn btn-danger btn-lg"
-                                    onclick="return confirm('¿Confirma el RECHAZO de este alquiler?')">
-                                ❌ Rechazar Alquiler
-                            </button>
+                            <div class="form-group" style="margin-bottom: 12px;">
+                                <label for="rejectAlquilerComment" class="form-label" style="display:block; margin-bottom: 6px;">
+                                    Motivo del rechazo <span class="required" style="color: red;">*</span>
+                                </label>
+                                <textarea name="observacion" id="rejectAlquilerComment"
+                                          class="form-control" rows="3" style="width: 100%;"
+                                          placeholder="Explique el motivo del rechazo del alquiler..."
+                                          required minlength="10"></textarea>
+                                <small class="form-hint" style="color: var(--text-muted); font-size: .8rem;">Esta observación quedará registrada en el sistema y se le enviará por correo al vendedor.</small>
+                            </div>
+                            <div class="action-buttons" style="display:flex; gap:.5rem;">
+                                <button type="button" class="btn btn-secondary"
+                                        onclick="document.getElementById('rejectAlquilerSection').style.display='none';
+                                                 document.getElementById('showRejectAlquilerBtn').style.display='inline-flex';">
+                                    Cancelar
+                                </button>
+                                <button type="submit" class="btn btn-danger">❌ Confirmar Rechazo</button>
+                            </div>
                         </form>
                     </div>
                 </div>
@@ -170,7 +191,7 @@
                         <img src="{{ $urlImagen }}"
                              alt="Imagen alquiler {{ $img->orden }}"
                              style="width: 100%; height: 180px; object-fit: cover; display: block;"
-                             onerror="this.style.display='none'; this.parentElement.innerHTML+='<div style=\'height:180px;display:flex;align-items:center;justify-content:center;background:var(--bg-light);color:var(--text-muted);font-size:0.85rem;\'>Imagen no disponible</div>';">
+                             onerror="this.onerror=null; this.style.display='none'; this.insertAdjacentHTML('afterend', '<div style=\'height:180px;display:flex;align-items:center;justify-content:center;background:var(--bg-light);color:var(--text-muted);font-size:0.85rem;\'>Imagen no disponible</div>');">
 
                         <div style="padding: 8px 12px; background: var(--bg-light); font-size: 0.8rem; color: var(--text-muted); text-align: center;">
                             Imagen {{ $img->orden }}

@@ -2,6 +2,10 @@
 
 @section('title', $alquiler->titulo . ' | TerrenoSur')
 
+@push('styles')
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+@endpush
+
 @section('content')
 <style>
     :root {
@@ -197,6 +201,12 @@
                 <div class="det-prop-head">
                     <div class="det-prop-eyebrow">
                         <span>Propiedad en alquiler</span>
+                        @if($alquiler->categoria)
+                            <span>•</span>
+                            <span style="color:{{ $alquiler->categoria->color }}; border: 1px solid {{ $alquiler->categoria->color }}44; padding: 2px 8px; border-radius: 12px; background: {{ $alquiler->categoria->color }}11;">
+                                {{ $alquiler->categoria->nombre }}
+                            </span>
+                        @endif
                     </div>
                     <h1 class="det-prop-title">{{ $alquiler->titulo }}</h1>
                     <div class="det-prop-loc">
@@ -286,6 +296,12 @@
                 </div>
                 @endif
 
+                {{-- Mapa de ubicación --}}
+                @if($alquiler->latitud && $alquiler->longitud)
+                <p class="det-section-title">Ubicación en el Mapa</p>
+                <div id="mapaAlquiler" style="height:320px; border-radius:20px; overflow:hidden; border:1px solid var(--rim); margin-bottom:2rem;"></div>
+                @endif
+
             </div>
 
             {{-- RIGHT (sticky card) --}}
@@ -322,17 +338,28 @@
                     </div>
 
                     <div class="det-contact-cta">
-                        @php
-                            $waMsg = urlencode('Hola, me interesa alquilar: ' . $alquiler->titulo . ' — ubicado en ' . $alquiler->ubicacion);
-                        @endphp
-                        <a href="https://wa.me/?text={{ $waMsg }}" target="_blank" class="det-wa-btn">
-                            <i class="fa-brands fa-whatsapp"></i>
-                            <div>
-                                <span>Consultar por WhatsApp</span>
-                                <span class="btn-sub">Respuesta en minutos</span>
-                            </div>
-                        </a>
-                        <p class="det-wa-note">* Agregá el número de la inmobiliaria al enlace</p>
+                        @if(Auth::check() && Auth::user()->rol === 'comprador')
+                            <form action="{{ route('catalogo.alquiler.contactar', $alquiler->id) }}" method="POST">
+                                @csrf
+                                <input type="hidden" name="telefono" value="{{ Auth::user()->telefono ?? '00000000' }}">
+                                <input type="hidden" name="mensaje" value="Hola, estoy interesado en alquilar la propiedad: {{ $alquiler->titulo }}">
+                                <button type="submit" class="det-wa-btn" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);">
+                                    <i class="fa-solid fa-comments"></i>
+                                    <div>
+                                        <span>Contactar al Arrendador</span>
+                                        <span class="btn-sub">Vía chat interno</span>
+                                    </div>
+                                </button>
+                            </form>
+                        @elseif(!Auth::check())
+                            <a href="{{ route('login') }}" class="det-wa-btn" style="background: linear-gradient(135deg, #3d5480 0%, #1f2937 100%);">
+                                <i class="fa-solid fa-right-to-bracket"></i>
+                                <div>
+                                    <span>Iniciar Sesión para Contactar</span>
+                                    <span class="btn-sub">Solo usuarios registrados</span>
+                                </div>
+                            </a>
+                        @endif
 
                         <div class="det-divider"><span>o también</span></div>
 
@@ -369,4 +396,36 @@
         </div>
     </div>
 </div>
+
+@push('scripts')
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+@if($alquiler->latitud && $alquiler->longitud)
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var lat = {{ $alquiler->latitud }};
+    var lng = {{ $alquiler->longitud }};
+
+    var mapaAlquiler = L.map('mapaAlquiler', { zoomControl: true }).setView([lat, lng], 15);
+
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+        attribution: '&copy; OSM &copy; CartoDB',
+        subdomains: 'abcd',
+        maxZoom: 19
+    }).addTo(mapaAlquiler);
+
+    var icon = L.divIcon({
+        html: '<div style="width:18px;height:18px;background:#f59e0b;border:3px solid #fff;border-radius:50%;box-shadow:0 0 12px rgba(245,158,11,0.6);"></div>',
+        iconSize: [18, 18],
+        iconAnchor: [9, 9],
+        className: ''
+    });
+
+    L.marker([lat, lng], { icon: icon })
+        .addTo(mapaAlquiler)
+        .bindPopup('<strong style="color:#111;">{{ addslashes($alquiler->ubicacion) }}</strong>')
+        .openPopup();
+});
+</script>
+@endif
+@endpush
 @endsection

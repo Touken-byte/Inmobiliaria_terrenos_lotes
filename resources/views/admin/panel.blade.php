@@ -243,7 +243,7 @@
                     <tr id="vendor-row-{{ $v->id }}">
                         <td>
                             <div class="user-cell">
-                                <div class="user-avatar-sm {{ $v->doc_id ? 'has-doc' : '' }}">{{ strtoupper(substr($v->nombre, 0, 1)) }}</div>
+                                <div class="user-avatar-sm {{ $v->doc_id ? 'has-doc' : '' }} {{ $v->estado_verificacion === 'pendiente' ? 'avatar-pending' : ($v->estado_verificacion === 'verificado' ? 'avatar-verified' : ($v->estado_verificacion === 'rechazado' ? 'avatar-rejected' : '')) }}">{{ strtoupper(substr($v->nombre, 0, 1)) }}</div>
                                 <div>
                                     <span class="user-name-text">{{ $v->nombre }}</span>
                                     <span class="user-email-text">{{ $v->email }}</span>
@@ -334,5 +334,39 @@
         </form>
     </div>
 </div>
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const modal = document.getElementById('modalCrearVendedor');
+    if (!modal) return;
+
+    const passwordInput = modal.querySelector('input[name="password"]');
+    if (passwordInput) {
+        passwordInput.type = 'password';
+        passwordInput.placeholder = 'Min. 8, mayúscula, número y símbolo';
+    }
+
+    const modalBody = modal.querySelector('.modal-body');
+    if (!modalBody || modal.querySelector('input[name="password_confirmation"]')) {
+        return;
+    }
+
+    const confirmGroup = document.createElement('div');
+    confirmGroup.className = 'form-group';
+    confirmGroup.innerHTML = `
+        <label class="form-label">Confirmar Contraseña <span class="required">*</span></label>
+        <input type="password" name="password_confirmation" class="form-control" required placeholder="Repite la contraseña">
+    `;
+
+    const telefonoGroup = modal.querySelector('input[name="telefono"]')?.closest('.form-group');
+    if (telefonoGroup) {
+        modalBody.insertBefore(confirmGroup, telefonoGroup);
+    } else {
+        modalBody.appendChild(confirmGroup);
+    }
+});
+</script>
+@endpush
 
 @endsection

@@ -104,6 +104,9 @@
                     </label>
                     <input type="email" name="email" id="email" class="form-control"
                         placeholder="tu@correo.com" required value="{{ old('email') }}">
+                    <small style="color:#6c757d;font-size:0.75rem;margin-top:4px;display:block;">
+                        🔒 Tu correo debe ser real y válido.
+                    </small>
                 </div>
 
                 <div class="form-group">
@@ -126,7 +129,19 @@
                         Contraseña
                     </label>
                     <input type="password" name="password" id="password" class="form-control"
-                        placeholder="Mínimo 6 caracteres" required>
+                        placeholder="Mín. 8 car., mayúscula, número y símbolo" required
+                        oninput="checkPasswordStrength(this.value)">
+                    {{-- Indicador de fortaleza --}}
+                    <div id="pass-strength-bar" style="height:4px;border-radius:2px;margin-top:6px;background:#e9ecef;overflow:hidden;">
+                        <div id="pass-strength-fill" style="height:100%;width:0%;background:#dc3545;transition:width 0.3s,background 0.3s;"></div>
+                    </div>
+                    <div style="display:flex;flex-direction:column;gap:3px;margin-top:8px;" id="pass-reqs">
+                        <span id="req-len"   style="font-size:0.72rem;color:#6c757d;">&#9675; Mínimo 8 caracteres</span>
+                        <span id="req-upper" style="font-size:0.72rem;color:#6c757d;">&#9675; Al menos una mayúscula (A-Z)</span>
+                        <span id="req-lower" style="font-size:0.72rem;color:#6c757d;">&#9675; Al menos una minúscula (a-z)</span>
+                        <span id="req-num"   style="font-size:0.72rem;color:#6c757d;">&#9675; Al menos un número (0-9)</span>
+                        <span id="req-sym"   style="font-size:0.72rem;color:#6c757d;">&#9675; Al menos un símbolo (!@#$%...)</span>
+                    </div>
                 </div>
 
                 <div class="form-group">
@@ -166,5 +181,29 @@
 </div>
 <script>
     document.body.classList.add('login-page');
+
+    function checkPasswordStrength(val) {
+        var checks = {
+            'req-len':   val.length >= 8,
+            'req-upper': /[A-Z]/.test(val),
+            'req-lower': /[a-z]/.test(val),
+            'req-num':   /[0-9]/.test(val),
+            'req-sym':   /[^A-Za-z0-9]/.test(val),
+        };
+        var passed = 0;
+        Object.keys(checks).forEach(function(id) {
+            var el = document.getElementById(id);
+            if (el) {
+                el.textContent = (checks[id] ? '✅' : '○') + ' ' + el.textContent.replace(/^[✅○]\s+/, '');
+                el.style.color = checks[id] ? '#28a745' : '#6c757d';
+            }
+            if (checks[id]) passed++;
+        });
+        var fill = document.getElementById('pass-strength-fill');
+        if (fill) {
+            fill.style.width = (passed * 20) + '%';
+            fill.style.background = passed <= 2 ? '#dc3545' : passed <= 3 ? '#ffc107' : passed === 4 ? '#17a2b8' : '#28a745';
+        }
+    }
 </script>
 @endsection

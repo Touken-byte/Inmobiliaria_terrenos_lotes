@@ -7,6 +7,7 @@ use App\Models\Terreno;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use App\Helpers\Auditoria;
 
 class DocumentoPropiedadController extends Controller
 {
@@ -67,6 +68,13 @@ class DocumentoPropiedadController extends Controller
                 'creado_en' => now(),
                 'actualizado_en' => now(),
             ]
+        );
+
+        Auditoria::registrar(
+            'subida_documento',
+            'terreno',
+            $terreno->id,
+            "El vendedor {$user->nombre} subió el documento de propiedad '{$archivo->getClientOriginalName()}' para el terreno/lote #{$terreno->id}"
         );
 
         return redirect()
@@ -130,6 +138,13 @@ class DocumentoPropiedadController extends Controller
         if (Storage::disk('local')->exists($documento->nombre_archivo)) {
             Storage::disk('local')->delete($documento->nombre_archivo);
         }
+
+        Auditoria::registrar(
+            'eliminacion_documento',
+            'terreno',
+            $terreno->id,
+            "El vendedor {$user->nombre} eliminó el documento de propiedad para el terreno/lote #{$terreno->id}"
+        );
 
         $documento->delete();
 

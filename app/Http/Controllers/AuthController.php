@@ -85,6 +85,11 @@ class AuthController extends Controller
             $usuario->id
         );
 
+        if (!$usuario->hasVerifiedEmail()) {
+            return redirect()->route('verification.notice')
+                ->with('warning', 'Debes verificar tu correo electrónico antes de continuar.');
+        }
+
         return $this->redirectByRole($usuario->rol);
     }
 
@@ -122,7 +127,7 @@ class AuthController extends Controller
             case 'vendedor':
                 return redirect()->route('vendedor.dashboard');
             case 'comprador':
-                return redirect()->route('catalogo.terrenos');
+                return redirect()->route('catalogo.unificado');
             default:
                 return redirect('/login')->with('error', 'Rol no reconocido. Contacta al administrador.');
         }

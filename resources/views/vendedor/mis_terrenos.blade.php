@@ -4,14 +4,14 @@
 
 @section('content')
     <div class="page-header">
-        <h1>Mis Terrenos</h1>
-        <a href="{{ route('vendedor.terrenos.create') }}" class="btn btn-primary">+ Publicar nuevo terreno</a>
+        <h1>Mis Terrenos y Lotes</h1>
+        <a href="{{ route('vendedor.terrenos.create') }}" class="btn btn-primary">+ Publicar nueva propiedad</a>
     </div>
 
     @if($terrenos->isEmpty())
         <div class="empty-state">
             <p>No has publicado ningún terreno aún.</p>
-            <a href="{{ route('vendedor.terrenos.create') }}" class="btn btn-primary">Publicar mi primer terreno</a>
+            <a href="{{ route('vendedor.terrenos.create') }}" class="btn btn-primary">Publicar mi primera propiedad</a>
         </div>
     @else
         <div class="terrenos-grid">
@@ -19,20 +19,35 @@
                 <div class="card terreno-card">
                     <div class="terreno-imagen">
                         @if($terreno->portada)
-                            <img src="{{ $terreno->portada->url }}" alt="Portada">
+                            <img src="{{ asset($terreno->portada->ruta_archivo) }}" alt="Portada">
                         @elseif($terreno->imagenes->first())
-                            <img src="{{ $terreno->imagenes->first()->url }}" alt="Terreno">
+                            <img src="{{ asset($terreno->imagenes->first()->ruta_archivo) }}" alt="Terreno">
                         @else
                             <div class="sin-imagen">📷 Sin imagen</div>
                         @endif
+                        
+                        @if($terreno->estado_lote === 'vendido')
+                            <div style="position: absolute; top: 10px; right: 10px; background: #dc3545; color: white; padding: 5px 15px; border-radius: 20px; font-weight: bold; font-size: 0.9rem; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                                🏆 VENDIDO
+                            </div>
+                        @endif
                     </div>
                     <div class="terreno-info">
+                        <div class="mb-2">
+                            <span class="badge badge-{{ ($terreno->tipo ?? 'terreno') === 'lote' ? 'info' : 'primary' }}">
+                                {{ ($terreno->tipo ?? 'terreno') === 'lote' ? 'Lote' : 'Terreno' }}
+                            </span>
+                        </div>
                         <h3>{{ $terreno->ubicacion }}</h3>
                         <p class="precio">${{ number_format($terreno->precio, 2) }} USD</p>
                         <p>{{ $terreno->metros_cuadrados }} m²</p>
-                        <span class="badge badge-{{ $terreno->estado === 'aprobado' ? 'success' : ($terreno->estado === 'rechazado' ? 'danger' : 'warning') }}">
-                            {{ ucfirst($terreno->estado) }}
-                        </span>
+                        @if($terreno->estado_lote === 'vendido')
+                            <span class="badge badge-danger">Vendido Oficialmente</span>
+                        @else
+                            <span class="badge badge-{{ $terreno->estado === 'aprobado' ? 'success' : ($terreno->estado === 'rechazado' ? 'danger' : 'warning') }}">
+                                {{ ucfirst($terreno->estado) }}
+                            </span>
+                        @endif
 
                         @if($terreno->estado === 'rechazado' && $terreno->motivo_rechazo)
                             <div class="alert alert-danger mt-3 mb-0" style="padding: 0.5rem; font-size: 0.9rem;">
@@ -40,12 +55,17 @@
                             </div>
                         @endif
 
-                        @if($terreno->estado === 'aprobado')
+                        @if(($terreno->tipo ?? 'terreno') === 'lote' && $terreno->terrenoPadre)
+                            <p style="font-size: 0.9rem; color: var(--text-muted); margin-top: 0.5rem;">
+                                Terreno padre: {{ $terreno->terrenoPadre->ubicacion }}
+                            </p>
+                        @endif
+
+                        @if($terreno->estado === 'aprobado' && $terreno->estado_lote !== 'vendido')
                             @php
                                 $badgeLote = 'secondary';
                                 if($terreno->estado_lote === 'disponible') $badgeLote = 'success';
                                 if($terreno->estado_lote === 'reservado') $badgeLote = 'warning';
-                                if($terreno->estado_lote === 'vendido') $badgeLote = 'danger';
                             @endphp
                             <div class="mt-2">
                                 <span style="font-size: 0.85em; color: var(--text-muted);">Estado del Lote:</span>
@@ -142,8 +162,39 @@
                         @endif
                         {{-- ═══ FIN SECCIÓN FOLIO ═══ --}}
 
-                        <div class="acciones">
-                            <a href="{{ route('vendedor.terrenos.edit', $terreno->id) }}" class="btn btn-sm btn-secondary">Editar</a>
+                        <div class="acciones" style="display:flex; gap:6px; flex-wrap:wrap; align-items:center;">
+                            @if($terreno->estado === 'aprobado' && $terreno->estado_lote !== 'vendido')
+                                {{-- Botones para los 3 estados (disponible / reservado / vendido) --}}
+                                <form action="{{ route('vendedor.terrenos.toggle_estado', $terreno->id) }}" method="POST" style="display:flex; gap:6px; flex-wrap:wrap;">
+                                    @csrf
+                                    <button type="submit" name="estado_lote" value="disponible" 
+                                        class="btn btn-sm {{ $terreno->estado_lote === 'disponible' ? 'btn-success' : 'btn-outline-success' }}" 
+                                        style="padding:5px 14px; font-size:0.78em; font-weight:700; border-radius:20px; {{ $terreno->estado_lote === 'disponible' ? 'background:#28a745;color:#fff;border:2px solid #28a745;' : 'background:#fff;color:#28a745;border:2px solid #28a745;' }}"
+                                        onclick="return confirm('¿Cambiar a DISPONIBLE?')">
+                                        🟢 Disponible
+                                    </button>
+                                    <button type="submit" name="estado_lote" value="reservado" 
+                                        class="btn btn-sm {{ $terreno->estado_lote === 'reservado' ? 'btn-warning' : 'btn-outline-warning' }}" 
+                                        style="padding:5px 14px; font-size:0.78em; font-weight:700; border-radius:20px; {{ $terreno->estado_lote === 'reservado' ? 'background:#ffc107;color:#fff;border:2px solid #ffc107;' : 'background:#fff;color:#ffc107;border:2px solid #ffc107;' }}"
+                                        onclick="return confirm('¿Marcar como RESERVADO?')">
+                                        🟡 Reservado
+                                    </button>
+                                    <button type="submit" name="estado_lote" value="vendido" 
+                                        class="btn btn-sm {{ $terreno->estado_lote === 'vendido' ? 'btn-danger' : 'btn-outline-danger' }}" 
+                                        style="padding:5px 14px; font-size:0.78em; font-weight:700; border-radius:20px; {{ $terreno->estado_lote === 'vendido' ? 'background:#dc3545;color:#fff;border:2px solid #dc3545;' : 'background:#fff;color:#dc3545;border:2px solid #dc3545;' }}"
+                                        onclick="return confirm('¿Marcar como VENDIDO? La propiedad dejará de aparecer en el catálogo.')">
+                                        🔴 Vendido
+                                    </button>
+                                </form>
+                            @elseif(($terreno->tipo ?? 'terreno') === 'lote' && $terreno->estado === 'aprobado' && $terreno->estado_lote !== 'vendido')
+                                <a href="{{ route('vendedor.lotes') }}" class="btn btn-sm btn-outline-info" style="padding:5px 14px; font-weight:600;">Gestionar en Control de Lotes</a>
+                            @endif
+
+                            @if($terreno->estado_lote !== 'vendido' && in_array($terreno->estado, ['pendiente', 'rechazado']))
+                                <a href="{{ route('vendedor.terrenos.edit', $terreno->id) }}" class="btn btn-sm btn-secondary" style="padding:5px 14px; font-weight:600;">✏️ Editar</a>
+                            @elseif($terreno->estado_lote === 'vendido')
+                                <span class="btn btn-sm btn-outline-secondary" style="opacity: 0.6; cursor: not-allowed; padding:5px 14px;">Trámite finalizado</span>
+                            @endif
                         </div>
                     </div>
                 </div>
@@ -171,6 +222,7 @@
         display: flex;
         align-items: center;
         justify-content: center;
+        position: relative;
     }
 
     .terreno-imagen img {
@@ -231,3 +283,11 @@
     .badge-en_revision { background:#cce5ff; border:1px solid #b8daff; color:#004085; }
     .badge-inscrito    { background:#d4edda; border:1px solid #c3e6cb; color:#155724; }
 </style>
+
+@push('scripts')
+<script>
+function confirmDisponible() {
+    return confirm('¿Marcar como DISPONIBLE? La propiedad volverá a aparecer en el catálogo para los compradores.');
+}
+</script>
+@endpush

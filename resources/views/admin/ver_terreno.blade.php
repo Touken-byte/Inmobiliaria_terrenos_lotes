@@ -1,12 +1,15 @@
 @extends('layouts.app')
 
-@section('title', 'Terreno #' . $terreno->id)
+@section('title', 'Publicación #' . $terreno->id)
 
 @push('styles')
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 @endpush
 
 @section('content')
+@php
+    $tipoLabel = ($terreno->tipo ?? 'terreno') === 'lote' ? 'Lote' : 'Terreno';
+@endphp
 
 <div class="page-actions">
     <a href="{{ route('admin.terrenos_panel') }}" class="btn btn-secondary" id="backToTerrenos">
@@ -14,7 +17,7 @@
             <line x1="19" y1="12" x2="5" y2="12"/>
             <polyline points="12,19 5,12 12,5"/>
         </svg>
-        Volver a Terrenos
+        Volver a Publicaciones
     </a>
 </div>
 
@@ -29,7 +32,7 @@
                         <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
                         <line x1="3" y1="9" x2="21" y2="9"/>
                     </svg>
-                    Datos del Terreno #{{ $terreno->id }}
+                    Datos del {{ $tipoLabel }} #{{ $terreno->id }}
                 </h2>
             </div>
             <div class="card-body">
@@ -66,6 +69,16 @@
                         <span class="doc-info-label">📍 Ubicación:</span>
                         <span class="doc-info-value">{{ $terreno->ubicacion }}</span>
                     </div>
+                    <div class="doc-info-row">
+                        <span class="doc-info-label">Tipo:</span>
+                        <span class="doc-info-value">{{ $tipoLabel }}</span>
+                    </div>
+                    @if(($terreno->tipo ?? 'terreno') === 'lote' && $terreno->terrenoPadre)
+                    <div class="doc-info-row">
+                        <span class="doc-info-label">Terreno padre:</span>
+                        <span class="doc-info-value">{{ $terreno->terrenoPadre->ubicacion }}</span>
+                    </div>
+                    @endif
                     @if($terreno->latitud && $terreno->longitud)
                     <div class="doc-info-row">
                         <span class="doc-info-label">🌐 Coordenadas:</span>
@@ -301,7 +314,7 @@
                     @foreach($terreno->imagenes as $img)
 
                     @php
-                        $urlImagen = Storage::url(str_replace('/storage/', '', $img->ruta_archivo));
+                        $urlImagen = asset($img->ruta_archivo);
                     @endphp
 
                     <div style="border-radius: var(--border-radius-sm); overflow: hidden; border: 1px solid rgba(0,0,0,0.08); box-shadow: var(--shadow-sm); transition: var(--transition); cursor: pointer; position: relative;"
@@ -312,7 +325,7 @@
                         <img src="{{ $urlImagen }}"
                              alt="Imagen terreno {{ $img->orden }}"
                              style="width: 100%; height: 180px; object-fit: cover; display: block;"
-                             onerror="this.style.display='none'; this.parentElement.innerHTML+='<div style=\'height:180px;display:flex;align-items:center;justify-content:center;background:var(--bg-light);color:var(--text-muted);font-size:0.85rem;\'>Imagen no disponible</div>';">
+                             onerror="this.onerror=null; this.style.display='none'; this.insertAdjacentHTML('afterend', '<div style=\'height:180px;display:flex;align-items:center;justify-content:center;background:var(--bg-light);color:var(--text-muted);font-size:0.85rem;\'>Imagen no disponible</div>');">
 
                         <div style="padding: 8px 12px; background: var(--bg-light); font-size: 0.8rem; color: var(--text-muted); text-align: center;">
                             Imagen {{ $img->orden }}

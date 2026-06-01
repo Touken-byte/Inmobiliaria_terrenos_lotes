@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'TerrenoSur')</title>
 
     <script src="https://cdn.tailwindcss.com"></script>
@@ -31,6 +32,20 @@
             --text-3:       #3d5480;
             --font-serif:   'Cormorant Garamond', Georgia, serif;
             --font-sans:    'Outfit', system-ui, sans-serif;
+        }
+
+        body.light-mode {
+            --void:        #f0ebe0;
+            --deep:        #f0f4ff;
+            --surface:     #ffffff;
+            --card:        #ffffff;
+            --card-raised: #f8faff;
+            --rim:         rgba(30, 58, 138, 0.10);
+            --rim-bright:  rgba(30, 58, 138, 0.25);
+            --text-1:      #1a0f06;
+            --text-2:      #c9963a;
+            --text-3:      #64748b;
+            --card-h:      #ffffff;
         }
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -302,7 +317,6 @@
             letter-spacing: .05em;
         }
     </style>
-    @stack('scripts')
 </head>
 <body>
 
@@ -331,19 +345,35 @@
 
         {{-- NAV LINKS (Terrenos / Alquileres) --}}
         <nav class="ts-nav-links">
-            <a href="{{ route('catalogo.terrenos') }}"
-               class="ts-nav-link {{ request()->routeIs('catalogo.terrenos*') ? 'active' : '' }}">
-                <i class="fa-solid fa-map" style="margin-right:.35rem; font-size:.75rem;"></i>
-                Terrenos
+            <a href="{{ route('catalogo.unificado') }}"
+               class="ts-nav-link {{ request()->routeIs('catalogo.unificado*') ? 'active' : '' }}">
+                <i class="fa-solid fa-compass" style="margin-right:.35rem; font-size:.75rem;"></i>
+                Catálogo
             </a>
-            <a href="{{ route('catalogo.alquileres') }}"
-               class="ts-nav-link {{ request()->routeIs('catalogo.alquileres*') ? 'active' : '' }}">
-                <i class="fa-solid fa-bed" style="margin-right:.35rem; font-size:.75rem;"></i>
-                Alquileres
+            @auth
+            <a href="{{ route('favoritos.index') }}"
+               class="ts-nav-link {{ request()->routeIs('favoritos.*') ? 'active' : '' }}">
+                <i class="fa-solid fa-heart" style="margin-right:.35rem; font-size:.75rem;"></i>
+                Mis Favoritos
             </a>
+            <a href="{{ route('comprador.leads') }}"
+               class="ts-nav-link {{ request()->routeIs('comprador.leads*') || request()->routeIs('chat.*') ? 'active' : '' }}"
+               style="display: flex; align-items: center; gap: 0.4rem;">
+                <i class="fa-solid fa-handshake" style="font-size:.75rem;"></i>
+                <span>Chats</span>
+                @if(Auth::user()->unreadMessagesCount() > 0)
+                    <span style="background: #3d7ef5; color: white; font-size: 0.6rem; padding: 1px 5px; border-radius: 100px; font-weight: 800;">
+                        {{ Auth::user()->unreadMessagesCount() }}
+                    </span>
+                @endif
+            </a>
+            @endauth
         </nav>
 
         <div class="ts-nav-actions">
+            <button id="theme-toggle" onclick="toggleTheme()" style="background: none; border: none; cursor: pointer; padding: 8px; border-radius: 8px; color: var(--text-1); font-size: 18px; transition: all 0.2s; margin-right: 0.75rem;" title="Cambiar tema">
+                <span id="theme-icon">☀️</span>
+            </button>
             @auth
                 <div class="ts-user-chip">
                     <div class="ts-user-ava">{{ substr(Auth::user()->nombre, 0, 1) }}</div>
@@ -373,6 +403,29 @@
         </p>
     </div>
 </footer>
+    <script>
+        function applyTheme(mode) {
+            if (mode === 'light') {
+                document.body.classList.add('light-mode');
+                document.getElementById('theme-icon').textContent = '🌙';
+            } else {
+                document.body.classList.remove('light-mode');
+                document.getElementById('theme-icon').textContent = '☀️';
+            }
+        }
 
+        function toggleTheme() {
+            const isLight = document.body.classList.contains('light-mode');
+            const newMode = isLight ? 'dark' : 'light';
+            localStorage.setItem('terrenosur-theme', newMode);
+            applyTheme(newMode);
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const savedTheme = localStorage.getItem('terrenosur-theme') || 'dark';
+            applyTheme(savedTheme);
+        });
+    </script>
+    @stack('scripts')
 </body>
 </html>

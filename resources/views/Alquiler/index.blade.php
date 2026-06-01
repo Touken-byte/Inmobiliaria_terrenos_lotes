@@ -80,6 +80,10 @@
         0%, 100% { opacity: 1; transform: scale(1); }
         50%       { opacity: .5; transform: scale(.7); }
     }
+    @keyframes pulse-glow {
+        0%, 100% { transform: scale(1); box-shadow: 0 4px 12px rgba(255,107,107,0.4); }
+        50% { transform: scale(1.05); box-shadow: 0 4px 20px rgba(255,107,107,0.7); }
+    }
     .cat-hero-title {
         font-family: var(--font-serif);
         font-size: clamp(2.8rem, 6vw, 5rem);
@@ -109,7 +113,7 @@
         backdrop-filter: blur(20px) saturate(1.4);
         border-bottom: 1px solid var(--rim);
     }
-    .cat-search-form { max-width: 780px; margin: 0 auto; }
+    .cat-search-form { max-width: 780px; margin: 0 auto; position: relative; }
     .cat-search-inner {
         display: flex;
         align-items: center;
@@ -147,19 +151,17 @@
     }
     .cat-search-btn:hover { filter: brightness(1.1); }
 
-    /* ══ MAIN LAYOUT ══ */
+    /* ══ MAIN LAYOUT (SIN SIDEBAR) ══ */
     .cat-main {
         max-width: 1360px;
         margin: 0 auto;
         padding: 3rem 2rem 0;
-        display: flex;
-        gap: 2.5rem;
-        align-items: flex-start;
     }
 
-    /* ══ SIDEBAR ══ */
-    .cat-aside { width: 290px; flex-shrink: 0; position: sticky; top: calc(68px + 74px); }
+    /* ══ SIDEBAR OCULTO ══ */
+    .cat-aside { display: none; }
 
+    /* Map preview (no usado) */
     .cat-map-preview {
         position: relative;
         height: 190px;
@@ -198,28 +200,76 @@
     .cat-map-overlay { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; padding-bottom: 1.25rem; background: linear-gradient(to top, rgba(5,8,16,0.8) 0%, transparent 60%); }
     .cat-map-label { font-size: .62rem; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; color: var(--text-3); }
 
+    /* Filter (legacy, no se usa) */
     .cat-filter { background: var(--card); border: 1px solid var(--rim); border-radius: 20px; overflow: hidden; }
     .cat-filter-head { padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--rim); display: flex; align-items: center; justify-content: space-between; }
     .cat-filter-head h3 { font-family: var(--font-serif); font-size: 1.2rem; font-weight: 700; color: var(--text-1); }
     .cat-filter-badge { font-size: .6rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; padding: .3rem .65rem; border-radius: 100px; background: var(--amber-soft); color: var(--amber); border: 1px solid rgba(245,158,11,0.25); }
-    .cat-filter-body { padding: 1.5rem; opacity: .5; pointer-events: none; user-select: none; }
+    .cat-filter-body { padding: 1.5rem; }
     .cat-filter-group { margin-bottom: 1.5rem; }
     .cat-filter-group:last-child { margin-bottom: 0; }
     .cat-filter-label { font-size: .6rem; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; color: var(--text-3); margin-bottom: .85rem; }
     .cat-range-row { display: flex; gap: .5rem; align-items: center; }
-    .cat-range-input { flex: 1; padding: .5rem .75rem; background: var(--surface); border: 1px solid var(--rim); border-radius: 10px; font-size: .75rem; color: var(--text-2); text-align: center; font-family: var(--font-sans); }
+    .cat-range-input {
+        flex: 1;
+        padding: .5rem .75rem;
+        background: var(--surface);
+        border: 1px solid var(--rim);
+        border-radius: 10px;
+        font-size: .75rem;
+        color: var(--text-2);
+        font-family: var(--font-sans);
+        outline: none;
+        transition: border-color .2s;
+    }
+    .cat-range-input:focus { border-color: var(--amber); color: var(--text-1); }
+    .cat-range-input::placeholder { color: var(--text-3); }
     .cat-range-sep { color: var(--text-3); font-size: .8rem; }
     .cat-divider { border: none; border-top: 1px solid var(--rim); margin: 1.25rem 0; }
     .cat-check-row { display: flex; align-items: center; gap: .75rem; margin-bottom: .65rem; }
-    .cat-check-box { width: 18px; height: 18px; border: 1px solid var(--rim); border-radius: 5px; background: var(--surface); flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
-    .cat-check-box.on { background: var(--amber); border-color: var(--amber); }
-    .cat-check-box.on i { font-size: .55rem; color: #1a0800; }
+    .cat-check-box { width: 18px; height: 18px; border: 1px solid var(--rim); border-radius: 5px; background: var(--surface); flex-shrink: 0; display: flex; align-items: center; justify-content: center; transition: background .2s, border-color .2s; }
     .cat-check-text { font-size: .8rem; color: var(--text-2); }
-    .cat-tag { display: inline-flex; align-items: center; gap: .3rem; font-size: .7rem; padding: .3rem .7rem; background: var(--surface); border: 1px solid var(--rim); border-radius: 100px; color: var(--text-2); }
-    .cat-soon-btn { width: 100%; margin-top: 1rem; padding: .7rem; background: transparent; border: 1px dashed var(--text-3); border-radius: 12px; font-family: var(--font-sans); font-size: .65rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--text-3); cursor: not-allowed; }
+    .cat-radio-label { display: flex; align-items: center; gap: .75rem; cursor: pointer; width: 100%; }
+
+    .cat-apply-btn {
+        width: 100%;
+        margin-top: 1rem;
+        padding: .75rem;
+        background: var(--amber-soft);
+        border: 1px solid var(--amber);
+        border-radius: 12px;
+        font-family: var(--font-sans);
+        font-size: .68rem;
+        font-weight: 700;
+        letter-spacing: .14em;
+        text-transform: uppercase;
+        color: var(--amber);
+        cursor: pointer;
+        transition: background .2s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: .4rem;
+    }
+    .cat-apply-btn:hover { background: rgba(245,158,11,0.2); }
+
+    .cat-clear-link {
+        font-size: .6rem;
+        font-weight: 700;
+        letter-spacing: .12em;
+        text-transform: uppercase;
+        padding: .3rem .65rem;
+        border-radius: 100px;
+        background: rgba(239,68,68,0.12);
+        color: #f87171;
+        border: 1px solid rgba(239,68,68,0.25);
+        text-decoration: none;
+        transition: background .2s;
+    }
+    .cat-clear-link:hover { background: rgba(239,68,68,0.2); }
 
     /* ══ RESULTS ══ */
-    .cat-results { flex: 1; min-width: 0; }
+    .cat-results { flex: 1; min-width: 0; width: 100%; }
     .cat-results-head { display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 2.25rem; padding-bottom: 1.5rem; border-bottom: 1px solid var(--rim); position: relative; }
     .cat-results-head::after { content: ''; position: absolute; bottom: -1px; left: 0; width: 80px; height: 1px; background: var(--amber); }
     .cat-results-head h2 { font-family: var(--font-serif); font-size: 2.2rem; font-weight: 700; color: var(--text-1); line-height: 1.1; letter-spacing: -.01em; }
@@ -267,13 +317,24 @@
     .ts-price-overlay .currency { font-size: .7rem; font-weight: 500; color: rgba(232,201,122,0.6); letter-spacing: .08em; margin-top: .15rem; }
 
     .ts-prop-body { padding: 1.35rem 1.35rem 1.25rem; display: flex; flex-direction: column; flex-grow: 1; }
+
+    .ts-cat-badge {
+        display: inline-block;
+        margin-bottom: .6rem;
+        padding: .2rem .65rem;
+        border-radius: 100px;
+        font-size: .6rem;
+        font-weight: 700;
+        letter-spacing: .1em;
+        text-transform: uppercase;
+    }
+
     .ts-prop-title { font-family: var(--font-serif); font-size: 1.15rem; font-weight: 700; color: var(--text-1); line-height: 1.25; margin-bottom: .35rem; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; transition: color .2s; }
     .ts-prop-card:hover .ts-prop-title { color: #d4e4ff; }
     .ts-prop-loc { display: flex; align-items: center; gap: .4rem; margin-bottom: .5rem; }
     .ts-prop-loc i { color: var(--cobalt); font-size: .75rem; flex-shrink: 0; }
     .ts-prop-loc span { font-size: .78rem; color: var(--text-2); overflow: hidden; display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; }
 
-    /* Amenidades: camas / baños */
     .ts-prop-amenities { display: flex; align-items: center; gap: 1rem; margin-bottom: .65rem; }
     .ts-amenity { display: flex; align-items: center; gap: .35rem; font-size: .75rem; color: var(--text-3); }
     .ts-amenity i { font-size: .7rem; color: var(--amber); }
@@ -300,6 +361,183 @@
     .cat-pag > div { background: var(--card); border: 1px solid var(--rim); border-radius: 16px; padding: .6rem 1.25rem; }
 
     @media (max-width: 960px) { .cat-main { flex-direction: column; } .cat-aside { width: 100%; position: static; } .cat-hero { padding: 3rem 1.5rem 2.5rem; } }
+    /* ══ FAVORITO BTN ══ */
+    .fav-btn {
+        background: rgba(5,8,16,0.7);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(255,255,255,0.12);
+        border-radius: 50%;
+        width: 34px; height: 34px;
+        display: flex; align-items: center; justify-content: center;
+        cursor: pointer;
+        transition: all .25s;
+        flex-shrink: 0;
+        padding: 0;
+    }
+    .fav-btn:hover {
+        border-color: rgba(244,63,94,0.5);
+        background: rgba(244,63,94,0.15);
+        transform: scale(1.1);
+    }
+    .fav-btn.activo {
+        border-color: rgba(244,63,94,0.6);
+        background: rgba(244,63,94,0.18);
+    }
+
+    /* ══ NUEVOS ESTILOS PARA FILTROS DROPDOWN Y CHIPS ══ */
+    .filter-toggle-btn {
+        height: 100%;
+        padding: 0 1.25rem;
+        background: transparent;
+        border: none;
+        border-left: 1px solid var(--rim);
+        color: var(--text-2);
+        font-family: var(--font-sans);
+        font-size: .82rem;
+        font-weight: 600;
+        letter-spacing: .04em;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: .45rem;
+        flex-shrink: 0;
+        transition: color .2s, background .2s;
+        position: relative;
+    }
+    .filter-toggle-btn:hover { color: var(--text-1); background: rgba(255,255,255,0.03); }
+    .filter-toggle-btn.active { color: var(--amber); }
+    .filter-dot {
+        width: 6px; height: 6px;
+        border-radius: 50%;
+        background: var(--amber);
+        position: absolute;
+        top: 12px; right: 10px;
+        box-shadow: 0 0 6px var(--amber);
+    }
+
+    .filter-panel {
+        display: none;
+        position: absolute;
+        top: calc(100% + 10px);
+        left: 50%;
+        transform: translateX(-50%);
+        width: min(780px, 96vw);
+        background: var(--card);
+        border: 1px solid var(--rim-h);
+        border-radius: 20px;
+        padding: 1.75rem 2rem 1.5rem;
+        z-index: 200;
+        box-shadow: 0 24px 60px rgba(0,0,0,0.7), 0 0 0 1px rgba(120,160,255,0.06);
+        animation: panel-in .2s cubic-bezier(.2,.8,.2,1);
+    }
+    .filter-panel.open { display: block; }
+    @keyframes panel-in {
+        from { opacity: 0; transform: translateX(-50%) translateY(-8px); }
+        to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+    }
+
+    .filter-panel-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1.25rem 2rem;
+        margin-bottom: 1.5rem;
+    }
+    @media(max-width:600px) { .filter-panel-grid { grid-template-columns: 1fr; } }
+
+    .filter-section-cats { grid-column: 1 / -1; }
+
+    .filter-section-label {
+        font-size: .6rem;
+        font-weight: 700;
+        letter-spacing: .16em;
+        text-transform: uppercase;
+        color: var(--text-3);
+        margin-bottom: .7rem;
+        display: flex;
+        align-items: center;
+        gap: .4rem;
+    }
+
+    .cats-grid {
+        display: flex;
+        flex-wrap: wrap;
+        gap: .4rem;
+    }
+    .cat-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: .35rem;
+        padding: .3rem .85rem;
+        border: 1px solid var(--rim);
+        border-radius: 100px;
+        background: var(--surface);
+        color: var(--text-2);
+        font-size: .75rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all .2s;
+    }
+    .cat-pill:hover { border-color: var(--rim-h); color: var(--text-1); }
+    .cat-pill.active { border-color: var(--amber); background: var(--amber-soft); color: var(--text-1); }
+
+    .filter-panel-footer {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding-top: 1.25rem;
+        border-top: 1px solid var(--rim);
+        gap: 1rem;
+    }
+    .filter-clear-btn {
+        font-size: .72rem;
+        font-weight: 600;
+        letter-spacing: .06em;
+        color: var(--text-3);
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        gap: .35rem;
+        transition: color .2s;
+    }
+    .filter-clear-btn:hover { color: #f87171; }
+    .filter-apply-btn {
+        padding: .65rem 1.75rem;
+        background: linear-gradient(135deg, var(--amber) 0%, #b45309 100%);
+        border: none;
+        border-radius: 12px;
+        font-family: var(--font-sans);
+        font-size: .8rem;
+        font-weight: 700;
+        letter-spacing: .06em;
+        color: #1a0800;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: .5rem;
+        transition: filter .2s, transform .2s;
+    }
+    .filter-apply-btn:hover { filter: brightness(1.15); transform: translateY(-1px); }
+
+    .filter-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: .4rem;
+        padding: .28rem .75rem;
+        background: var(--amber-soft);
+        border: 1px solid rgba(245,158,11,0.3);
+        border-radius: 100px;
+        font-size: .7rem;
+        font-weight: 500;
+        color: var(--text-2);
+    }
+    .chip-remove {
+        color: var(--text-3);
+        text-decoration: none;
+        font-size: .65rem;
+        margin-left: .15rem;
+        transition: color .15s;
+    }
+    .chip-remove:hover { color: #f87171; }
 </style>
 
 <div class="cat-wrap">
@@ -317,81 +555,181 @@
         </p>
     </header>
 
-    {{-- SEARCH --}}
+    {{-- SEARCH + FILTROS --}}
     <div class="cat-search-wrap">
-        <form action="{{ route('catalogo.alquileres') }}" method="GET" class="cat-search-form">
-            <div class="cat-search-inner">
-                <span class="cat-search-icon"><i class="fa-solid fa-magnifying-glass"></i></span>
-                <input
-                    class="cat-search-input"
-                    type="text"
-                    name="search"
-                    value="{{ request('search') }}"
-                    placeholder="Buscar por zona, barrio o tipo de habitación…"
-                    autocomplete="off"
-                >
-                <button type="submit" class="cat-search-btn">
-                    <i class="fa-solid fa-magnifying-glass"></i>
-                    <span>Buscar</span>
-                </button>
+        <div class="cat-search-form" style="position:relative;">
+
+            @php
+                $filtrosActivos = array_filter(request()->only(['precio_min','precio_max','metros_min','metros_max','categoria_id','ubicacion','lat','lng','radio','con_promocion']), fn($v) => $v !== '' && $v !== null);
+            @endphp
+            @if(count($filtrosActivos))
+            <div style="display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;margin-bottom:.6rem;max-width:780px;margin-left:auto;margin-right:auto;">
+                @if(request('precio_min') || request('precio_max'))
+                <span class="filter-chip">
+                    <i class="fa-solid fa-bolivar-sign"></i>
+                    Bs. {{ request('precio_min') ?: '0' }} — {{ request('precio_max') ?: '∞' }}
+                    <a href="{{ route('catalogo.alquileres', request()->except(['precio_min','precio_max','page'])) }}" class="chip-remove">✕</a>
+                </span>
+                @endif
+                @if(request('con_promocion'))
+                <span class="filter-chip" style="border-color:rgba(255,107,107,0.4);background:rgba(255,107,107,0.12);color:#ff8787;">
+                    🏷️ Solo con Promoción
+                    <a href="{{ route('catalogo.alquileres', request()->except(['con_promocion','page'])) }}" class="chip-remove">✕</a>
+                </span>
+                @endif
+                @if(request('metros_min') || request('metros_max'))
+                <span class="filter-chip">
+                    <i class="fa-solid fa-vector-square"></i>
+                    {{ request('metros_min') ?: '0' }} — {{ request('metros_max') ?: '∞' }} m²
+                    <a href="{{ route('catalogo.alquileres', request()->except(['metros_min','metros_max','page'])) }}" class="chip-remove">✕</a>
+                </span>
+                @endif
+                @if(request('ubicacion'))
+                <span class="filter-chip">
+                    <i class="fa-solid fa-location-dot"></i>
+                    {{ request('ubicacion') }}
+                    <a href="{{ route('catalogo.alquileres', request()->except(['ubicacion','page'])) }}" class="chip-remove">✕</a>
+                </span>
+                @endif
+                @if(request('categoria_id'))
+                @php $catActiva = $categorias->firstWhere('id', request('categoria_id')); @endphp
+                @if($catActiva)
+                <span class="filter-chip" style="border-color:{{ $catActiva->color }}55;background:{{ $catActiva->color }}15;">
+                    <span style="width:6px;height:6px;border-radius:50%;background:{{ $catActiva->color }};flex-shrink:0;"></span>
+                    {{ $catActiva->nombre }}
+                    <a href="{{ route('catalogo.alquileres', request()->except(['categoria_id','page'])) }}" class="chip-remove">✕</a>
+                </span>
+                @endif
+                @endif
+                @if(request('lat') && request('lng'))
+                <span class="filter-chip" style="border-color:rgba(245,158,11,0.4);background:rgba(245,158,11,0.12);">
+                    <i class="fa-solid fa-location-crosshairs" style="color:var(--amber);"></i>
+                    Radio {{ request('radio',5) }} km
+                    <a href="{{ route('catalogo.alquileres', request()->except(['lat','lng','radio','page'])) }}" class="chip-remove">✕</a>
+                </span>
+                @endif
+                <a href="{{ route('catalogo.alquileres', request()->only('search')) }}" style="font-size:.65rem;color:var(--text-3);text-decoration:none;margin-left:.25rem;" onmouseover="this.style.color='#f87171'" onmouseout="this.style.color='var(--text-3)'">
+                    Limpiar todo ✕
+                </a>
             </div>
-        </form>
+            @endif
+
+            <form action="{{ route('catalogo.alquileres') }}" method="GET" style="max-width:780px;margin:0 auto;position:relative;">
+                @foreach(request()->except(['search','page']) as $key => $val)
+                    @if($val !== '' && $val !== null)
+                        <input type="hidden" name="{{ $key }}" value="{{ $val }}">
+                    @endif
+                @endforeach
+                <div class="cat-search-inner">
+                    <span class="cat-search-icon"><i class="fa-solid fa-magnifying-glass"></i></span>
+                    <input
+                        class="cat-search-input"
+                        type="text"
+                        name="search"
+                        value="{{ request('search') }}"
+                        placeholder="Buscar por zona, barrio o tipo de habitación…"
+                        autocomplete="off"
+                    >
+                    @php $hayFiltros = count($filtrosActivos) > 0; @endphp
+                    <button type="button" class="filter-toggle-btn {{ $hayFiltros ? 'active' : '' }}" onclick="toggleFilterPanel('panel-filtros-a')" id="btn-filtros-a">
+                        <i class="fa-solid fa-sliders"></i>
+                        <span>Filtros</span>
+                        @if($hayFiltros)
+                        <span class="filter-dot" style="background:var(--amber);box-shadow:0 0 6px var(--amber);"></span>
+                        @endif
+                    </button>
+                    <button type="submit" class="cat-search-btn">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                        <span>Buscar</span>
+                    </button>
+                </div>
+            </form>
+
+            {{-- PANEL DESPLEGABLE --}}
+            <div class="filter-panel" id="panel-filtros-a">
+                <form action="{{ route('catalogo.alquileres') }}" method="GET">
+                    @if(request('search'))
+                        <input type="hidden" name="search" value="{{ request('search') }}">
+                    @endif
+                    @if(request('lat'))
+                        <input type="hidden" name="lat" value="{{ request('lat') }}">
+                        <input type="hidden" name="lng" value="{{ request('lng') }}">
+                        <input type="hidden" name="radio" value="{{ request('radio',5) }}">
+                    @endif
+
+                    <div class="filter-panel-grid">
+                        <div class="filter-section">
+                            <p class="filter-section-label"><i class="fa-solid fa-bolivar-sign"></i> Precio mensual (Bs.)</p>
+                            <div class="cat-range-row">
+                                <input type="number" name="precio_min" placeholder="Mínimo" value="{{ request('precio_min') }}" class="cat-range-input" min="0">
+                                <span class="cat-range-sep">—</span>
+                                <input type="number" name="precio_max" placeholder="Máximo" value="{{ request('precio_max') }}" class="cat-range-input" min="0">
+                            </div>
+                        </div>
+                        <div class="filter-section">
+                            <p class="filter-section-label"><i class="fa-solid fa-vector-square"></i> Superficie (m²)</p>
+                            <div class="cat-range-row">
+                                <input type="number" name="metros_min" placeholder="Mínimo" value="{{ request('metros_min') }}" class="cat-range-input" min="0">
+                                <span class="cat-range-sep">—</span>
+                                <input type="number" name="metros_max" placeholder="Máximo" value="{{ request('metros_max') }}" class="cat-range-input" min="0">
+                            </div>
+                        </div>
+                        <div class="filter-section">
+                            <p class="filter-section-label"><i class="fa-solid fa-location-dot"></i> Ubicación</p>
+                            <input type="text" name="ubicacion" placeholder="Zona o barrio…" value="{{ request('ubicacion') }}" class="cat-range-input" style="width:100%;box-sizing:border-box;">
+                        </div>
+                        <div class="filter-section">
+                            <p class="filter-section-label"><i class="fa-solid fa-percent"></i> Ofertas Especiales</p>
+                            <div style="display:flex;gap:.5rem;flex-wrap:wrap;">
+                                <label class="cat-pill {{ request('con_promocion') === '1' ? 'active' : '' }}"
+                                       style="{{ request('con_promocion') === '1' ? 'background:rgba(255,107,107,0.15);border-color:rgba(255,107,107,0.5);color:#ff8787;' : '' }}">
+                                    <input type="checkbox" name="con_promocion" value="1" {{ request('con_promocion') === '1' ? 'checked' : '' }} style="display:none;" onchange="this.closest('form').submit();">
+                                    🏷️ Solo con Promoción
+                                </label>
+                            </div>
+                        </div>
+                        @if($categorias->count() > 0)
+                        <div class="filter-section filter-section-cats">
+                            <p class="filter-section-label"><i class="fa-solid fa-tag"></i> Categoría</p>
+                            <div class="cats-grid">
+                                <label class="cat-pill {{ !request('categoria_id') ? 'active' : '' }}" style="{{ !request('categoria_id') ? 'border-color:var(--amber);background:rgba(245,158,11,0.12);' : '' }}"
+                                      onclick="this.querySelector('input[type=radio]').checked=true; this.closest('form').submit();">
+                                    <input type="radio" name="categoria_id" value="" {{ !request('categoria_id') ? 'checked' : '' }} style="display:none;">
+                                    Todas
+                                </label>
+                                @foreach($categorias as $cat)
+                                <label class="cat-pill {{ request('categoria_id') == $cat->id ? 'active' : '' }}"
+                                       style="{{ request('categoria_id') == $cat->id ? 'background:'.$cat->color.'22;border-color:'.$cat->color.'66;color:'.$cat->color.';' : '' }}"
+                                       onclick="this.querySelector('input[type=radio]').checked=true; this.closest('form').submit();">
+                                    <input type="radio" name="categoria_id" value="{{ $cat->id }}" {{ request('categoria_id') == $cat->id ? 'checked' : '' }} style="display:none;" data-color="{{ $cat->color }}">
+                                    <span style="width:6px;height:6px;border-radius:50%;background:{{ $cat->color }};flex-shrink:0;"></span>
+                                    {{ $cat->nombre }}
+                                </label>
+                                @endforeach
+                            </div>
+                        </div>
+                        @endif
+                    </div>
+
+                    <div class="filter-panel-footer">
+                        <a href="{{ route('catalogo.alquileres', request()->only('search')) }}" class="filter-clear-btn">
+                            <i class="fa-solid fa-xmark"></i> Limpiar filtros
+                        </a>
+                        <button type="submit" class="filter-apply-btn" style="background:linear-gradient(135deg,var(--amber) 0%,#b45309 100%);color:#1a0800;">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                            Aplicar y buscar
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+        </div>
     </div>
 
     {{-- MAIN --}}
     <div class="cat-main">
 
-        {{-- SIDEBAR --}}
-        <aside class="cat-aside">
-
-            <div class="cat-map-preview">
-                <div class="cat-map-grid"></div>
-                <div class="cat-map-roads"></div>
-                <div class="cat-map-pin"></div>
-                <div class="cat-map-overlay">
-                    <p class="cat-map-label">Vista en mapa · próximamente</p>
-                </div>
-            </div>
-
-            <div class="cat-filter">
-                <div class="cat-filter-head">
-                    <h3>Filtros</h3>
-                    <span class="cat-filter-badge">Próximamente</span>
-                </div>
-                <div class="cat-filter-body">
-                    <div class="cat-filter-group">
-                        <p class="cat-filter-label">Precio Mensual</p>
-                        <div class="cat-range-row">
-                            <div class="cat-range-input">Mínimo</div>
-                            <span class="cat-range-sep">—</span>
-                            <div class="cat-range-input">Máximo</div>
-                        </div>
-                    </div>
-                    <hr class="cat-divider">
-                    <div class="cat-filter-group">
-                        <p class="cat-filter-label">Habitaciones</p>
-                        <div class="cat-check-row">
-                            <div class="cat-check-box on"><i class="fa-solid fa-check"></i></div>
-                            <span class="cat-check-text">1 habitación</span>
-                        </div>
-                        <div class="cat-check-row">
-                            <div class="cat-check-box"></div>
-                            <span class="cat-check-text">2+ habitaciones</span>
-                        </div>
-                    </div>
-                    <hr class="cat-divider">
-                    <div class="cat-filter-group">
-                        <p class="cat-filter-label">Servicios</p>
-                        <div style="display:flex;flex-wrap:wrap;gap:.4rem;">
-                            <span class="cat-tag"><i class="fa-solid fa-droplet" style="font-size:.6rem;color:var(--cobalt)"></i> Agua</span>
-                            <span class="cat-tag"><i class="fa-solid fa-bolt" style="font-size:.6rem;color:var(--amber)"></i> Luz</span>
-                            <span class="cat-tag"><i class="fa-solid fa-wifi" style="font-size:.6rem;color:var(--emerald)"></i> Internet</span>
-                        </div>
-                    </div>
-                    <button class="cat-soon-btn">Aplicar Filtros</button>
-                </div>
-            </div>
-        </aside>
+        {{-- Sidebar eliminado: filtros ahora en barra superior --}}
 
         {{-- RESULTS --}}
         <section class="cat-results">
@@ -452,17 +790,54 @@
                                         <i class="fa-solid fa-bed" style="margin-right:.3rem;"></i>{{ $alquiler->habitaciones }} hab.
                                     </span>
                                 @endif
-                                <span class="ts-b-alquiler">Alquiler</span>
+                                <div style="display:flex;align-items:center;gap:.5rem;">
+                                    @if($alquiler->promocion)
+                                        <span class="ts-b-alquiler" style="background:linear-gradient(135deg, #ff6b6b 0%, #ff8787 100%); color:white; font-weight:900; box-shadow: 0 4px 12px rgba(255,107,107,0.4); animation: pulse-glow 2s infinite;">
+                                            🔥 {{ number_format($alquiler->promocion->descuento_porcentaje, 0) }}% OFF
+                                        </span>
+                                    @endif
+                                    <span class="ts-b-alquiler">Alquiler</span>
+                                    @auth
+                                        @if($alquiler->estado === 'disponible' && $alquiler->estado_aprobacion === 'aprobado')
+                                        <button
+                                            class="fav-btn {{ $alquiler->esFavorito() ? 'activo' : '' }}"
+                                            data-id="{{ $alquiler->id }}"
+                                            data-type="alquiler"
+                                            title="{{ $alquiler->esFavorito() ? 'Quitar de favoritos' : 'Agregar a favoritos' }}"
+                                            onclick="toggleFavorito(this)">
+                                            <i class="fa-{{ $alquiler->esFavorito() ? 'solid' : 'regular' }} fa-heart"
+                                                style="color:{{ $alquiler->esFavorito() ? '#f43f5e' : 'var(--text-2)' }};font-size:.85rem;pointer-events:none;"></i>
+                                        </button>
+                                        @endif
+                                    @endauth
+                                </div>
                             </div>
 
                             <div class="ts-price-overlay">
-                                <div class="price">Bs. {{ number_format($alquiler->precio_mensual, 0) }}</div>
+                                @if($alquiler->promocion)
+                                    <div style="font-size:0.85rem; text-decoration:line-through; opacity:0.6; color:#fff; font-weight:600; line-height:1; margin-bottom:2px;">
+                                        Bs. {{ number_format($alquiler->precio_mensual, 0) }}
+                                    </div>
+                                    <div class="price" style="color:#ff8787;">
+                                        Bs. {{ number_format($alquiler->precio_mensual * (1 - $alquiler->promocion->descuento_porcentaje / 100), 0) }}
+                                    </div>
+                                @else
+                                    <div class="price">Bs. {{ number_format($alquiler->precio_mensual, 0) }}</div>
+                                @endif
                                 <div class="currency">por mes</div>
                             </div>
                         </div>
 
                         {{-- BODY --}}
                         <div class="ts-prop-body">
+
+                            {{-- Badge de categoría --}}
+                            @if($alquiler->categoria)
+                                <span class="ts-cat-badge" style="background:{{ $alquiler->categoria->color }}22;color:{{ $alquiler->categoria->color }};border:1px solid {{ $alquiler->categoria->color }}44;">
+                                    {{ $alquiler->categoria->nombre }}
+                                </span>
+                            @endif
+
                             <h3 class="ts-prop-title">{{ $alquiler->titulo }}</h3>
                             <div class="ts-prop-loc">
                                 <i class="fa-solid fa-location-dot"></i>
@@ -503,4 +878,145 @@
         </section>
     </div>
 </div>
+@push('styles')
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+@endpush
+
+@push('scripts')
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script>
+// ── Toggle panel filtros ──
+function toggleFilterPanel(id) {
+    const panel = document.getElementById(id);
+    if (panel) panel.classList.toggle('open');
+}
+document.addEventListener('click', function(e) {
+    const panel = document.getElementById('panel-filtros-a');
+    const btn = document.getElementById('btn-filtros-a');
+    if (panel && btn && !panel.contains(e.target) && !btn.contains(e.target)) {
+        panel.classList.remove('open');
+    }
+});
+
+// ── Mapa Alquileres ──
+(function() {
+    var initLat = {{ request('lat', -21.5355) }};
+    var initLng = {{ request('lng', -63.6724) }};
+    var initRadio = {{ request('radio', 5) }};
+    var hasFiltro = {{ (request('lat') && request('lng')) ? 'true' : 'false' }};
+
+    var map = L.map('map-alquileres', { zoomControl: true, attributionControl: false })
+        .setView([initLat, initLng], hasFiltro ? 11 : 8);
+
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+        maxZoom: 19
+    }).addTo(map);
+
+    var marker = null;
+    var circle = null;
+
+    function setPoint(lat, lng, radio) {
+        if (marker) { map.removeLayer(marker); map.removeLayer(circle); }
+        marker = L.marker([lat, lng], {
+            icon: L.divIcon({
+                className: '',
+                html: '<div style="width:14px;height:14px;background:#f59e0b;border:2px solid white;border-radius:50%;box-shadow:0 0 8px rgba(245,158,11,0.8);"></div>',
+                iconAnchor: [7, 7]
+            })
+        }).addTo(map);
+        circle = L.circle([lat, lng], {
+            radius: radio * 1000,
+            color: '#f59e0b',
+            fillColor: '#f59e0b',
+            fillOpacity: 0.08,
+            weight: 1.5
+        }).addTo(map);
+        document.getElementById('map-lat-a').value = lat.toFixed(6);
+        document.getElementById('map-lng-a').value = lng.toFixed(6);
+    }
+
+    if (hasFiltro) { setPoint(initLat, initLng, initRadio); }
+
+    map.on('click', function(e) {
+        var radio = parseInt(document.getElementById('map-radio-a').value) || 5;
+        setPoint(e.latlng.lat, e.latlng.lng, radio);
+        document.getElementById('form-mapa-alquileres').submit();
+    });
+
+    var radioSlider = document.getElementById('radio-slider-a');
+    if (radioSlider) {
+        radioSlider.addEventListener('change', function() {
+            if (marker) {
+                var lat = parseFloat(document.getElementById('map-lat-a').value);
+                var lng = parseFloat(document.getElementById('map-lng-a').value);
+                var radio = parseInt(this.value);
+                setPoint(lat, lng, radio);
+            }
+        });
+    }
+})();
+
+function toggleFavorito(btn) {
+    const id   = btn.dataset.id;
+    const type = btn.dataset.type;
+
+    fetch('{{ route("favoritos.toggle") }}', {
+        method: 'POST',
+        headers: {
+            'Content-Type':  'application/json',
+            'X-CSRF-TOKEN':  document.querySelector('meta[name="csrf-token"]').content
+        },
+        body: JSON.stringify({ id, type })
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.action === 'limit') {
+            alert('Alcanzaste el límite de 50 favoritos. Elimina alguno para agregar otro.');
+            return;
+        }
+        const icon = btn.querySelector('i');
+        if (data.action === 'added') {
+            icon.className       = 'fa-solid fa-heart';
+            icon.style.color     = '#f43f5e';
+            btn.classList.add('activo');
+            btn.title            = 'Quitar de favoritos';
+        } else {
+            icon.className       = 'fa-regular fa-heart';
+            icon.style.color     = 'var(--text-2)';
+            btn.classList.remove('activo');
+            btn.title            = 'Agregar a favoritos';
+        }
+    })
+    .catch(() => alert('Error al actualizar favorito. Intenta de nuevo.'));
+}
+
+// ── Interactividad visual de los filtros de categoría ──
+document.addEventListener('DOMContentLoaded', function() {
+    const catLabels = document.querySelectorAll('.cat-pill');
+    catLabels.forEach(label => {
+        label.addEventListener('click', function() {
+            const group = this.closest('.cats-grid');
+            if (group) {
+                group.querySelectorAll('.cat-pill').forEach(pill => {
+                    pill.classList.remove('active');
+                    pill.style.background = '';
+                    pill.style.borderColor = '';
+                    pill.style.color = '';
+                });
+            }
+            this.classList.add('active');
+            const radio = this.querySelector('input[type="radio"]');
+            if (radio && radio.value !== '') {
+                const color = radio.dataset.color;
+                if (color) {
+                    this.style.borderColor = color + '66';
+                    this.style.color = color;
+                    this.style.background = color + '22';
+                }
+            }
+        });
+    });
+});
+</script>
+@endpush
 @endsection

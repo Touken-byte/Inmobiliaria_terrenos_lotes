@@ -17,6 +17,7 @@ class ComprobanteIt extends Model
         'archivo',
         'estado',
         'observacion',
+        'alerta_multa',
     ];
 
     protected $casts = [

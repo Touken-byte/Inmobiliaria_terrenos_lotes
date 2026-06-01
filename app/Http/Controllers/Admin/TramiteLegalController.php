@@ -22,9 +22,25 @@ class TramiteLegalController extends Controller
             ->latest()
             ->paginate(15);
 
-        // Para cada minuta, buscamos su comprobante IT vinculado
+        // RE-EVALUACIÓN EN TIEMPO REAL:
+        // Cada vez que el administrador carga esta página, re-evaluamos silenciosamente las reglas 
+        // de auditoría para las minutas en pantalla. Así, si el vendedor corrigió algo 
+        // (ej. subió un documento faltante en otro módulo), la alerta desaparecerá automáticamente.
+        $validator = new \App\Services\LegalValidatorService();
+        foreach ($minutas as $minuta) {
+            // Solo reevaluamos minutas que no estén ya finalizadas
+            if (!in_array($minuta->estado, ['completada', 'aprobada'])) {
+                $validator->validarMinuta($minuta);
+                // Refrescamos las alertas en memoria para que la vista las muestre
+                $minuta->load('alertasLegales');
+            }
+        }
+
+        // Para cada minuta, buscamos su comprobante IT y Protocolización vinculados
         $minutas->getCollection()->transform(function ($minuta) {
             $minuta->comprobante = ComprobanteIt::where('minuta_id', $minuta->id)
+                ->first();
+            $minuta->protocolizacion = \App\Models\Protocolizacion::where('minuta_id', $minuta->id)
                 ->first();
             return $minuta;
         });
@@ -97,23 +113,28 @@ class TramiteLegalController extends Controller
     }
 
     /**
-     * Marcar el trámite completo (cuando Minuta e IT están aprobados).
+     * Marcar la protocolización como aprobada y finalizar oficialmente la venta.
      */
-    public function finalizarTramite($id)
+    public function aprobarProtocolizacion($id)
     {
-        $minuta = Minuta::with('terreno')->findOrFail($id);
-        $terreno = $minuta->terreno;
+        $proto = \App\Models\Protocolizacion::with(['minuta', 'terreno'])->findOrFail($id);
+        $minuta = $proto->minuta;
+        $terreno = $proto->terreno;
         $adminId = Auth::id();
-        
-        // 1. Marcamos ambos documentos como completados oficialmente
-        $minuta->update(['estado' => 'completada']);
-        
-        $comp = ComprobanteIt::where('minuta_id', $minuta->id)->first();
-        if ($comp) {
-            $comp->update(['estado' => 'completado']);
+
+        // 1. Aprobar Protocolización
+        $proto->update(['estado' => 'aprobado', 'observacion' => null]);
+
+        // 2. Marcar Minuta y Comprobante como completados
+        if ($minuta) {
+            $minuta->update(['estado' => 'completada']);
+            $comp = ComprobanteIt::where('minuta_id', $minuta->id)->first();
+            if ($comp) {
+                $comp->update(['estado' => 'completado']);
+            }
         }
 
-        // 2. REGISTRO OFICIAL DE VENTA: Actualizamos el estado del lote a 'vendido'
+        // 3. REGISTRO OFICIAL DE VENTA: Actualizamos el estado del lote a 'vendido'
         if ($terreno) {
             $estadoAnterior = $terreno->estado_lote;
             $terreno->update([
@@ -130,9 +151,39 @@ class TramiteLegalController extends Controller
                 'fecha_cambio' => now(),
             ]);
         }
-        
+
         return redirect()->route('admin.tramites_legales.index')
-            ->with('success', '✅ Trámite finalizado. El lote ha sido marcado como VENDIDO oficialmente.');
+            ->with('success', '✅ Trámite finalizado. Protocolización aprobada y lote marcado como VENDIDO oficialmente.');
+    }
+
+    /**
+     * Rechazar la protocolización con observación.
+     */
+    public function rechazarProtocolizacion(Request $request, $id)
+    {
+        $request->validate([
+            'observacion' => 'required|string|min:5|max:1000',
+        ]);
+
+        $proto = \App\Models\Protocolizacion::findOrFail($id);
+        $proto->update([
+            'estado'      => 'rechazado',
+            'observacion' => $request->observacion,
+        ]);
+
+        return redirect()->route('admin.tramites_legales.index')
+            ->with('success', 'Protocolización rechazada. Se solicitó corrección al vendedor.');
+    }
+
+    public function verTestimonio($id)
+    {
+        $proto = \App\Models\Protocolizacion::findOrFail($id);
+
+        if (!$proto->archivo_testimonio || !Storage::disk('public')->exists($proto->archivo_testimonio)) {
+            abort(404, 'El archivo de testimonio no fue encontrado.');
+        }
+
+        return Storage::disk('public')->response($proto->archivo_testimonio);
     }
 
     public function verMinuta($id)

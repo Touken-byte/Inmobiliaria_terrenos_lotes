@@ -27,6 +27,7 @@ class SolicitudVisita extends Model
         'fecha_cancelacion',
         'aprobado_por',
         'cancelado_por',
+        'alquiler_id',
     ];
 
     protected $casts = [
@@ -44,6 +45,11 @@ class SolicitudVisita extends Model
     public function terreno(): BelongsTo
     {
         return $this->belongsTo(Terreno::class, 'terreno_id');
+    }
+
+    public function alquiler(): BelongsTo
+    {
+        return $this->belongsTo(Alquiler::class, 'alquiler_id');
     }
 
     public function vendedor(): BelongsTo

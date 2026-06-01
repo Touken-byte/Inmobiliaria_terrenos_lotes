@@ -42,6 +42,7 @@
                             <th style="padding: 1.5rem; opacity: 0.4; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em;">Terreno / Cliente</th>
                             <th style="padding: 1.5rem; opacity: 0.4; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em;">Estado Minuta</th>
                             <th style="padding: 1.5rem; opacity: 0.4; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em;">Estado IT</th>
+                            <th style="padding: 1.5rem; opacity: 0.4; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em;">Estado Protoc.</th>
                             <th style="padding: 1.5rem; opacity: 0.4; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em;">Monto Total</th>
                             <th style="padding: 1.5rem; opacity: 0.4; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em; text-align: right;">Documentos</th>
                         </tr>
@@ -71,6 +72,16 @@
                                 @endif
                             </td>
                             <td style="padding: 1.5rem;">
+                                @if($h->protocolizacion)
+                                    <div class="doc-status">
+                                        <span class="dot dot-{{ in_array($h->protocolizacion->estado, ['aprobado', 'completado']) ? 'aprobado' : ($h->protocolizacion->estado === 'rechazado' ? 'rechazado' : 'pendiente') }}"></span>
+                                        {{ ucfirst($h->protocolizacion->estado === 'en_revision' ? 'En Revisión' : $h->protocolizacion->estado) }}
+                                    </div>
+                                @else
+                                    <span style="opacity: 0.3; font-style: italic; font-size: 0.85rem;">No cargado</span>
+                                @endif
+                            </td>
+                            <td style="padding: 1.5rem;">
                                 <div style="font-weight: 800; color: var(--accent); font-size: 1.1rem;">${{ number_format($h->monto + ($h->it->monto ?? 0), 2) }}</div>
                             </td>
                             <td style="padding: 1.5rem; text-align: right;">
@@ -92,12 +103,21 @@
                                             <a href="{{ route('vendedor.comprobante_it.archivo', $h->it->id) }}" target="_blank" class="action-btn-circle" title="Ver IT">🧾</a>
                                         </div>
                                     @endif
+
+                                    @if($h->protocolizacion && $h->protocolizacion->archivo_testimonio)
+                                        <div style="width: 1px; height: 15px; background: rgba(255,255,255,0.1);"></div>
+
+                                        {{-- Grupo Protocolización --}}
+                                        <div style="display: flex; gap: 5px; background: rgba(255,255,255,0.03); padding: 5px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);">
+                                            <a href="{{ route('vendedor.protocolizacion.archivo', $h->protocolizacion->id) }}" target="_blank" class="action-btn-circle" title="Ver Protocolización">🏛️</a>
+                                        </div>
+                                    @endif
                                 </div>
                             </td>
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="5" style="padding: 5rem; text-align: center;">
+                            <td colspan="6" style="padding: 5rem; text-align: center;">
                                 <div style="font-size: 3rem; opacity: 0.1; margin-bottom: 1.5rem;">📁</div>
                                 <p style="opacity: 0.4; font-size: 1.1rem;">No tienes trámites legales registrados aún.</p>
                                 <a href="{{ route('vendedor.proceso_legal') }}" class="btn btn-primary btn-sm" style="margin-top: 1rem; border-radius: 10px;">Iniciar Trámite</a>

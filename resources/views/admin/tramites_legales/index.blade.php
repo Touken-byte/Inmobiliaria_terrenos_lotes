@@ -44,13 +44,17 @@
                         <th>Terreno</th>
                         <th>Estado Minuta</th>
                         <th>Estado IT</th>
+                        <th>Estado Protocolización</th>
                         <th>Monto Total</th>
                         <th style="text-align: right;">Acciones de Gestión</th>
                     </tr>
                 </thead>
                 <tbody>
                     @forelse($minutas as $minuta)
-                    @php $comp = $minuta->comprobante; @endphp
+                    @php 
+                        $comp = $minuta->comprobante; 
+                        $proto = $minuta->protocolizacion;
+                    @endphp
                     <tr onmouseover="this.style.background='rgba(255,255,255,0.01)'" onmouseout="this.style.background='transparent'">
                         <td>
                             <div style="font-weight: 700;">{{ $minuta->vendedor->nombre ?? 'N/D' }}</div>
@@ -65,12 +69,29 @@
                                 <span class="dot dot-{{ $minuta->estado === 'aprobada' ? 'aprobado' : ($minuta->estado === 'rechazada' ? 'rechazado' : 'pendiente') }}"></span>
                                 {{ ucfirst($minuta->estado) }}
                             </div>
+                            @if($minuta->alertasLegales && $minuta->alertasLegales->where('estado', 'activa')->count() > 0)
+                                @foreach($minuta->alertasLegales->where('estado', 'activa') as $alerta)
+                                    <div style="font-size: 0.7rem; color: #ef4444; margin-top: 5px; background: rgba(239,68,68,0.1); padding: 4px; border-radius: 4px;">
+                                        <i class="fas fa-exclamation-circle"></i> {{ $alerta->mensaje }}
+                                    </div>
+                                @endforeach
+                            @endif
                         </td>
                         <td>
                             @if($comp)
                                 <div class="doc-status">
                                     <span class="dot dot-{{ $comp->estado === 'aprobado' ? 'aprobado' : ($comp->estado === 'rechazado' ? 'rechazado' : 'pendiente') }}"></span>
                                     {{ ucfirst($comp->estado) }}
+                                </div>
+                            @else
+                                <span style="opacity: 0.3; font-style: italic; font-size: 0.8rem;">No cargado</span>
+                            @endif
+                        </td>
+                        <td>
+                            @if($proto)
+                                <div class="doc-status">
+                                    <span class="dot dot-{{ $proto->estado === 'aprobado' ? 'aprobado' : ($proto->estado === 'rechazado' ? 'rechazado' : 'pendiente') }}"></span>
+                                    {{ ucfirst($proto->estado === 'en_revision' ? 'En Revisión' : $proto->estado) }}
                                 </div>
                             @else
                                 <span style="opacity: 0.3; font-style: italic; font-size: 0.8rem;">No cargado</span>
@@ -108,13 +129,19 @@
                                     </div>
                                 @endif
 
-                                {{-- Botón Finalizar (Habilitado si la minuta está aprobada y el IT existe) --}}
-                                @if($minuta->estado === 'aprobada' && $comp)
-                                    <button type="button" class="btn btn-primary btn-sm" 
-                                            style="height: 34px; border-radius: 10px; margin-left: 10px; font-weight: 700; background: linear-gradient(135deg, #7c3aed, #4f46e5);"
-                                            onclick="openModal('finalizar', {{ $minuta->id }}, '{{ addslashes($minuta->vendedor->nombre) }}')">
-                                        🏆 Finalizar
-                                    </button>
+                                {{-- Sección Protocolización --}}
+                                @if($proto)
+                                    <div style="width: 2px; height: 20px; background: rgba(255,255,255,0.1);"></div>
+                                    <div style="display: flex; gap: 5px; background: rgba(255,255,255,0.03); padding: 5px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);">
+                                        @if($proto->archivo_testimonio)
+                                            <a href="{{ route('admin.tramites_legales.ver_testimonio', $proto->id) }}" target="_blank" class="action-btn-circle" title="Ver Testimonio">📜</a>
+                                        @endif
+
+                                        @if($proto->estado === 'en_revision')
+                                            <button class="action-btn-circle btn-success" title="Aprobar Protocolización y Cerrar Venta" onclick="openModal('aprobar-protocolizacion', {{ $proto->id }}, '{{ addslashes($minuta->vendedor->nombre) }}')">✓</button>
+                                            <button class="action-btn-circle btn-danger" title="Rechazar Protocolización" onclick="openModal('rechazar-protocolizacion', {{ $proto->id }})">✗</button>
+                                        @endif
+                                    </div>
                                 @endif
                             </div>
                         </td>
@@ -195,12 +222,19 @@ function openModal(type, id, name = '') {
         obs.style.display = 'block';
         submit.innerText = 'Rechazar Comprobante';
         submit.className = 'btn btn-danger';
-    } else if(type === 'finalizar') {
-        title.innerText = '🏆 Finalizar Proceso Legal';
-        msg.innerHTML = `Estás a punto de completar oficialmente el trámite de <strong>${name}</strong>.<br><br>Ambos documentos (Minuta e IT) se marcarán como completados y el proceso se cerrará.`;
-        form.action = `/admin/tramites-legales/${id}/finalizar`;
-        submit.innerText = 'Sí, Finalizar Trámite';
+    } else if(type === 'aprobar-protocolizacion') {
+        title.innerText = '🏆 Aprobar Protocolización y Finalizar Venta';
+        msg.innerHTML = `Confirma que el testimonio notarial de <strong>${name}</strong> es correcto.<br><br>Al aprobar esto, el proceso se cerrará oficialmente y el terreno quedará marcado como <strong>VENDIDO</strong>.`;
+        form.action = `/admin/tramites-legales/${id}/aprobar-protocolizacion`;
+        submit.innerText = 'Sí, Aprobar y Finalizar';
         submit.className = 'btn btn-primary';
+    } else if(type === 'rechazar-protocolizacion') {
+        title.innerText = 'Rechazar Protocolización';
+        msg.innerText = 'Indique qué problema encontró en el testimonio notarial.';
+        form.action = `/admin/tramites-legales/${id}/rechazar-protocolizacion`;
+        obs.style.display = 'block';
+        submit.innerText = 'Rechazar Testimonio';
+        submit.className = 'btn btn-danger';
     }
 
     container.style.display = 'flex';

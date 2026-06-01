@@ -89,6 +89,12 @@
                             <span class="badge badge-danger" style="padding: 6px 12px; font-size: 0.8rem;">Rechazado</span>
                         @endif
                     </div>
+
+                    @if($comp->alerta_multa)
+                        <div class="alert alert-warning" style="padding: 8px 12px; font-size: 0.8rem; margin-bottom: 15px; border-left: 4px solid #f59e0b; background: rgba(245,158,11,0.1); color: #fcd34d;">
+                            <i class="fas fa-exclamation-triangle"></i> <strong>Pago fuera de plazo:</strong> El registro excede los 10 días hábiles desde la minuta. Podría estar sujeto a multas por la entidad tributaria.
+                        </div>
+                    @endif
                     
                     <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px; padding: 15px; background: rgba(0,0,0,0.2); border-radius: 8px;">
                         <div>

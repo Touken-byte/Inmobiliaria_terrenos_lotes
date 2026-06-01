@@ -1,6 +1,6 @@
 @extends('layouts.comprador')
 
-@section('title', 'Detalles del Terreno | TerrenoSur')
+@section('title', 'Detalle de la Propiedad | TerrenoSur')
 
 @push('styles')
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -590,6 +590,248 @@
         color: var(--text-3);
     }
     .det-trust-item i { color: var(--gold); font-size: .8rem; width: 14px; flex-shrink: 0; }
+
+    /* ══ SERVICIOS DISPONIBLES — Premium Dark ══ */
+    .det-services-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 12px;
+        margin-bottom: 2rem;
+    }
+    .det-service-card {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 14px 16px;
+        background: var(--card);
+        border: 1px solid var(--rim);
+        border-radius: 16px;
+        transition: all .3s cubic-bezier(.4,0,.2,1);
+        position: relative;
+        overflow: hidden;
+    }
+    .det-service-card::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 50%; transform: translateX(-50%);
+        width: 60%; height: 1px;
+        opacity: 0;
+        transition: opacity .3s;
+    }
+    .det-service-card:hover {
+        border-color: var(--rim-gold);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+    }
+    .det-service-card:hover::before { opacity: 1; }
+    .det-service-card.available {
+        border-color: rgba(29,186,126,0.25);
+    }
+    .det-service-card.unavailable {
+        opacity: 0.4;
+    }
+    .det-svc-icon {
+        width: 44px; height: 44px; min-width: 44px;
+        border-radius: 12px;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 1.3rem;
+        transition: all .3s ease;
+        flex-shrink: 0;
+    }
+    .det-svc-icon.agua { background: rgba(59,130,246,0.15); border: 1px solid rgba(59,130,246,0.2); }
+    .det-svc-icon.energia { background: rgba(245,158,11,0.15); border: 1px solid rgba(245,158,11,0.2); }
+    .det-svc-icon.alcantarillado { background: rgba(139,92,246,0.15); border: 1px solid rgba(139,92,246,0.2); }
+    .det-svc-icon.gas { background: rgba(239,68,68,0.15); border: 1px solid rgba(239,68,68,0.2); }
+    .det-svc-icon.internet { background: rgba(16,185,129,0.15); border: 1px solid rgba(16,185,129,0.2); }
+    .det-service-card:hover .det-svc-icon { transform: scale(1.08); }
+    .det-svc-info { flex: 1; min-width: 0; }
+    .det-svc-name {
+        font-size: .85rem; font-weight: 700;
+        color: var(--text-1); line-height: 1.2;
+        margin-bottom: 2px;
+    }
+    .det-svc-desc {
+        font-size: .72rem; color: var(--text-3);
+        line-height: 1.3;
+    }
+    .det-svc-badge {
+        width: 26px; height: 26px; min-width: 26px;
+        border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+        font-size: .7rem; font-weight: 700;
+        flex-shrink: 0;
+    }
+    .det-svc-badge.yes {
+        background: rgba(29,186,126,0.18);
+        border: 1px solid rgba(29,186,126,0.35);
+        color: #1dba7e;
+    }
+    .det-svc-badge.no {
+        background: rgba(255,255,255,0.04);
+        border: 1px solid rgba(255,255,255,0.08);
+        color: var(--text-3);
+    }
+
+    /* ══ LOCATION DETAIL CARD ══ */
+    .det-loc-card {
+        background: var(--card);
+        border: 1px solid var(--rim);
+        border-radius: 20px;
+        overflow: hidden;
+        margin-bottom: 2rem;
+    }
+    .det-loc-header {
+        padding: 1.25rem 1.75rem;
+        border-bottom: 1px solid var(--rim);
+        display: flex; align-items: center; gap: .75rem;
+    }
+    .det-loc-header-icon {
+        width: 38px; height: 38px; border-radius: 10px;
+        background: var(--cobalt-soft);
+        border: 1px solid rgba(61,126,245,0.2);
+        display: flex; align-items: center; justify-content: center;
+        font-size: 1rem;
+    }
+    .det-loc-header-text {
+        font-size: .62rem; font-weight: 700; letter-spacing: .14em;
+        text-transform: uppercase; color: var(--text-3);
+    }
+    .det-loc-body {
+        padding: 1.25rem 1.75rem;
+        display: grid; grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+    }
+    .det-loc-item {}
+    .det-loc-label {
+        font-size: .6rem; font-weight: 700; letter-spacing: .14em;
+        text-transform: uppercase; color: var(--text-3);
+        margin-bottom: .25rem;
+    }
+    .det-loc-value {
+        font-size: .92rem; color: var(--text-1); font-weight: 500;
+    }
+    .det-loc-value.muted { color: var(--text-3); font-style: italic; font-weight: 400; }
+
+    /* ══ DIMENSIONS / SPECS CARD ══ */
+    .det-specs-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+        gap: 12px;
+        margin-bottom: 2rem;
+    }
+    .det-spec {
+        background: var(--card);
+        border: 1px solid var(--rim);
+        border-radius: 16px;
+        padding: 1.25rem 1rem;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+        transition: border-color .2s, transform .2s;
+    }
+    .det-spec::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 50%; transform: translateX(-50%);
+        width: 50%; height: 1px;
+        background: linear-gradient(90deg, transparent, var(--cobalt), transparent);
+        opacity: 0;
+        transition: opacity .3s;
+    }
+    .det-spec:hover { border-color: var(--rim-gold); transform: translateY(-2px); }
+    .det-spec:hover::before { opacity: 1; }
+    .det-spec-icon {
+        width: 36px; height: 36px; border-radius: 10px;
+        background: var(--cobalt-soft);
+        border: 1px solid rgba(61,126,245,0.15);
+        display: flex; align-items: center; justify-content: center;
+        margin: 0 auto .65rem;
+        font-size: .85rem;
+    }
+    .det-spec-val {
+        font-family: var(--font-serif);
+        font-size: 1.3rem; font-weight: 700;
+        color: var(--text-1); line-height: 1;
+        margin-bottom: .2rem;
+    }
+    .det-spec-label {
+        font-size: .6rem; font-weight: 600;
+        letter-spacing: .12em; text-transform: uppercase;
+        color: var(--text-3);
+    }
+
+    /* ══ COMMERCIAL INFO PILLS ══ */
+    .det-commercial-row {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+        margin-bottom: 2rem;
+    }
+    .det-comm-pill {
+        display: flex; align-items: center; gap: .65rem;
+        padding: .75rem 1.25rem;
+        background: var(--card);
+        border: 1px solid var(--rim);
+        border-radius: 14px;
+        transition: all .2s;
+    }
+    .det-comm-pill:hover { border-color: var(--rim-gold); }
+    .det-comm-icon {
+        width: 32px; height: 32px; border-radius: 8px;
+        display: flex; align-items: center; justify-content: center;
+        font-size: .85rem; flex-shrink: 0;
+    }
+    .det-comm-icon.gold {
+        background: var(--gold-glow);
+        border: 1px solid rgba(201,168,76,0.25);
+    }
+    .det-comm-icon.blue {
+        background: var(--cobalt-soft);
+        border: 1px solid rgba(61,126,245,0.2);
+    }
+    .det-comm-label {
+        font-size: .6rem; font-weight: 700;
+        letter-spacing: .12em; text-transform: uppercase;
+        color: var(--text-3); margin-bottom: 1px;
+    }
+    .det-comm-value {
+        font-size: .88rem; font-weight: 600; color: var(--text-1);
+    }
+
+    /* ══ COLINDANCIAS (LOTE) ══ */
+    .det-colindancias {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0;
+        margin-bottom: 2rem;
+        background: var(--card);
+        border: 1px solid var(--rim);
+        border-radius: 20px;
+        overflow: hidden;
+    }
+    .det-colinda-item {
+        padding: 1rem 1.5rem;
+        border-bottom: 1px solid var(--rim);
+        display: flex; align-items: center; gap: .75rem;
+    }
+    .det-colinda-item:nth-child(odd) { border-right: 1px solid var(--rim); }
+    .det-colinda-item:nth-last-child(-n+2) { border-bottom: none; }
+    .det-colinda-dir {
+        width: 32px; height: 32px; border-radius: 8px;
+        display: flex; align-items: center; justify-content: center;
+        font-size: .8rem; flex-shrink: 0;
+        background: var(--cobalt-soft);
+        border: 1px solid rgba(61,126,245,0.15);
+    }
+    .det-colinda-info {}
+    .det-colinda-label {
+        font-size: .58rem; font-weight: 700;
+        letter-spacing: .14em; text-transform: uppercase;
+        color: var(--text-3);
+    }
+    .det-colinda-value {
+        font-size: .85rem; color: var(--text-2); font-weight: 500;
+    }
 </style>
 
 <div class="det-wrap">
@@ -609,7 +851,7 @@
         <!-- ── HERO IMAGE ── -->
         <div class="det-hero-img">
             @if($terreno->imagenes->count() > 0)
-                <img src="{{ asset($terreno->imagenes->first()->ruta_archivo) }}" alt="Terreno en {{ $terreno->ubicacion }}">
+                <img src="{{ asset($terreno->imagenes->first()->ruta_archivo) }}" alt="{{ ($terreno->tipo ?? 'terreno') === 'lote' ? 'Lote' : 'Terreno' }} en {{ $terreno->ubicacion }}">
             @else
                 <div class="det-no-img">
                     <i class="fa-regular fa-images"></i>
@@ -643,6 +885,12 @@
                 <div class="det-prop-head">
                     <div class="det-prop-eyebrow">
                         <span>Propiedad en venta</span>
+                        @if($terreno->categoria)
+                            <span>•</span>
+                            <span style="color:{{ $terreno->categoria->color }}; border: 1px solid {{ $terreno->categoria->color }}44; padding: 2px 8px; border-radius: 12px; background: {{ $terreno->categoria->color }}11;">
+                                {{ $terreno->categoria->nombre }}
+                            </span>
+                        @endif
                     </div>
                     <h1 class="det-prop-title">
                         Lote en {{ Str::words($terreno->ubicacion, 5, '') }}
@@ -662,13 +910,13 @@
                     </div>
                     <div class="det-stat">
                         <div class="det-stat-icon"><i class="fa-solid fa-city"></i></div>
-                        <div class="det-stat-val">Urbano</div>
+                        <div class="det-stat-val">{{ ucfirst($terreno->tipo_terreno ?? 'Urbano') }}</div>
                         <div class="det-stat-label">Tipo de terreno</div>
                     </div>
                     <div class="det-stat">
-                        <div class="det-stat-icon"><i class="fa-solid fa-tag"></i></div>
-                        <div class="det-stat-val">Venta</div>
-                        <div class="det-stat-label">Modalidad</div>
+                        <div class="det-stat-icon"><i class="fa-solid fa-mountain-sun"></i></div>
+                        <div class="det-stat-val">{{ ucfirst($terreno->topografia ?? 'Plano') }}</div>
+                        <div class="det-stat-label">Topografía</div>
                     </div>
                 </div>
 
@@ -678,8 +926,278 @@
                     <p class="det-desc-text">{{ $terreno->descripcion }}</p>
                 </div>
 
+                <!-- ══ SERVICIOS DISPONIBLES ══ -->
+                <p class="det-section-title">Servicios Disponibles</p>
+                <div class="det-services-grid">
+                    <div class="det-service-card {{ $terreno->agua_potable ? 'available' : 'unavailable' }}">
+                        <div class="det-svc-icon agua">💧</div>
+                        <div class="det-svc-info">
+                            <div class="det-svc-name">Agua Potable</div>
+                            <div class="det-svc-desc">Red de agua tratada</div>
+                        </div>
+                        <div class="det-svc-badge {{ $terreno->agua_potable ? 'yes' : 'no' }}">
+                            {{ $terreno->agua_potable ? '✓' : '✕' }}
+                        </div>
+                    </div>
+                    <div class="det-service-card {{ $terreno->energia_electrica ? 'available' : 'unavailable' }}">
+                        <div class="det-svc-icon energia">⚡</div>
+                        <div class="det-svc-info">
+                            <div class="det-svc-name">Energía Eléctrica</div>
+                            <div class="det-svc-desc">Conexión a la red eléctrica</div>
+                        </div>
+                        <div class="det-svc-badge {{ $terreno->energia_electrica ? 'yes' : 'no' }}">
+                            {{ $terreno->energia_electrica ? '✓' : '✕' }}
+                        </div>
+                    </div>
+                    <div class="det-service-card {{ $terreno->alcantarillado ? 'available' : 'unavailable' }}">
+                        <div class="det-svc-icon alcantarillado">🚰</div>
+                        <div class="det-svc-info">
+                            <div class="det-svc-name">Alcantarillado</div>
+                            <div class="det-svc-desc">Sistema de drenaje sanitario</div>
+                        </div>
+                        <div class="det-svc-badge {{ $terreno->alcantarillado ? 'yes' : 'no' }}">
+                            {{ $terreno->alcantarillado ? '✓' : '✕' }}
+                        </div>
+                    </div>
+                    <div class="det-service-card {{ $terreno->gas_domiciliario ? 'available' : 'unavailable' }}">
+                        <div class="det-svc-icon gas">🔥</div>
+                        <div class="det-svc-info">
+                            <div class="det-svc-name">Gas Domiciliario</div>
+                            <div class="det-svc-desc">Instalación de gas natural</div>
+                        </div>
+                        <div class="det-svc-badge {{ $terreno->gas_domiciliario ? 'yes' : 'no' }}">
+                            {{ $terreno->gas_domiciliario ? '✓' : '✕' }}
+                        </div>
+                    </div>
+                    <div class="det-service-card {{ $terreno->internet ? 'available' : 'unavailable' }}">
+                        <div class="det-svc-icon internet">🌐</div>
+                        <div class="det-svc-info">
+                            <div class="det-svc-name">Internet</div>
+                            <div class="det-svc-desc">Cobertura de fibra óptica o WiFi</div>
+                        </div>
+                        <div class="det-svc-badge {{ $terreno->internet ? 'yes' : 'no' }}">
+                            {{ $terreno->internet ? '✓' : '✕' }}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ══ UBICACIÓN DETALLADA ══ -->
+                @if($terreno->pais || $terreno->departamento || $terreno->provincia || $terreno->municipio || $terreno->zona_barrio || $terreno->direccion)
+                <p class="det-section-title">Ubicación Detallada</p>
+                <div class="det-loc-card">
+                    <div class="det-loc-header">
+                        <div class="det-loc-header-icon">📍</div>
+                        <span class="det-loc-header-text">Datos de Ubicación Geográfica</span>
+                    </div>
+                    <div class="det-loc-body">
+                        <div class="det-loc-item">
+                            <p class="det-loc-label">País</p>
+                            <p class="det-loc-value {{ $terreno->pais ? '' : 'muted' }}">{{ $terreno->pais ?: 'No especificado' }}</p>
+                        </div>
+                        <div class="det-loc-item">
+                            <p class="det-loc-label">Departamento</p>
+                            <p class="det-loc-value {{ $terreno->departamento ? '' : 'muted' }}">{{ $terreno->departamento ?: 'No especificado' }}</p>
+                        </div>
+                        <div class="det-loc-item">
+                            <p class="det-loc-label">Provincia</p>
+                            <p class="det-loc-value {{ $terreno->provincia ? '' : 'muted' }}">{{ $terreno->provincia ?: 'No especificado' }}</p>
+                        </div>
+                        <div class="det-loc-item">
+                            <p class="det-loc-label">Municipio</p>
+                            <p class="det-loc-value {{ $terreno->municipio ? '' : 'muted' }}">{{ $terreno->municipio ?: 'No especificado' }}</p>
+                        </div>
+                        @if($terreno->zona_barrio)
+                        <div class="det-loc-item">
+                            <p class="det-loc-label">Zona / Barrio</p>
+                            <p class="det-loc-value">{{ $terreno->zona_barrio }}</p>
+                        </div>
+                        @endif
+                        @if($terreno->direccion)
+                        <div class="det-loc-item">
+                            <p class="det-loc-label">Dirección</p>
+                            <p class="det-loc-value">{{ $terreno->direccion }}</p>
+                        </div>
+                        @endif
+                    </div>
+                </div>
+                @endif
+
+                <!-- ══ DIMENSIONES Y ESPECIFICACIONES ══ -->
+                @php
+                    $hasDimensions = $terreno->largo || $terreno->ancho || $terreno->frente || $terreno->fondo;
+                @endphp
+                @if($hasDimensions)
+                <p class="det-section-title">Dimensiones</p>
+                <div class="det-specs-grid">
+                    @if($terreno->largo)
+                    <div class="det-spec">
+                        <div class="det-spec-icon">📏</div>
+                        <div class="det-spec-val">{{ number_format($terreno->largo, 1) }}</div>
+                        <div class="det-spec-label">Largo (m)</div>
+                    </div>
+                    @endif
+                    @if($terreno->ancho)
+                    <div class="det-spec">
+                        <div class="det-spec-icon">↔️</div>
+                        <div class="det-spec-val">{{ number_format($terreno->ancho, 1) }}</div>
+                        <div class="det-spec-label">Ancho (m)</div>
+                    </div>
+                    @endif
+                    @if($terreno->frente)
+                    <div class="det-spec">
+                        <div class="det-spec-icon">🏗️</div>
+                        <div class="det-spec-val">{{ number_format($terreno->frente, 1) }}</div>
+                        <div class="det-spec-label">Frente (m)</div>
+                    </div>
+                    @endif
+                    @if($terreno->fondo)
+                    <div class="det-spec">
+                        <div class="det-spec-icon">📐</div>
+                        <div class="det-spec-val">{{ number_format($terreno->fondo, 1) }}</div>
+                        <div class="det-spec-label">Fondo (m)</div>
+                    </div>
+                    @endif
+                    <div class="det-spec">
+                        <div class="det-spec-icon">🏠</div>
+                        <div class="det-spec-val">{{ number_format($terreno->metros_cuadrados, 0) }}</div>
+                        <div class="det-spec-label">Superficie (m²)</div>
+                    </div>
+                </div>
+                @endif
+
+                <!-- ══ INFORMACIÓN COMERCIAL ══ -->
+                <p class="det-section-title">Información Comercial</p>
+                <div class="det-commercial-row">
+                    <div class="det-comm-pill">
+                        <div class="det-comm-icon gold">💰</div>
+                        <div>
+                            <p class="det-comm-label">Precio</p>
+                            <p class="det-comm-value">${{ number_format($terreno->precio, 0) }} {{ $terreno->moneda ?? 'USD' }}</p>
+                        </div>
+                    </div>
+                    <div class="det-comm-pill">
+                        <div class="det-comm-icon blue">💳</div>
+                        <div>
+                            <p class="det-comm-label">Moneda</p>
+                            <p class="det-comm-value">{{ $terreno->moneda === 'BOB' ? 'Bolivianos (Bs.)' : 'Dólares (USD)' }}</p>
+                        </div>
+                    </div>
+                    <div class="det-comm-pill">
+                        <div class="det-comm-icon gold">🤝</div>
+                        <div>
+                            <p class="det-comm-label">Forma de Pago</p>
+                            <p class="det-comm-value">{{ ucfirst($terreno->forma_pago ?? 'Ambos') }}</p>
+                        </div>
+                    </div>
+                    @if($terreno->metros_cuadrados > 0)
+                    <div class="det-comm-pill">
+                        <div class="det-comm-icon blue">📊</div>
+                        <div>
+                            <p class="det-comm-label">Precio por m²</p>
+                            <p class="det-comm-value">${{ number_format($terreno->precio / $terreno->metros_cuadrados, 2) }}</p>
+                        </div>
+                    </div>
+                    @endif
+                </div>
+
+                <!-- ══ DATOS ESPECÍFICOS DE LOTE ══ -->
+                @if(($terreno->tipo ?? 'terreno') === 'lote')
+                    @if($terreno->numero_lote || $terreno->codigo_lote || $terreno->manzano_bloque)
+                    <p class="det-section-title">Identificación del Lote</p>
+                    <div class="det-commercial-row">
+                        @if($terreno->numero_lote)
+                        <div class="det-comm-pill">
+                            <div class="det-comm-icon blue">🔢</div>
+                            <div>
+                                <p class="det-comm-label">Número de Lote</p>
+                                <p class="det-comm-value">{{ $terreno->numero_lote }}</p>
+                            </div>
+                        </div>
+                        @endif
+                        @if($terreno->codigo_lote)
+                        <div class="det-comm-pill">
+                            <div class="det-comm-icon gold">🏷️</div>
+                            <div>
+                                <p class="det-comm-label">Código del Lote</p>
+                                <p class="det-comm-value">{{ $terreno->codigo_lote }}</p>
+                            </div>
+                        </div>
+                        @endif
+                        @if($terreno->manzano_bloque)
+                        <div class="det-comm-pill">
+                            <div class="det-comm-icon blue">🏘️</div>
+                            <div>
+                                <p class="det-comm-label">Manzano / Bloque</p>
+                                <p class="det-comm-value">{{ $terreno->manzano_bloque }}</p>
+                            </div>
+                        </div>
+                        @endif
+                    </div>
+                    @endif
+
+                    <!-- Colindancias -->
+                    @if($terreno->colinda_norte || $terreno->colinda_sur || $terreno->colinda_este || $terreno->colinda_oeste)
+                    <p class="det-section-title">Colindancias</p>
+                    <div class="det-colindancias">
+                        <div class="det-colinda-item">
+                            <div class="det-colinda-dir">⬆️</div>
+                            <div class="det-colinda-info">
+                                <p class="det-colinda-label">Norte</p>
+                                <p class="det-colinda-value">{{ $terreno->colinda_norte ?: 'No especificado' }}</p>
+                            </div>
+                        </div>
+                        <div class="det-colinda-item">
+                            <div class="det-colinda-dir">⬇️</div>
+                            <div class="det-colinda-info">
+                                <p class="det-colinda-label">Sur</p>
+                                <p class="det-colinda-value">{{ $terreno->colinda_sur ?: 'No especificado' }}</p>
+                            </div>
+                        </div>
+                        <div class="det-colinda-item">
+                            <div class="det-colinda-dir">➡️</div>
+                            <div class="det-colinda-info">
+                                <p class="det-colinda-label">Este</p>
+                                <p class="det-colinda-value">{{ $terreno->colinda_este ?: 'No especificado' }}</p>
+                            </div>
+                        </div>
+                        <div class="det-colinda-item">
+                            <div class="det-colinda-dir">⬅️</div>
+                            <div class="det-colinda-info">
+                                <p class="det-colinda-label">Oeste</p>
+                                <p class="det-colinda-value">{{ $terreno->colinda_oeste ?: 'No especificado' }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    @endif
+                @endif
+
+                <!-- ══ DATOS LEGALES (TERRENO) ══ -->
+                @if(($terreno->tipo ?? 'terreno') === 'terreno' && ($terreno->numero_matricula || $terreno->codigo_catastral))
+                <p class="det-section-title">Información Legal</p>
+                <div class="det-commercial-row">
+                    @if($terreno->numero_matricula)
+                    <div class="det-comm-pill">
+                        <div class="det-comm-icon gold">📋</div>
+                        <div>
+                            <p class="det-comm-label">N° de Matrícula</p>
+                            <p class="det-comm-value">{{ $terreno->numero_matricula }}</p>
+                        </div>
+                    </div>
+                    @endif
+                    @if($terreno->codigo_catastral)
+                    <div class="det-comm-pill">
+                        <div class="det-comm-icon blue">🗺️</div>
+                        <div>
+                            <p class="det-comm-label">Código Catastral</p>
+                            <p class="det-comm-value">{{ $terreno->codigo_catastral }}</p>
+                        </div>
+                    </div>
+                    @endif
+                </div>
+                @endif
+
                 <!-- Features -->
-                <p class="det-section-title">Características</p>
+                <p class="det-section-title">Características Generales</p>
                 <div class="det-features">
                     <div class="det-feature">
                         <div class="det-feature-dot"></div>
@@ -687,7 +1205,7 @@
                     </div>
                     <div class="det-feature">
                         <div class="det-feature-dot"></div>
-                        <span class="det-feature-text">Terreno Urbano</span>
+                        <span class="det-feature-text">{{ ($terreno->tipo ?? 'terreno') === 'lote' ? 'Lote disponible' : 'Terreno disponible' }}</span>
                     </div>
                     <div class="det-feature">
                         <div class="det-feature-dot"></div>
@@ -872,14 +1390,38 @@
                     </div>
 
                     <div class="det-contact-cta">
-                        <button class="det-wa-btn">
-                            <i class="fa-brands fa-whatsapp"></i>
-                            <div>
-                                <span>Contactar Inmobiliaria</span>
-                                <span class="btn-sub">Respuesta en minutos</span>
-                            </div>
-                        </button>
-                        <p class="det-wa-note">* Funcionalidad de contacto próximamente</p>
+                        @auth
+                            @if(auth()->user()->rol === 'comprador')
+                                <form action="{{ route('catalogo.contactar', $terreno->id) }}" method="POST">
+                                    @csrf
+                                    <input type="hidden" name="telefono" value="{{ auth()->user()->telefono ?? '00000000' }}">
+                                    <input type="hidden" name="mensaje" value="Hola, estoy interesado en esta propiedad.">
+                                    <button type="submit" class="det-wa-btn" style="background: linear-gradient(135deg, #3d7ef5 0%, #1a4eb8 100%); box-shadow: 0 8px 28px rgba(61,126,245,0.3); border:none; width:100%;">
+                                        <i class="fa-solid fa-comments"></i>
+                                        <div>
+                                            <span>Contactar Vendedor</span>
+                                            <span class="btn-sub">Iniciar negociación en tiempo real</span>
+                                        </div>
+                                    </button>
+                                </form>
+                            @else
+                                <button type="button" class="det-wa-btn" disabled style="background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.3); box-shadow: none;">
+                                    <i class="fa-solid fa-lock"></i>
+                                    <div>
+                                        <span>Solo compradores</span>
+                                        <span class="btn-sub">Inicia sesión como comprador</span>
+                                    </div>
+                                </button>
+                            @endif
+                        @else
+                            <a href="{{ route('login') }}" class="det-wa-btn" style="background: linear-gradient(135deg, #3d7ef5 0%, #1a4eb8 100%); box-shadow: 0 8px 28px rgba(61,126,245,0.3); text-decoration: none;">
+                                <i class="fa-solid fa-user"></i>
+                                <div>
+                                    <span>Iniciar Sesión</span>
+                                    <span class="btn-sub">Para contactar al vendedor</span>
+                                </div>
+                            </a>
+                        @endauth
 
                         <div class="det-divider"><span>o también</span></div>
 
@@ -917,6 +1459,9 @@
 
     </div>
 </div>
+
+
+
 @push('scripts')
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 @if($terreno->latitud && $terreno->longitud)
